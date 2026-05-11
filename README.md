@@ -8,7 +8,7 @@ collaborative mode inside the Claude desktop app).
 
 | Plugin | What it does |
 |---|---|
-| [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with Nano Banana 2. 11 numbered slash commands, persistent project memory, dual-provider routing (Gemini + fal.ai). |
+| [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with **two model families**: Nano Banana 2 (Gemini + fal.ai, 4 tools — the bulk of the workflow) and OpenAI's gpt-image-2 (2 tools — optional, for paytables, logos, banners with required copy, photorealistic 4K, and compositional multi-image edits). 13 slash commands (workflow + onboarding), persistent project memory, independent keys per family. |
 
 ## Add this marketplace
 

@@ -16,7 +16,7 @@
         "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git"
       },
       "description": "Generate, QA, and resize mobile slot machine art (symbols, UI, backgrounds, key art) with Nano Banana 2. 11 numbered slash commands, persistent project memory, dual-provider routing (Gemini + fal.ai).",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
