@@ -37,13 +37,17 @@ claude plugin install slot-art-creator-node@h5g-plugins
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
 6. Enter the URL: `https://github.com/michaelericksonh5/claude-plugins`
 7. After it syncs, the **slot-art-creator-node** plugin appears in the marketplace listing — click **Install**
+8. Open the plugin's settings and paste your `GEMINI_API_KEY` and `FAL_KEY` into the env-var fields. (See the [plugin README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) for where to get keys.)
+9. **Restart Claude Desktop once** so the MCP server picks up your keys
+10. Type `/` in any Cowork chat — you should see `/slot-art-creator-node:slot-step-00` through `slot-step-10`
 
 > [!NOTE]
 > Cowork's **Personal** marketplace tier has a documented persistence bug
 > ([claude-code #40600](https://github.com/anthropics/claude-code/issues/40600))
-> where the marketplace persists but the installed plugin must be re-installed
-> after every Claude Desktop restart. The fix on Anthropic's side is in progress.
-> For a stable install, use Claude Code or wait for the fix.
+> where the marketplace persists across Claude Desktop restarts but installed
+> plugins need to be re-installed each time Claude Desktop reopens. The fix
+> on Anthropic's side is in progress. Workaround: re-install from the
+> marketplace listing — the marketplace stays added.
 
 ## Repository structure
 
@@ -61,20 +65,27 @@ and version history independent.
 
 1. Publish the plugin to its own public GitHub repo with a valid
    `.claude-plugin/plugin.json` at its root.
-2. Add an entry to the `plugins[]` array in `.claude-plugin/marketplace.json`:
+2. If the plugin includes a Node.js MCP server, bundle it into a single
+   self-contained file (e.g. via `esbuild --bundle --platform=node --format=esm`)
+   and check the bundle into the repo — Claude Code and Cowork don't run
+   `npm install` on the cached plugin, so the bundle must be import-ready.
+   Point `plugin.json`'s MCP `args` at the bundle path.
+3. Add an entry to the `plugins[]` array in `.claude-plugin/marketplace.json`.
+   Use the `url` source type with an explicit `https://` URL (avoids the
+   git client trying SSH on machines without a key):
    ```json
    {
      "name": "my-new-plugin",
      "source": {
-       "source": "github",
-       "repo": "michaelericksonh5/my-new-plugin"
+       "source": "url",
+       "url": "https://github.com/michaelericksonh5/my-new-plugin.git"
      },
      "description": "...",
      "version": "1.0.0"
    }
    ```
-3. Validate locally: `claude plugin validate .`
-4. Commit and push. Users with the marketplace already added pick up new
+4. Validate locally: `claude plugin validate .`
+5. Commit and push. Users with the marketplace already added pick up new
    plugins on the next `/plugin marketplace update`.
 
 ## Validation
