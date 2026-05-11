@@ -14,12 +14,20 @@ collaborative mode inside the Claude desktop app).
 
 ### Claude Code (CLI / IDE)
 
-From inside Claude Code:
+From inside Claude Code, run these three commands in order:
 
 ```
 /plugin marketplace add michaelericksonh5/claude-plugins
 /plugin install slot-art-creator-node@h5g-plugins
+/slot-setup
 ```
+
+The first two install the plugin. `/slot-setup` is a guided first-run skill
+that walks you through getting and saving API keys safely (it points you at
+a double-click launcher script — `setup-keys.bat` on Windows, `setup-keys.sh`
+on Mac/Linux — that uses hidden-input prompts so keys never echo to terminal
+logs and never touch chat). Once keys are configured, run `/slot-help` for
+the workflow overview.
 
 Or from a shell:
 
@@ -37,9 +45,9 @@ claude plugin install slot-art-creator-node@h5g-plugins
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
 6. Enter the URL: `https://github.com/michaelericksonh5/claude-plugins`
 7. After it syncs, the **slot-art-creator-node** plugin appears in the marketplace listing — click **Install**
-8. Open the plugin's settings and paste your `GEMINI_API_KEY` and `FAL_KEY` into the env-var fields. (See the [plugin README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) for where to get keys.)
+8. Open the plugin's settings and paste your `GEMINI_API_KEY` and `FAL_KEY` into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [plugin README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
-10. Type `/` in any Cowork chat — you should see `/slot-art-creator-node:slot-step-00` through `slot-step-10`
+10. In any Cowork chat, run `/slot-help` for the workflow overview, or `/slot-setup` for a guided check that your keys are configured correctly. Then jump to `/slot-step-00` (GDD-driven) or `/slot-step-01` (fresh concept).
 
 > [!NOTE]
 > Cowork's **Personal** marketplace tier has a documented persistence bug
