@@ -1,0 +1,31 @@
+{
+  "name": "h5g-plugins",
+  "metadata": {
+    "description": "High 5 Games Claude plugin marketplace — slot art generation, GDD tooling, and other game-production utilities.",
+    "version": "1.0.0"
+  },
+  "owner": {
+    "name": "Michael Erickson (High 5 Games)",
+    "email": "michael.erickson@high5games.com"
+  },
+  "plugins": [
+    {
+      "name": "slot-art-creator-node",
+      "source": {
+        "source": "github",
+        "repo": "michaelericksonh5/slot-art-creator-node"
+      },
+      "description": "Generate, QA, and resize mobile slot machine art (symbols, UI, backgrounds, key art) with Nano Banana 2. 11 numbered slash commands, persistent project memory, dual-provider routing (Gemini + fal.ai).",
+      "version": "1.1.0",
+      "author": {
+        "name": "High 5 Games",
+        "email": "michael.erickson@high5games.com"
+      },
+      "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
+      "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
+      "license": "MIT",
+      "category": "creative",
+      "tags": ["slot-machine", "image-generation", "nano-banana", "gemini", "fal-ai", "game-art"]
+    }
+  ]
+}
