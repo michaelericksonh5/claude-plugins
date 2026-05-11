@@ -58,8 +58,10 @@ claude-plugins/
 ```
 
 Individual plugins live in **their own GitHub repositories** and are referenced
-via the `github` source type. This keeps each plugin's release cycle, issues,
-and version history independent.
+via the `url` source type with explicit `https://` URLs. This keeps each
+plugin's release cycle, issues, and version history independent, and avoids
+the SSH-host-key fallback that the `github` shorthand triggers on machines
+without an SSH key configured.
 
 ## Adding a new plugin to this marketplace
 
