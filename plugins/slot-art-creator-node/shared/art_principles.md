@@ -61,6 +61,58 @@ Pick **one** LP family; **never mix**:
 `warm` on LP — not even trim. Letter/suit reads first; theme is decoration
 *behind* the letter.
 
+### Edge definition — primary readability mechanism
+
+At reel-cell size, the subject must read as a clean, confident silhouette
+against the dark background. **This is the single most important readability
+element.** Without clear edge definition, symbols merge into visual noise at
+thumbnail.
+
+Two techniques achieve this. **Pick one per game and stay consistent** —
+never mix within a set:
+
+| Technique | Use when | Prompt language |
+|---|---|---|
+| **Rim lighting / edge glow** | Painterly, semi-realistic, oil, fantasy styles | "warm luminous rim light tracing the silhouette, clear edge separation from background" |
+| **Hard outer outline** | Stylized 2D illustrated style | "bold clean outer outline, strong contrast against background" |
+
+Rim lighting is generally more premium — it integrates with the lighting
+model naturally. Hard outline is appropriate (and correct) for the stylized
+2D style. Both serve the same goal: **unambiguous subject/background
+separation at thumbnail size.** Never rely on interior detail for this —
+detail is invisible at 64 px. The edge is what reads.
+
+### Mid-frequency texture ban
+
+Three texture families destroy readability at mobile thumbnail size and must
+be avoided at every pay tier:
+
+| Forbidden texture | Why |
+|---|---|
+| Fine scales / fish-scale fill | Becomes gray smear at 25% scale |
+| Chainmail / ring-mail mesh | Indistinguishable from noise at 64 px |
+| Fine hatching / cross-hatching | Creates halftone banding at reel size |
+| Basket-weave / tight wicker | All detail collapses to mid-value mud |
+| Dense filigree / micro-ornament | Same as above — adds weight, zero read |
+
+**What to use instead:** bold macro-shapes, broad color planes, **3–5 color
+regions max** across the symbol face. Each region must be identifiable at 64 px
+by both hue and value difference from its neighbors.
+
+### 3–5 color region rule
+
+Every symbol face (foreground subject + immediate frame) must read as **no
+more than 3–5 distinct color regions** at thumbnail size. More than that
+collapses into noise.
+
+Count by region, not by named color: a gradient counts as **one** region if
+both endpoints share the same hue family and relative value. A warm gold
+center + warm orange frame = one region. A warm gold center + dark navy
+frame = two regions.
+
+This is a design constraint, not just a QA check. Build with it in mind from
+the first prompt draft.
+
 ### Silhouette tests (mandatory)
 
 - **Black-fill test** — solid black on white at 64 px. Target **≥85%**
@@ -178,11 +230,13 @@ Across **every** symbol in the set:
 
 - Silhouette black-fill at 64 px (peer recognition ≥85%).
 - Readable at 25% source size.
+- Edge definition present (rim light or hard outline per style lock), clearly separates subject from background at 64 px.
+- No mid-frequency textures (scales, chainmail, hatching, filigree) — see §3.
+- 3–5 color regions max across symbol face — see §3.
 - Light direction matches upper-left ~10 o'clock.
 - No duplicate silhouettes in the set.
 - Edge policy matches the set.
 - Fill % matches tier.
-- 3–5 value zones at squint/25% zoom.
 - No pure black shadows.
 - LP prompts contain no `gold` / `detailed`.
 
