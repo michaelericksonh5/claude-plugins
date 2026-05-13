@@ -16,10 +16,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": {
-        "source": "url",
-        "url": "https://github.com/michaelericksonh5/skill-auditor.git"
-      },
+      "source": "./plugins/skill-auditor",
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
       "license": "MIT",
@@ -34,10 +31,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": {
-        "source": "url",
-        "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git"
-      },
+      "source": "./plugins/slot-art-creator-node",
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",

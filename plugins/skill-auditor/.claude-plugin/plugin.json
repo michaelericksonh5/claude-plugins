@@ -1,0 +1,12 @@
+{
+  "name": "skill-auditor",
+  "version": "1.0.0",
+  "description": "Audits a skill file or directory against an 8-dimension quality rubric. Produces a structured READY / NEEDS WORK / DRAFT report with specific, actionable findings on frontmatter, description quality, instruction clarity, reference integrity, completeness, output specification, evals coverage, and security.",
+  "author": {
+    "name": "Michael Erickson (High 5 Games)",
+    "email": "michael.erickson@high5games.com"
+  },
+  "skills": [
+    "./skills/skill-auditor"
+  ]
+}

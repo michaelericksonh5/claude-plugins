@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "mcp__nb2node__nb2_generate|mcp__nb2node__nb2_edit|mcp__nb2node__nb2_upscale|mcp__nb2node__nb2_smart_resize",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/show_generated_images.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
