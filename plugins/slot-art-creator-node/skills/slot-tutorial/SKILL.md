@@ -471,7 +471,7 @@ folder if they want a clean slate before starting a real project.
 
 ## Pacing
 
-This tour is **17 steps long** (1 setup + 2 utility + 11 numbered
+This tour is **15 steps long** (1 setup + 2 utility + 11 numbered
 workflow + 1 conclusion + 2 prerequisite checks). At a relaxed pace
 that's 20–30 minutes of reading.
 
@@ -482,7 +482,7 @@ The natural pause points are:
 - After Step 8 (symbol sheet — the visual identity is decided)
 - After Step 12 (audit — production discipline starts to bite)
 
-Don't dump all 17 steps in one wall of text. The tutorial fails if the
+Don't dump all 15 steps in one wall of text. The tutorial fails if the
 user skims and learns nothing.
 
 ## What this skill does NOT do
@@ -514,7 +514,7 @@ user skims and learns nothing.
   the user away from the real contract.
 - **Respect the readonly contract in DRY mode.** Reading the user's
   active `project.json` for examples is fine. Writing anywhere is not.
-- **Stop and ask between phases.** Don't run all 17 steps end-to-end
+- **Stop and ask between phases.** Don't run all 15 steps end-to-end
   without checking the user is still with you.
 
 ## References

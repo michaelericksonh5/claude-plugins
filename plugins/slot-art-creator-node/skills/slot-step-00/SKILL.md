@@ -1,6 +1,6 @@
 ---
 name: slot-step-00
-description: STEP 0 (optional) — Pull a Game Design Document from the team Google Drive, extract theme/mechanics/symbol structure, and seed the project. Run this BEFORE /slot-step-01 if a GDD already exists for this game. Skip directly to /slot-step-01 if you're pitching a new concept without a GDD.
+description: STEP 0 (optional) — Pull a Game Design Document from the team Google Drive, extract theme/mechanics/symbol structure, and seed the project. Run this BEFORE /slot-step-01 if a GDD already exists for this game. Skip directly to /slot-step-01 if you're pitching a new concept without a GDD. Use when the user says things like "grab the GDD", "pull the game design doc", "connect to Drive for [game name]", "bootstrap from the GDD", or "get the GDD for [game]".
 ---
 
 # Step 0 — GDD Connect (optional)
@@ -49,17 +49,32 @@ Then ask: **"What's the game name or title of the GDD on Drive?"**
 
 Search the canonical GDD folder
 (`https://drive.google.com/drive/folders/1SfzTV7n6CPlNXjMTR-RfRLtXIaJ-wCtr`)
-restricting to that folder so unrelated team-wide hits don't pollute results:
+using a two-step approach — GDDs live in per-game subfolders, not as
+direct children of the root folder:
 
+**Step 1 — Find the game's subfolder:**
 ```
-'1SfzTV7n6CPlNXjMTR-RfRLtXIaJ-wCtr' in parents
-  and fullText contains '<game name>'
-  and mimeType != 'application/vnd.google-apps.folder'
-  and trashed = false
+parentId = '1SfzTV7n6CPlNXjMTR-RfRLtXIaJ-wCtr' and title contains '<game name>'
 ```
 
-Drive CQL uses `'<folder_id>' in parents` (not `parentId = '<folder_id>'`)
-— the latter is invalid and silently returns nothing.
+**Step 2 — Find the GDD inside that subfolder:**
+```
+parentId = '<subfolder_id_from_step_1>' and title contains 'gdd'
+```
+
+**Fallback** — if step 1 or 2 returns empty (shared Drive traversal
+limitations), search Drive-wide:
+```
+title contains 'gdd' and fullText contains '<game name>'
+```
+
+**Drive CQL notes for this MCP:**
+- Use `parentId = '<id>'` — NOT `'<id>' in parents` (that syntax throws
+  "Unsupported query field: parents")
+- Do NOT include `trashed = false` — that field is unsupported and causes
+  an error
+- `parentId` only checks direct children, not nested subfolders — that's
+  why the two-step approach is needed
 
 Use the **highest version** if multiple are found. Confirm with the user.
 
@@ -70,12 +85,11 @@ all return clean text. Do not download or convert to PDF.
 
 ### Step 3 — Read reference images (if any)
 
-Search the same folder for image files using the correct CQL form:
+Search the same subfolder for image files (use the subfolder ID found in
+Step 1, not the root folder ID):
 
 ```
-'<folder_id>' in parents
-  and (mimeType = 'image/png' or mimeType = 'image/jpeg')
-  and trashed = false
+parentId = '<subfolder_id>' and (mimeType = 'image/png' or mimeType = 'image/jpeg')
 ```
 
 Call `read_file_content` on each — Claude sees them visually. Use them to
@@ -117,7 +131,7 @@ fabricate. The target schema is `skills/slot-step-01/GAME_BRIEF_TEMPLATE.md`
 
 | Field in `game_brief.json` | Where to look in the GDD |
 |---|---|
-| `game_name` | Title — use marketing/player-facing name, NEVER internal codenames |
+| `game_name` | The name as it appears in the GDD — which is always a preproduction codename at H5G (e.g. "Tesla", "Chevy"). Record it as-is for now and always add an open question flagging it: "game_name: GDD uses '[name]' as codename — confirm the player-facing title in /slot-step-01 before locking the brief." Never attempt to infer the visual theme from the codename. |
 | `theme_summary` | Overview / concept |
 | `grid` | Math spec ("5x3", "5x4", "5x6", "3x5") |
 | `tier_plan.lp_family` | Are LPs card royals (`card_royals`), themed objects (`themed_objects`), gems (`gems`), or suits (`suits`)? Most newer H5G games use themed objects. |

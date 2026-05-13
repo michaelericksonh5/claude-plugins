@@ -1,6 +1,6 @@
 ---
 name: slot-step-04
-description: STEP 4 — Generate a full symbol contact sheet. Two modes — IDEATION (key art + GDD/manifest → propose what each symbol could look like, before locking individuals) and ASSEMBLE (lay out approved individual symbols). Often used right after /slot-step-02 to brainstorm the set visually before refining symbols in /slot-step-03.
+description: STEP 4 — Generate a full symbol contact sheet. Two modes — IDEATION (key art + GDD/manifest → propose what each symbol could look like, before locking individuals) and ASSEMBLE (lay out approved individual symbols). Often used right after /slot-step-02 to brainstorm the set visually before refining symbols in /slot-step-03. Use when the user asks to "show all the symbols", "lay out the symbol set", "brainstorm what the symbols should look like", "show me the full set", "give me a contact sheet", or "see all symbols together".
 ---
 
 # Step 4 — Symbol Contact Sheet

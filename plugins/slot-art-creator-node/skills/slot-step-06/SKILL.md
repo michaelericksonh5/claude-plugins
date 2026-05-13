@@ -141,6 +141,8 @@ its 4K targets are experimental and unreliable for production; upscale
 the approved 2K result with `nb2_upscale` if you need 4K marketing
 output. See `shared/gpt_image2_prompting.md` for the full routing table.
 
+Call `mcp__nb2node__nb2_generate` (NB2 path) or `mcp__nb2node__gpt2_generate` (gpt2 path — see routing table above):
+
 **API args (NB2 path — most surfaces):**
 
 | API arg | Value |

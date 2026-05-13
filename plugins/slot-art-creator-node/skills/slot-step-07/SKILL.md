@@ -1,6 +1,6 @@
 ---
 name: slot-step-07
-description: STEP 7 (optional) — Adapt an existing UI mock to a new theme/palette while preserving exact layout (button positions, panel proportions, control placement). Edit operation, not from-scratch generation. Use when reusing a proven UI layout across reskinned games or matching a partner's reference UI. Anchored to the locked key art so the new theme stays consistent.
+description: STEP 7 (optional) — Adapt an existing UI mock to a new theme/palette while preserving exact layout (button positions, panel proportions, control placement). Edit operation, not from-scratch generation. Use when reusing a proven UI layout across reskinned games or matching a partner's reference UI. Anchored to the locked key art so the new theme stays consistent. Use when the user says "reskin the UI", "adapt the existing layout to the new theme", "apply the new look to this UI", "take this reference UI and make it match our game", or "keep the same layout but change the theme".
 ---
 
 # Step 7 — UI Reskin (optional)

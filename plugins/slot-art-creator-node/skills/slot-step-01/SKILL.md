@@ -1,6 +1,6 @@
 ---
 name: slot-step-01
-description: STEP 1 — Lock the game brief (theme, palette, style, tier plan, symbol manifest) into project.json. This is the foundation every later skill reads. Run after /slot-step-00 (if you have a GDD) or as the first step if pitching a fresh concept. Always run before /slot-step-02.
+description: STEP 1 — Lock the game brief (theme, palette, style, tier plan, symbol manifest) into project.json. This is the foundation every later skill reads. Run after /slot-step-00 (if you have a GDD) or as the first step if pitching a fresh concept. Always run before /slot-step-02. Use when the user describes a game theme, pitches a concept ("let's make a [X] game", "I want a [theme] slot"), discusses what symbols to include, or wants to set up or update the game brief. Also use when continuing a project that has a GDD loaded but no art direction locked yet — apply the user's theme description to the existing active project, never start a new one.
 ---
 
 # Step 1 — Game Brief
@@ -20,14 +20,48 @@ Follow the standard startup from `shared/project_memory.md`:
 
 1. **Resolve project.** Did the user pass a GameID arg? Use it. Otherwise
    read `~/.h5g-slot-active-project.json`. If neither exists, ask the user
-   for a GameID and create the project folder.
+   for a GameID and create the project folder. **Never ask for a GameID
+   when an active-project pointer already exists** — that pointer
+   establishes the project; use it.
 2. **Construct project root.** Resolve `<PROJECT_BASE>` per
    `shared/project_memory.md` (env var → H5G Drive Stream → `~/slot-art-projects/`),
    then join `<PROJECT_BASE>/{GameID}_{username}/`. `username` comes from
    `os.userInfo().username` — never hardcoded.
-3. **Load existing state.** If `project.json` exists, this is an iteration —
-   show the user what's locked and ask what to change. If not, create from
-   scratch (or seeded from `/slot-step-00` output).
+3. **Load existing state.** If `project.json` exists, use the active
+   project — do not propose a new one or ask for a new GameID. Read the
+   existing brief and style anchor. When `current_step` is `gdd_loaded`
+   (a GDD was extracted but art direction hasn't been locked yet), art
+   fields like `theme_summary`, `palette`, `style_lock`, and all symbol
+   `subject` fields will be null — that's the expected state for a pure
+   engineering GDD with no art direction.
+
+   **Critical: `game_name` from a GDD is always a preproduction codename
+   — never a visual theme.** H5G games are developed under internal
+   codenames (like "Tesla", "Chevy", "Blazing Stampede") that have zero
+   relationship to the actual art direction. "Tesla" is not about cars.
+   "Chevy" is not about trucks. The codename is just a project identifier.
+   Never look at `game_name` and infer anything about what the game looks
+   like, what the symbols are, or what the theme is. The visual theme
+   comes exclusively from: (1) the user's description, or (2) explicit art
+   direction sections in the GDD.
+
+   When the active brief has null art fields and the user describes a
+   visual theme, confirm the connection before applying it — don't silently
+   decide it's a different game just because the codename and theme don't
+   match:
+
+   > "You have an active project — **Game [ID] ([game_name])** — with a GDD
+   > loaded but no visual theme set yet. I'm going to apply your theme to
+   > this project. Quick check: are you designing the art direction for
+   > game [ID], or did you want to start a completely separate project?"
+
+   Always ask for the real player-facing title when locking the brief —
+   the codename must never appear in any prompt, style anchor, or
+   creative-facing output. This is unconditional: even if `open_questions`
+   doesn't flag it, the `game_name` from a GDD needs confirmation.
+
+   If `project.json` doesn't exist, create from scratch (or seed from
+   `/slot-step-00` output).
 
 ## Workflow
 
@@ -40,10 +74,21 @@ have a pitch. Ask once for whichever is missing.
 
 Required fields (full schema in `GAME_BRIEF_TEMPLATE.md`):
 
-- `game_name` — user-facing theme name, NEVER the internal codename
+- `game_name` — the real player-facing title confirmed by the user. H5G
+  GDDs always use internal preproduction codenames (e.g. "Tesla", "Chevy")
+  that have no relationship to the game's visual theme or subject matter.
+  Always ask the user "What's the player-facing title for this game?" when
+  locking the brief. Never use the GDD's `game_name` as the final title
+  without explicit confirmation.
 - `mood` — 1–2 words
 - `theme_summary` — ≤ 2 sentences
-- `style_lock` — exactly one phrase from `shared/nb2_prompting.md` §9.4
+- `style_lock` — exactly one phrase from `shared/nb2_prompting.md` §9.4.
+  H5G games are adult casino entertainment — the style must reflect a
+  premium adult aesthetic (painterly, cinematic, semi-realistic, dark
+  fantasy, baroque, art deco, hyper-detailed illustration). Cartoon,
+  cel-shaded, flat vector, and children's-game-adjacent styles are never
+  appropriate and must not be offered or accepted, even if the user
+  suggests one.
 - `palette_leads` — `primary`, `accents`, `forbidden_on_lp` (named colors only, no hex)
 - `grid` — e.g. `"5x4"`
 - `tier_plan` — canonical baseline: 3 specials + 2 HP + 2 MP + 5–6 LP.

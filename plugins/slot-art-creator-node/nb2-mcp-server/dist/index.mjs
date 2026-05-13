@@ -71597,7 +71597,7 @@ try {
   const userEnv = path4.join(os.homedir(), ".h5g-slot-art-creator", ".env");
   const pluginEnv = path4.join(PLUGIN_ROOT, ".env");
   if (fs4.existsSync(userEnv)) {
-    dotenv.config({ path: userEnv, override: false });
+    dotenv.config({ path: userEnv, override: true });
   }
   if (fs4.existsSync(pluginEnv)) {
     dotenv.config({ path: pluginEnv, override: false });

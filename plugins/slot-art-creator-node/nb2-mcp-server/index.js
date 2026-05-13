@@ -142,15 +142,23 @@ function readServerVersion() {
 const SERVER_VERSION = readServerVersion();
 
 // Load .env in priority order:
-//   1. ~/.h5g-slot-art-creator/.env   (canonical, survives plugin reinstall)
+//   1. ~/.h5g-slot-art-creator/.env   (canonical, written by setup-keys.js)
 //   2. PLUGIN_ROOT/.env                (legacy / fallback)
-// Existing process.env values take precedence over either file (override:false).
+//
+// The user .env uses override:true so it always wins — even when Claude Code's
+// plugin harness injects unresolved ${VAR_NAME} placeholder strings into the
+// child process environment. Without override:true, dotenv sees those placeholders
+// as "already set" and skips the real key from the file, causing tools to fail
+// with what looks like an authentication error despite keys being configured.
+//
+// The plugin .env (fallback) keeps override:false so it never clobbers a real
+// system-level key a developer may have set in their shell profile.
 try {
   const { default: dotenv } = await import("dotenv");
   const userEnv = path.join(os.homedir(), ".h5g-slot-art-creator", ".env");
   const pluginEnv = path.join(PLUGIN_ROOT, ".env");
   if (fs.existsSync(userEnv)) {
-    dotenv.config({ path: userEnv, override: false });
+    dotenv.config({ path: userEnv, override: true });  // user key always wins
   }
   if (fs.existsSync(pluginEnv)) {
     dotenv.config({ path: pluginEnv, override: false });
