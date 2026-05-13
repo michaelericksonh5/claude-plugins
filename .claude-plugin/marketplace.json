@@ -10,6 +10,24 @@
   },
   "plugins": [
     {
+      "name": "skill-auditor",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/skill-auditor.git"
+      },
+      "description": "Audits a Claude skill against an 8-dimension quality rubric (frontmatter, description quality, instruction clarity, reference integrity, completeness, output spec, evals, security). Returns a READY / NEEDS WORK / DRAFT verdict with specific, actionable findings.",
+      "version": "1.0.0",
+      "author": {
+        "name": "High 5 Games",
+        "email": "michael.erickson@high5games.com"
+      },
+      "homepage": "https://github.com/michaelericksonh5/skill-auditor",
+      "repository": "https://github.com/michaelericksonh5/skill-auditor",
+      "license": "MIT",
+      "category": "developer-tools",
+      "tags": ["skill-quality", "audit", "validation", "claude-skills", "developer-tools"]
+    },
+    {
       "name": "slot-art-creator-node",
       "source": {
         "source": "url",

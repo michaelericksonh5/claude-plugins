@@ -8,21 +8,23 @@ collaborative mode inside the Claude desktop app).
 
 | Plugin | What it does |
 |---|---|
+| [`skill-auditor`](https://github.com/michaelericksonh5/skill-auditor) | Audits a Claude skill against an 8-dimension quality rubric and returns a **READY / NEEDS WORK / DRAFT** verdict with specific, actionable findings. Checks frontmatter validity, description trigger quality, instruction clarity, reference integrity, completeness (no TODO/FIXME/TBD), output specification, evals coverage, and security. |
 | [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with **two model families**: Nano Banana 2 (Gemini + fal.ai, 4 tools — the bulk of the workflow) and OpenAI's gpt-image-2 (2 tools — optional, for paytables, logos, banners with required copy, photorealistic 4K, and compositional multi-image edits). 13 slash commands (workflow + onboarding), persistent project memory, independent keys per family. |
 
 ## Add this marketplace
 
 ### Claude Code (CLI / IDE)
 
-From inside Claude Code, run these three commands in order:
+From inside Claude Code, add the marketplace once, then install whichever plugins you want:
 
 ```
 /plugin marketplace add michaelericksonh5/claude-plugins
+/plugin install skill-auditor@h5g-plugins
 /plugin install slot-art-creator-node@h5g-plugins
 /slot-setup
 ```
 
-The first two install the plugin. `/slot-setup` is a guided first-run skill
+The first command adds the marketplace. `/slot-setup` is a guided first-run skill
 that walks you through getting and saving API keys safely (it points you at
 a double-click launcher script — `setup-keys.bat` on Windows, `setup-keys.sh`
 on Mac/Linux — that uses hidden-input prompts so keys never echo to terminal
