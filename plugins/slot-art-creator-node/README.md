@@ -285,6 +285,30 @@ sessions and conversation compaction (see [Project memory](#project-memory)).
 | 09 | `/slot-step-09` | Production | Upscale approved 2K to 4K (output naming: `<source>_upscl_x<N>.png`) |
 | 10 | `/slot-step-10` | Final delivery | Multi-aspect-ratio variants of approved hero (output naming: `<source>_resize_<W>_<H>.png`) |
 
+### Natural-language triggers — you don't have to type the slash commands
+
+Every skill auto-summons from plain English in chat — you don't need to remember the slash command. Here's what to say if you'd rather just describe what you want:
+
+| If you say... | Claude runs |
+|---|---|
+| "help", "what does this plugin do", "where do I start", "I'm lost" | `/slot-help` |
+| "set up my keys", "401 unauthorized", "auth failed", "the plugin isn't working", "Gemini rejected", "OPENAI_API_KEY is not set", "tools are failing" | `/slot-setup` |
+| "show me how this works", "give me a tutorial", "I'm new", "demo this for me" | `/slot-tutorial` |
+| "compare these", "which is better", "rank these", "A vs B", "are these consistent" | `/slot-compare` |
+| "grab the GDD", "pull the design doc from Drive", "import the spec", "load [game] from Drive" | `/slot-step-00` |
+| "let's make a [theme] game", "design a [theme] slot", "lock the brief", "define the symbols" | `/slot-step-01` |
+| "create key art", "make a hero shot", "show me what this game looks like", "concept art" | `/slot-step-02` |
+| "make HP1", "design the wild", "regenerate Zeus", "iterate on the scatter", "the WY1 needs work" | `/slot-step-03` |
+| "show all the symbols", "the full symbol set", "give me a contact sheet", "preview the set" | `/slot-step-04` |
+| "create the background", "make the BG", "what's behind the reels", "design the bonus environment" | `/slot-step-05` |
+| "design the UI", "make the buttons", "create the paytable", "design the bonus wheel", "create a character/mascot", "wheel", "paytable", "logo" | `/slot-step-06` |
+| "reskin this UI", "port this layout to our theme", "match this UI", "skin over this" | `/slot-step-07` |
+| "audit the symbols", "QA the art", "is this ready to ship", "final QA", "review the whole game" | `/slot-step-08` |
+| "upscale", "make this 4K", "blow this up", "higher resolution", "supersize this" | `/slot-step-09` |
+| "multiple aspect ratios", "make a square version", "Instagram size", "social variants", "16:9 and 9:16" | `/slot-step-10` |
+
+The triggers are fuzzy — you don't have to match the exact phrase. If you describe what you want and there's a reasonable match, the right skill will run. When you're not sure which one to invoke, just say "help" and `/slot-help` will route you.
+
 ### Route-and-resume on missing project
 
 Starting with v1.5.5, generation skills (`/slot-step-02` through

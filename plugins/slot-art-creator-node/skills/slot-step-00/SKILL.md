@@ -1,6 +1,6 @@
 ---
 name: slot-step-00
-description: STEP 0 (optional) — Pull a Game Design Document from the team Google Drive, extract theme/mechanics/symbol structure, and seed the project. Run this BEFORE /slot-step-01 if a GDD already exists for this game. Skip directly to /slot-step-01 if you're pitching a new concept without a GDD. Use when the user says things like "grab the GDD", "pull the game design doc", "connect to Drive for [game name]", "bootstrap from the GDD", or "get the GDD for [game]".
+description: STEP 0 (optional) — Pull a Game Design Document from the team Google Drive, extract theme/mechanics/symbol structure, and seed the project. Run this BEFORE /slot-step-01 if a GDD already exists for this game. Skip directly to /slot-step-01 if you're pitching a new concept without a GDD. Use when the user says things like "grab the GDD", "pull the game design doc", "connect to Drive for [game name]", "bootstrap from the GDD", "get the GDD for [game]", "import the spec", "load the design doc", "fetch the GDD", "use the docs from Drive", "start from the GDD", "I have a Google Doc design", or "load [game] from Drive".
 ---
 
 # Step 0 — GDD Connect (optional)

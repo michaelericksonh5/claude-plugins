@@ -1,6 +1,6 @@
 ---
 name: slot-step-02
-description: STEP 2 — Generate the master key art for the game. The approved key art becomes the visual style anchor — every downstream skill reads it as a reference image to keep symbols, backgrounds, and UI consistent. Run after /slot-step-01. Iterates freely until the user approves one as the locked anchor. Use when the user asks to "create key art", "generate the hero image", "show me what this game looks like", "make the main visual", "let's see a concept for the game art", "generate the style reference", or "I want to see the key art" for the active game.
+description: STEP 2 — Generate the master key art for the game. The approved key art becomes the visual style anchor — every downstream skill reads it as a reference image to keep symbols, backgrounds, and UI consistent. Run after /slot-step-01. Iterates freely until the user approves one as the locked anchor. Use when the user asks to "create key art", "generate the hero image", "show me what this game looks like", "make the main visual", "let's see a concept for the game art", "generate the style reference", "I want to see the key art", "make a hero shot", "concept art for the game", "design the cover image", "show me a visual", "make the splash art", or "give me the master visual" for the active game.
 ---
 
 # Step 2 — Key Art
