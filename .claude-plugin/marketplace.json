@@ -1,9 +1,8 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "h5g-plugins",
-  "metadata": {
-    "description": "High 5 Games Claude plugin marketplace — slot art generation, GDD tooling, and other game-production utilities.",
-    "version": "1.0.0"
-  },
+  "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, and other game-production utilities.",
+  "version": "1.1.0",
   "owner": {
     "name": "Michael Erickson (High 5 Games)",
     "email": "michael.erickson@high5games.com"
@@ -11,15 +10,15 @@
   "plugins": [
     {
       "name": "skill-auditor",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/michaelericksonh5/skill-auditor.git"
-      },
       "description": "Audits a Claude skill against an 8-dimension quality rubric (frontmatter, description quality, instruction clarity, reference integrity, completeness, output spec, evals, security). Returns a READY / NEEDS WORK / DRAFT verdict with specific, actionable findings.",
       "version": "1.0.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
+      },
+      "source": {
+        "source": "github",
+        "repo": "michaelericksonh5/skill-auditor"
       },
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
@@ -29,15 +28,15 @@
     },
     {
       "name": "slot-art-creator-node",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git"
-      },
       "description": "Generate, QA, and resize mobile slot machine art — symbols, UI, backgrounds, key art — with Nano Banana 2. Numbered slash-command workflow (slot-00 through slot-10), persistent project memory, key-art-anchored style consistency. Dual-provider: Gemini (NB2) for generation, fal.ai (NB Pro) for smart resize with Gemini fallback. Optional GPT-image-2 for paytables, logos, and photorealistic 4K composites. Node.js, no Python required.",
       "version": "1.6.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
+      },
+      "source": {
+        "source": "github",
+        "repo": "michaelericksonh5/slot-art-creator-node"
       },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
