@@ -17,8 +17,8 @@
         "email": "michael.erickson@high5games.com"
       },
       "source": {
-        "source": "github",
-        "repo": "michaelericksonh5/skill-auditor"
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/skill-auditor.git"
       },
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
@@ -35,8 +35,8 @@
         "email": "michael.erickson@high5games.com"
       },
       "source": {
-        "source": "github",
-        "repo": "michaelericksonh5/slot-art-creator-node"
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git"
       },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
