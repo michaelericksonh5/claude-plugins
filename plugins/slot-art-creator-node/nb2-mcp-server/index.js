@@ -153,19 +153,68 @@ const SERVER_VERSION = readServerVersion();
 //
 // The plugin .env (fallback) keeps override:false so it never clobbers a real
 // system-level key a developer may have set in their shell profile.
+const ENV_SOURCES = [];
 try {
   const { default: dotenv } = await import("dotenv");
   const userEnv = path.join(os.homedir(), ".h5g-slot-art-creator", ".env");
   const pluginEnv = path.join(PLUGIN_ROOT, ".env");
   if (fs.existsSync(userEnv)) {
     dotenv.config({ path: userEnv, override: true });  // user key always wins
+    ENV_SOURCES.push(userEnv);
   }
   if (fs.existsSync(pluginEnv)) {
     dotenv.config({ path: pluginEnv, override: false });
+    ENV_SOURCES.push(pluginEnv);
   }
 } catch {
   // dotenv optional at runtime — env vars may come from the shell
 }
+
+// ---------------------------------------------------------------------------
+// Startup banner — log what keys actually loaded, to stderr.
+//
+// Stderr is NOT part of the MCP wire protocol (stdout is). Logging to stderr
+// is safe and surfaces in Claude's MCP server logs. This is the single
+// best diagnostic when a user reports "tool failed with auth error" —
+// they (or a future model session) can read the server log and immediately
+// see whether keys loaded from the .env, from process env, or not at all.
+//
+// We treat values that look like unresolved Claude template placeholders
+// (e.g. "${OPENAI_API_KEY}") as missing. Without this normalization, the
+// banner would say "OPENAI=set" even when the value is literally the string
+// "${OPENAI_API_KEY}" — exactly the bug that caused hours of misdiagnosis
+// in prior sessions.
+// ---------------------------------------------------------------------------
+
+function looksLikeRealKey(value) {
+  if (!value) return false;
+  // Claude Code injects unresolved ${VAR} placeholder strings when the var
+  // isn't in its own environment. Treat those as missing.
+  if (/^\$\{[A-Z_]+\}$/.test(value)) return false;
+  // Real keys are at least ~20 chars. Anything shorter is suspect.
+  if (value.length < 20) return false;
+  return true;
+}
+
+const KEYS_LOADED = {
+  GEMINI_API_KEY: looksLikeRealKey(process.env.GEMINI_API_KEY) || looksLikeRealKey(process.env.GOOGLE_API_KEY),
+  FAL_KEY: looksLikeRealKey(process.env.FAL_KEY),
+  OPENAI_API_KEY: looksLikeRealKey(process.env.OPENAI_API_KEY),
+};
+
+(function logStartupBanner() {
+  const lines = [];
+  lines.push(`[nb2node v${SERVER_VERSION}] startup`);
+  lines.push(`  plugin root: ${PLUGIN_ROOT}`);
+  lines.push(`  .env sources loaded: ${ENV_SOURCES.length ? ENV_SOURCES.join(", ") : "(none — relying on process env)"}`);
+  lines.push(`  GEMINI_API_KEY: ${KEYS_LOADED.GEMINI_API_KEY ? "loaded" : "missing"}`);
+  lines.push(`  FAL_KEY: ${KEYS_LOADED.FAL_KEY ? "loaded" : "missing"}`);
+  lines.push(`  OPENAI_API_KEY: ${KEYS_LOADED.OPENAI_API_KEY ? "loaded" : "missing"}`);
+  if (!KEYS_LOADED.GEMINI_API_KEY && !KEYS_LOADED.FAL_KEY) {
+    lines.push(`  WARNING: no NB2 key found — nb2_* tools will fail. Run /slot-setup or 'node setup-keys.js' from the plugin directory.`);
+  }
+  process.stderr.write(lines.join("\n") + "\n");
+})();
 
 // ---------------------------------------------------------------------------
 // Resolve output directory.
@@ -764,10 +813,17 @@ function writeSidecar(pngPath, meta) {
 // Provider detection
 // ---------------------------------------------------------------------------
 
-const FAL_KEY = process.env.FAL_KEY || "";
+// Use looksLikeRealKey to strip out unresolved ${VAR} placeholder strings —
+// Claude Code's plugin harness injects those as literal env values when the
+// referenced var isn't in its own environment. Treating those as "set" is
+// what produced the misleading 401 "API rejected the key" errors that took
+// hours to root-cause in prior sessions.
+const FAL_KEY = looksLikeRealKey(process.env.FAL_KEY) ? process.env.FAL_KEY : "";
 const GEMINI_KEY =
-  process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "";
-const OPENAI_KEY = process.env.OPENAI_API_KEY || "";
+  (looksLikeRealKey(process.env.GEMINI_API_KEY) ? process.env.GEMINI_API_KEY : null) ||
+  (looksLikeRealKey(process.env.GOOGLE_API_KEY) ? process.env.GOOGLE_API_KEY : null) ||
+  "";
+const OPENAI_KEY = looksLikeRealKey(process.env.OPENAI_API_KEY) ? process.env.OPENAI_API_KEY : "";
 
 // OpenAI client for the gpt2_* tools. Lazy: only instantiated if the key
 // is set, so installs without the OpenAI key don't even load the client.

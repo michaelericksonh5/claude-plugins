@@ -71592,18 +71592,45 @@ function readServerVersion() {
   return "0.0.0";
 }
 var SERVER_VERSION = readServerVersion();
+var ENV_SOURCES = [];
 try {
   const { default: dotenv } = await Promise.resolve().then(() => __toESM(require_main(), 1));
   const userEnv = path4.join(os.homedir(), ".h5g-slot-art-creator", ".env");
   const pluginEnv = path4.join(PLUGIN_ROOT, ".env");
   if (fs4.existsSync(userEnv)) {
     dotenv.config({ path: userEnv, override: true });
+    ENV_SOURCES.push(userEnv);
   }
   if (fs4.existsSync(pluginEnv)) {
     dotenv.config({ path: pluginEnv, override: false });
+    ENV_SOURCES.push(pluginEnv);
   }
 } catch {
 }
+function looksLikeRealKey(value) {
+  if (!value) return false;
+  if (/^\$\{[A-Z_]+\}$/.test(value)) return false;
+  if (value.length < 20) return false;
+  return true;
+}
+var KEYS_LOADED = {
+  GEMINI_API_KEY: looksLikeRealKey(process.env.GEMINI_API_KEY) || looksLikeRealKey(process.env.GOOGLE_API_KEY),
+  FAL_KEY: looksLikeRealKey(process.env.FAL_KEY),
+  OPENAI_API_KEY: looksLikeRealKey(process.env.OPENAI_API_KEY)
+};
+(function logStartupBanner() {
+  const lines = [];
+  lines.push(`[nb2node v${SERVER_VERSION}] startup`);
+  lines.push(`  plugin root: ${PLUGIN_ROOT}`);
+  lines.push(`  .env sources loaded: ${ENV_SOURCES.length ? ENV_SOURCES.join(", ") : "(none \u2014 relying on process env)"}`);
+  lines.push(`  GEMINI_API_KEY: ${KEYS_LOADED.GEMINI_API_KEY ? "loaded" : "missing"}`);
+  lines.push(`  FAL_KEY: ${KEYS_LOADED.FAL_KEY ? "loaded" : "missing"}`);
+  lines.push(`  OPENAI_API_KEY: ${KEYS_LOADED.OPENAI_API_KEY ? "loaded" : "missing"}`);
+  if (!KEYS_LOADED.GEMINI_API_KEY && !KEYS_LOADED.FAL_KEY) {
+    lines.push(`  WARNING: no NB2 key found \u2014 nb2_* tools will fail. Run /slot-setup or 'node setup-keys.js' from the plugin directory.`);
+  }
+  process.stderr.write(lines.join("\n") + "\n");
+})();
 function resolveOutputDir(rawOut) {
   if (!rawOut) return path4.join(os.homedir(), "Pictures", "claude_nb2");
   const expanded = rawOut.startsWith("~") ? path4.join(os.homedir(), rawOut.slice(1)) : rawOut;
@@ -72012,9 +72039,9 @@ function writeSidecar2(pngPath, meta2) {
     console.error(`[sidecar] failed to write ${sidecarPath}: ${e2.message}`);
   }
 }
-var FAL_KEY = process.env.FAL_KEY || "";
-var GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "";
-var OPENAI_KEY = process.env.OPENAI_API_KEY || "";
+var FAL_KEY = looksLikeRealKey(process.env.FAL_KEY) ? process.env.FAL_KEY : "";
+var GEMINI_KEY = (looksLikeRealKey(process.env.GEMINI_API_KEY) ? process.env.GEMINI_API_KEY : null) || (looksLikeRealKey(process.env.GOOGLE_API_KEY) ? process.env.GOOGLE_API_KEY : null) || "";
+var OPENAI_KEY = looksLikeRealKey(process.env.OPENAI_API_KEY) ? process.env.OPENAI_API_KEY : "";
 var openaiClient = null;
 if (OPENAI_KEY) {
   openaiClient = new OpenAI({ apiKey: OPENAI_KEY });

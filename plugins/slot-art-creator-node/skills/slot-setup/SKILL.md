@@ -28,20 +28,56 @@ Then redirect them to the appropriate safe method.
 
 ## Workflow
 
-### Step 1 — Detect current state
+### Step 1 — Diagnose with ground truth (DO THIS FIRST)
 
-Determine what's already configured:
+**Never infer key state from reading files alone.** A key that's present in
+`.env` but doesn't authenticate is the most common silent failure mode (stale
+key, account deactivated, wrong project, copy-paste error introducing
+whitespace). Run the plugin's built-in validator before doing anything else:
 
-**a) Where keys would live for this user:**
+1. Resolve the plugin's installed path. The plugin lives in the Claude Code
+   plugin cache. Use Glob with pattern
+   `~/.claude/plugins/cache/h5g-plugins/slot-art-creator-node/*/setup-keys.js`
+   and pick the newest version directory.
+
+2. Run the validator via the Bash tool:
+
+   ```
+   node "<absolute path to setup-keys.js>" --check
+   ```
+
+   This makes real (free) API calls against Gemini and OpenAI to confirm the
+   keys actually work, and reports a routing summary showing which tools are
+   enabled.
+
+3. **Show the user the full output.** Don't summarize — the user benefits
+   from seeing exactly what's set vs. what's missing vs. what's broken.
+
+4. Based on the output, branch:
+   - **All keys OK** → confirm everything works, recommend a next-step skill, done.
+   - **NB2 keys (Gemini/FAL) all missing** → user needs to run setup. Continue to Step 2.
+   - **One key missing or broken** → ask the user whether they want to add/fix it. Continue to Step 2 for the affected provider only.
+
+### Step 1b — Where keys actually live
+
 - Canonical `.env` file: `~/.h5g-slot-art-creator/.env`
   - Windows: `%USERPROFILE%\.h5g-slot-art-creator\.env`
   - Mac/Linux: `$HOME/.h5g-slot-art-creator/.env`
 
-**b) Read the file if it exists.** Use the Read tool. Note which keys are
-present (non-empty values for `GEMINI_API_KEY`, `FAL_KEY`, and/or
-`OPENAI_API_KEY`).
+The MCP server reads this file at startup via dotenv with `override: true`,
+so values in the file always win over any environment variables Claude Code
+may have injected (including unresolved `${VAR}` placeholder strings — that
+was a real bug in versions before v1.7.0). If `node setup-keys.js --check`
+reports a key as `MISSING`, the most likely cause is that the file doesn't
+exist or that key wasn't written yet.
 
-**c) Detect which surface the user is on** (Claude Code or Cowork). Cowork
+If the user reports a tool failed with an auth error after they thought keys
+were set, check the MCP server's startup banner in the Claude Code logs.
+The banner explicitly says which .env path loaded and which keys it found.
+That's the fastest way to confirm the MCP server is seeing what the
+validator sees.
+
+**Detect which surface the user is on** (Claude Code or Cowork). Cowork
 sessions can be inferred from environment cues or just asked. The
 guidance differs between them.
 
@@ -167,30 +203,37 @@ permissions, etc.), the user can edit the `.env` file directly:
 >    text-heavy surfaces (paytables, logos, wheels, banner copy).
 > 3. Save the file, then come back here.
 
-### Step 4 — Validate
+### Step 4 — Validate (re-run the same diagnostic)
 
-Once the user reports keys are set, verify the file looks right:
+Once the user reports keys are set, re-run the validator that Step 1 used:
 
-1. **Read** `~/.h5g-slot-art-creator/.env` (Windows: `%USERPROFILE%\.h5g-slot-art-creator\.env`).
-2. Confirm at least one of `GEMINI_API_KEY=` or `FAL_KEY=` is present
-   and has a non-empty value after the `=` sign. This is the minimum
-   to unlock the four NB2 tools.
-3. Also check `OPENAI_API_KEY=`. If set, the two gpt2 tools
-   (`gpt2_generate`, `gpt2_edit`) are available too — surface this in
-   the Step 5 summary. If empty, that's fine; gpt2 is optional and
-   text-heavy surfaces (paytables, logos, banners) will fall back to
-   NB2 with reduced text fidelity.
-4. Do **NOT** print the key values back to the user (they'd end up in
-   chat). Just confirm presence: "I see GEMINI_API_KEY is set" /
-   "FAL_KEY is set" / "OPENAI_API_KEY is set" or "still empty."
+```
+node "<absolute path to setup-keys.js>" --check
+```
 
-If both NB2-eligible keys (`GEMINI_API_KEY`, `FAL_KEY`) are still
-empty after the user said "done," ask them where they saved the keys
-— they may have edited the wrong file or used the wrong UI.
+This is the **single source of truth** for whether keys actually work. It
+makes real API calls against Gemini and OpenAI (free / cheap endpoints), so
+a passing result here means the MCP server will succeed on its first real
+generation call.
+
+If the validator still reports a key as `MISSING` or `FAIL`:
+- `MISSING` → the user didn't write to `~/.h5g-slot-art-creator/.env`. Ask
+  where they saved keys — they may have used a different file or the wrong
+  Cowork field.
+- `FAIL: 401` → the key is wrong (typo, deactivated account, wrong project).
+  Ask them to regenerate the key at the provider's dashboard.
+- `Network check skipped` → ambient network issue; the key is structurally
+  valid but couldn't be validated this run. That's fine; move on.
+
+Do **NOT** print the key values back to the user. The validator never prints
+them either — just lengths and pass/fail.
 
 For Cowork users where keys live in the plugin's env-var UI (not in `.env`),
-the file check won't apply. In that case, trust the user's confirmation and
-move on; real validation happens on first MCP call.
+the validator can't see them — Cowork passes them through Claude's MCP
+spawn rather than the .env file. In that case, the validator will say
+`MISSING` even though keys are set. Trust the user's confirmation and move
+on; real validation happens on first MCP call. (This is a known limitation
+of running the validator outside the Claude harness.)
 
 ### Step 5 — Confirm and route
 
