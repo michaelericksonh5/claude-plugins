@@ -285,11 +285,13 @@ Tell the user what they have and what's next. Examples:
 
 - It does not store keys in the project's `project.json` (those are
   per-game; keys are per-user).
-- It does not validate keys via real API calls — that would burn the
-  user's quota for a setup check. Real validation happens implicitly on
-  first generation. If the user wants a verification call, they can run
-  `node setup-keys.js --check` from a terminal — that uses Gemini's
-  cheapest endpoint.
+- It does call `node setup-keys.js --check` in Steps 1 and 4 to get
+  ground-truth validation of the keys. Those checks hit Gemini's
+  `models.list` endpoint and OpenAI's `models.list` endpoint — both are
+  free / cheapest-tier reads, not generation calls. Quota impact is
+  negligible. The validator returns within a couple of seconds and
+  surfaces stale, deactivated, or malformed keys before they cause a
+  confusing 401 in a real generation later.
 - It does not handle multi-account scenarios (e.g. one Gemini key for
   prod, one for testing). Users with that requirement should set keys
   via shell env vars instead of `.env` so they can swap on the fly.
