@@ -76,18 +76,23 @@ If `active_provider === "none"`, ask: "Do you have a fal.ai key, a Google Gemini
 ### Setting up keys — always use the setup script
 
 Point users to the setup script. It writes directly to `~/.claude/settings.json` (the shared key
-store for all H5G Claude plugins — set once, works everywhere):
+store for all H5G Claude plugins — set once, works everywhere).
 
-**Windows:**
-```powershell
-node "C:\Users\<you>\.claude\plugins\data\ai-video-generator-inline\setup-keys.mjs"
+**Locate the script first** — use the Glob tool to find it:
 ```
-Or if you know the plugin root:
+~/.claude/plugins/marketplaces/h5g-plugins/plugins/ai-video-generator/setup-keys.mjs
+```
+On Windows that expands to:
+```
+C:\Users\<username>\.claude\plugins\marketplaces\h5g-plugins\plugins\ai-video-generator\setup-keys.mjs
+```
+
+**Run it:**
 ```powershell
-node setup-keys.mjs --check   # verify current status
-node setup-keys.mjs --fal     # add fal.ai key
-node setup-keys.mjs --gemini  # add Gemini key
-node setup-keys.mjs --both    # add both
+node "<full path to setup-keys.mjs>" --check   # verify current status
+node "<full path to setup-keys.mjs>" --fal     # add fal.ai key
+node "<full path to setup-keys.mjs>" --gemini  # add Gemini key
+node "<full path to setup-keys.mjs>" --both    # add both
 ```
 
 After running the script, **restart Claude Code** so the new key is picked up by the MCP server.
