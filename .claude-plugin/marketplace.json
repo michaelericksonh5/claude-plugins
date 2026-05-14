@@ -46,7 +46,7 @@
         "name": "Michael Erickson",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/ai-video-mcp-server" },
+      "source": { "source": "git-subdir", "url": "https://github.com/michaelericksonh5/ai-video-mcp-server.git", "path": "." },
       "homepage": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "repository": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "license": "MIT",
