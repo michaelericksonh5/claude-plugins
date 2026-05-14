@@ -31488,15 +31488,26 @@ async function downloadVideo(url, destPath, provider) {
   const buffer = await response.arrayBuffer();
   fs.writeFileSync(destPath, Buffer.from(buffer));
 }
-async function rewrapToMov(result) {
+function slugifyPrompt(prompt) {
+  if (!prompt) return null;
+  const slug = prompt
+    .trim()
+    .slice(0, 50)
+    .replace(/[^a-z0-9]+/gi, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 40);
+  return slug || null;
+}
+async function rewrapToMov(result, prompt) {
   const ffmpegBin = await ensureFfmpegStatic();
   if (!ffmpegBin) return null;
   const outDir = path.join(os.homedir(), ".h5g-ai-video", "output");
   fs.mkdirSync(outDir, { recursive: true });
-  const safeName = (result.model ?? "video").replace(/[^a-z0-9_-]/gi, "_").slice(0, 40);
+  const slug = slugifyPrompt(prompt) ?? (result.model ?? "video").replace(/[^a-z0-9_-]/gi, "_").slice(0, 40);
   const ts = Date.now();
-  const mp4Path = path.join(outDir, `${safeName}_${ts}_tmp.mp4`);
-  const movPath = path.join(outDir, `${safeName}_${ts}.mov`);
+  const mp4Path = path.join(outDir, `${slug}_${ts}_tmp.mp4`);
+  const movPath = path.join(outDir, `${slug}_${ts}.mov`);
   try {
     await downloadVideo(result.video.url, mp4Path, result.provider);
     await new Promise((resolve, reject) => {
@@ -31516,11 +31527,11 @@ var providerSchema = external_exports.enum(["auto", "fal", "gemini"]).default("a
 var safetySchema = external_exports.enum(["1", "2", "3", "4", "5", "6"]).default("4").describe(
   "Safety tolerance (fal.ai only): 1=most strict, 6=most permissive. Default 4. Not sent to Gemini."
 );
-async function formatResult(result) {
+async function formatResult(result, prompt) {
   let movPath = null;
   let movNote = "";
   try {
-    movPath = await rewrapToMov(result);
+    movPath = await rewrapToMov(result, prompt);
   } catch (e) {
     movNote = ` (MOV conversion failed: ${e.message})`;
   }
@@ -31531,7 +31542,7 @@ async function formatResult(result) {
     `**Model**: ${result.model}`
   ];
   if (movPath) {
-    lines.push(`**Local MOV**: ${movPath}`);
+    lines.push(`**Saved to**: ${movPath}`);
   } else {
     lines.push(`**Video URL**: ${result.video.url}${movNote}`);
   }
@@ -31543,7 +31554,7 @@ async function formatResult(result) {
   if (result.request_id) lines.push(`**Request ID**: ${result.request_id}`);
   lines.push(``);
   if (movPath) {
-    lines.push(`Open: ${movPath}`);
+    lines.push(`Video saved to: ${movPath}`);
     lines.push(`Source URL: ${result.video.url}`);
   } else {
     lines.push(`Download or open: ${result.video.url}`);
@@ -31616,7 +31627,7 @@ Returns: Video URL, provider, model, and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31687,7 +31698,7 @@ Returns: Video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31761,7 +31772,7 @@ Returns: Video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31824,7 +31835,7 @@ Returns: Video URL and metadata.`,
             duration_seconds: durationSeconds
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31895,7 +31906,7 @@ Returns: Extended video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31904,8 +31915,8 @@ Returns: Extended video URL and metadata.`,
 }
 
 // src/tools/alternativeTools.ts
-async function formatResult2(result) {
-  return formatResult(result); // result.provider is already "fal" from extractVideoResult
+async function formatResult2(result, prompt) {
+  return formatResult(result, prompt); // result.provider is already "fal" from extractVideoResult
 }
 function registerAlternativeTools(server2) {
   server2.registerTool(
@@ -31946,7 +31957,7 @@ Returns: Animated video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falHappyHorseImageToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31990,7 +32001,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falHappyHorseReferenceToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -32035,7 +32046,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falSeedanceImageToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -32085,7 +32096,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falSeedanceReferenceToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
