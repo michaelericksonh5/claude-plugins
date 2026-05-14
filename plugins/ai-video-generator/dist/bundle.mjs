@@ -30862,11 +30862,18 @@ var StdioServerTransport = class {
 };
 
 // src/services/keyManager.ts
+function looksLikeRealKey(value) {
+  if (!value) return false;
+  if (/^\$\{[A-Z_]+\}$/.test(value)) return false;
+  if (value.length < 20) return false;
+  return true;
+}
 function getFalKey() {
-  return process.env.FAL_KEY;
+  return looksLikeRealKey(process.env.FAL_KEY) ? process.env.FAL_KEY : void 0;
 }
 function getGeminiKey() {
-  return process.env.GEMINI_API_KEY;
+  const k = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  return looksLikeRealKey(k) ? k : void 0;
 }
 function getApiKeyStatus() {
   const falKey = getFalKey();
