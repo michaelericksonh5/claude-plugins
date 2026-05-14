@@ -21,6 +21,36 @@ opt-in for the surfaces where its strengths matter.
 >
 > The plugin code itself lives in a separate repo (`slot-art-creator-node` — the one you're reading now), but for a marketplace install you never need to clone it. Claude pulls the pre-built MCP bundle directly from the registry.
 
+### Fastest path — pick your situation
+
+| You are... | Easiest install |
+|---|---|
+| **H5G employee on Cowork** | Ask IT / your Cowork admin to enable the H5G marketplace at the org level (one-time — see [H5G org-level install](#h5g-org-level-install-admins-set-once) below). After that, the plugin appears in your Customize tab with one click — no marketplace URL to paste. |
+| **Anyone on Claude Code CLI** | Open a Claude Code terminal session and paste this block — it installs and starts setup in one go: `/plugin marketplace add michaelericksonh5/claude-plugins` then `/plugin install slot-art-creator-node@h5g-plugins` then `/slot-setup`. Three commands, ~10 seconds. |
+| **Solo user on Cowork (no admin help)** | The 9-step Customize-tab flow in Path A2 below. There is no shorter user-level path today — Cowork has no chat install, no CLI install, and no deep-link install URLs. |
+| **Plugin developer** | Path B (clone + `install.bat` / `install.sh`) further down. |
+
+#### H5G org-level install (admins, set once)
+
+Cowork Team / Enterprise plans support **organization-level marketplace sync**. An admin connects the H5G plugin registry once and every employee then sees H5G plugins auto-listed in their Cowork Customize tab — no marketplace URL pasting, no manual sync.
+
+1. Sign in to **Claude Cowork** as an organization admin.
+2. Open **Settings → Plugins** (admin-only section).
+3. Choose **Connect GitHub repository** (or the equivalent "Add organization marketplace" action — Cowork's UI labels may vary by plan tier).
+4. Paste the marketplace URL:
+   ```
+   https://github.com/michaelericksonh5/claude-plugins
+   ```
+5. Save. After Cowork syncs, every H5G employee sees `slot-art-creator-node` (and any future H5G plugins) in their personal Customize tab.
+
+Reference: Anthropic's [Manage Cowork plugins for your organization](https://support.claude.com/en/articles/13837433-manage-claude-cowork-plugins-for-your-organization).
+
+Employees still set their own API keys per-machine (`/slot-setup` or the Cowork plugin settings UI) — keys are per-user, not per-org.
+
+---
+
+### The two install paths in detail
+
 Two paths. Pick the one that matches what you're doing:
 
 | Path | Best for | Summary |
