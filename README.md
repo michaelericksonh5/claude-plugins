@@ -10,7 +10,7 @@ collaborative mode inside the Claude desktop app).
 |---|---|
 | [`skill-auditor`](https://github.com/michaelericksonh5/skill-auditor) | Audits a Claude skill against an 8-dimension quality rubric and returns a **READY / NEEDS WORK / DRAFT** verdict with specific, actionable findings. Checks frontmatter validity, description trigger quality, instruction clarity, reference integrity, completeness (no TODO/FIXME/TBD), output specification, evals coverage, and security. |
 | [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with **two model families**: Nano Banana 2 (Gemini + fal.ai, 4 tools — the bulk of the workflow) and OpenAI's gpt-image-2 (2 tools — optional, for paytables, logos, banners with required copy, photorealistic 4K, and compositional multi-image edits). 13 slash commands (workflow + onboarding), persistent project memory, independent keys per family. |
-| [`ai-video-generator`](https://github.com/michaelericksonh5/veo-video-mcp-server) | Generate AI videos using Veo 3.1, Happy Horse, and Seedance 2.0. Text-to-video, image-to-video, first+last frame, reference images, and video extension. Works with fal.ai and Google Gemini API keys. |text-to-video, image-to-video, first+last frame, reference images, and video extension. Works with fal.ai and Google Gemini API keys. |
+| [`ai-video-generator`](https://github.com/michaelericksonh5/ai-video-mcp-server) | Generate AI videos using Veo 3.1, Happy Horse, and Seedance 2.0. Text-to-video, image-to-video, first+last frame, reference images, and video extension. Works with fal.ai and Google Gemini API keys. |
 
 ## Add this marketplace
 
@@ -48,8 +48,8 @@ claude plugin install slot-art-creator-node@h5g-plugins
 4. Click **Browse plugins**
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
 6. Enter the URL: `https://github.com/michaelericksonh5/claude-plugins`
-7. After it syncs, the **slot-art-creator-node** plugin appears in the marketplace listing — click **Install**
-8. Open the plugin's settings and paste your `GEMINI_API_KEY` and `FAL_KEY` into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [plugin README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) for where to get keys.
+7. After it syncs, all three plugins appear in the marketplace listing — click **Install** on whichever you want
+8. Open the plugin's settings and paste your API keys into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [slot-art README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) or [ai-video README](https://github.com/michaelericksonh5/ai-video-mcp-server#set-up-your-api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
 10. In any Cowork chat, run `/slot-help` for the workflow overview, or `/slot-setup` for a guided check that your keys are configured correctly. Then jump to `/slot-step-00` (GDD-driven) or `/slot-step-01` (fresh concept).
 
@@ -65,15 +65,18 @@ claude plugin install slot-art-creator-node@h5g-plugins
 
 ```
 claude-plugins/
-└── .claude-plugin/
-    └── marketplace.json    # catalog: lists each plugin and where to fetch it
+├── .claude-plugin/
+│   └── marketplace.json    # catalog: lists each plugin and where to fetch it
+└── plugins/
+    ├── skill-auditor/          # bundled copy of the skill-auditor plugin
+    └── slot-art-creator-node/  # bundled copy of the slot-art plugin
 ```
 
-Individual plugins live in **their own GitHub repositories** and are referenced
-via the `url` source type with explicit `https://` URLs. This keeps each
-plugin's release cycle, issues, and version history independent, and avoids
-the SSH-host-key fallback that the `github` shorthand triggers on machines
-without an SSH key configured.
+The `skill-auditor` and `slot-art-creator-node` plugins are bundled directly
+in this repo under `plugins/` (using `"source": "./plugins/…"` in the catalog).
+The `ai-video-generator` plugin lives in its own repo and is referenced via the
+`github` source type (using `{"source": "github", "repo": "owner/repo"}`), which
+tells Claude Code to fetch it directly from GitHub without an SSH key.
 
 ## Adding a new plugin to this marketplace
 
@@ -85,18 +88,18 @@ without an SSH key configured.
    `npm install` on the cached plugin, so the bundle must be import-ready.
    Point `plugin.json`'s MCP `args` at the bundle path.
 3. Add an entry to the `plugins[]` array in `.claude-plugin/marketplace.json`.
-   Use the `url` source type with an explicit `https://` URL (avoids the
-   git client trying SSH on machines without a key):
+   Use the `github` source type for external repos:
    ```json
    {
      "name": "my-new-plugin",
-     "source": {
-       "source": "url",
-       "url": "https://github.com/michaelericksonh5/my-new-plugin.git"
-     },
+     "source": { "source": "github", "repo": "michaelericksonh5/my-new-plugin" },
      "description": "...",
      "version": "1.0.0"
    }
+   ```
+   Or bundle it locally in `plugins/my-new-plugin/` and use:
+   ```json
+   { "name": "my-new-plugin", "source": "./plugins/my-new-plugin" }
    ```
 4. Validate locally: `claude plugin validate .`
 5. Commit and push. Users with the marketplace already added pick up new
