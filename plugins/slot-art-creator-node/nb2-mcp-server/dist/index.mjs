@@ -72789,7 +72789,7 @@ var TOOLS = [
   },
   {
     name: "nb2_smart_resize",
-    description: "Pixel-perfect multi-size resize of an approved asset to one or more exact target dimensions. Either key works (both are fully implemented). When both are set, fal.ai runs because its purpose-built endpoint (Nano Banana Pro, single API call) beats Gemini's path (NB2 + N calls + pngjs center-crop) for this task. Pass the source image and target sizes as 'WxH' strings. Returns paths to each resized output.",
+    description: "Pixel-perfect multi-size resize of an approved asset to one or more exact target dimensions. Either key works (both are fully implemented). When both are set, Gemini runs first (preferred for cost). fal.ai (Nano Banana Pro, single API call) is used only when Gemini key is absent. Pass the source image and target sizes as 'WxH' strings. Returns paths to each resized output.",
     inputSchema: {
       type: "object",
       properties: {
@@ -72995,16 +72995,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const outputDir = resolveOutputDir(args.output_dir);
       const assetName = sanitizeAssetName(args.asset_name, "resize");
       const source = await validateImageInput(args.source, "source");
-      if (FAL_KEY) {
-        const result = await falSmartResize({
-          source,
-          outputDir,
-          assetName,
-          targetSizes,
-          prompt: args.prompt || null
-        });
-        return { content: formatResult(result, "nb2_smart_resize OK (fal.ai / nano-banana-pro)") };
-      }
       if (GEMINI_KEY) {
         const result = await geminiSmartResize({
           source,
@@ -73015,10 +73005,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         });
         return { content: formatResult(result, "nb2_smart_resize OK (Gemini / NB2)") };
       }
+      if (FAL_KEY) {
+        const result = await falSmartResize({
+          source,
+          outputDir,
+          assetName,
+          targetSizes,
+          prompt: args.prompt || null
+        });
+        return { content: formatResult(result, "nb2_smart_resize OK (fal.ai / nano-banana-pro)") };
+      }
       return {
         content: [{
           type: "text",
-          text: "ERROR: nb2_smart_resize needs at least one API key. Either works \u2014 both providers fully implement this tool.\n  FAL_KEY:        node setup-keys.js --fal  (purpose-built NB Pro endpoint, single API call)\n  GEMINI_API_KEY: node setup-keys.js --gemini  (NB2 + pngjs center-crop, one call per target)"
+          text: "ERROR: nb2_smart_resize needs at least one API key. Either works \u2014 both providers fully implement this tool.\n  GEMINI_API_KEY: node setup-keys.js --gemini  (preferred \u2014 NB2 + pngjs center-crop, one call per target)\n  FAL_KEY:        node setup-keys.js --fal  (fallback \u2014 purpose-built NB Pro endpoint, single API call)"
         }],
         isError: true
       };

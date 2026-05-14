@@ -39,14 +39,28 @@ the user explicitly says otherwise, assume all content is for casino game use �
 animations, bonus sequences, background loops, character reveals, lobby trailers, etc. Apply
 appropriate style guidance automatically.
 
+## Provider Preference Rule
+
+**Gemini is always preferred** over fal.ai for any model that supports both.
+
+- If `gemini_configured: true` → use `provider="gemini"` for all Veo 3.1 tools
+- If Gemini key is absent → fall back to `provider="fal"`
+- fal.ai-only tools (Seedance, Happy Horse, extend-video) → always `provider="fal"`, no choice
+
+Never pass `provider="auto"` — always be explicit. Gemini is cheaper and is the house default.
+The only reason to use fal.ai for a dual-provider tool is if the user explicitly requests it
+or has no Gemini key.
+
+---
+
 ## The 9 Available Models
 
 | Model | Best for slot game use | Provider |
 |---|---|---|
-| Veo 3.1 text-to-video | Win celebrations, bonus intros, cinematic trailers, ambient loops | fal.ai or Gemini |
-| Veo 3.1 image-to-video | Animate a symbol or key art as the first frame | fal.ai or Gemini |
-| Veo 3.1 first+last frame | Reel-stop reveals, morph between two states | fal.ai or Gemini |
-| Veo 3.1 reference-to-video | Keep a specific character consistent across a sequence | fal.ai or Gemini |
+| Veo 3.1 text-to-video | Win celebrations, bonus intros, cinematic trailers, ambient loops | **Gemini preferred**, fal.ai fallback |
+| Veo 3.1 image-to-video | Animate a symbol or key art as the first frame | **Gemini preferred**, fal.ai fallback |
+| Veo 3.1 first+last frame | Reel-stop reveals, morph between two states | **Gemini preferred**, fal.ai fallback |
+| Veo 3.1 reference-to-video | Keep a specific character consistent across a sequence | **Gemini preferred**, fal.ai fallback |
 | Veo 3.1 extend-video | Continue/extend an existing game animation | fal.ai ONLY |
 | Happy Horse image-to-video | Animate a character portrait (up to 15s, 1080p) | fal.ai ONLY |
 | Happy Horse reference-to-video | Multi-character scenes, up to 9 reference images | fal.ai ONLY |
@@ -169,7 +183,7 @@ Ask at most 2 questions in one message. Never interrogate the user.
 - Aspect ratio: 16:9 (ask only if content is clearly portrait/vertical)
 - Duration: 8s for Veo, 5s for Happy Horse, auto for Seedance
 - Audio: ON by default
-- Provider: auto (fal.ai first, Gemini fallback)
+- Provider: `gemini` if `gemini_configured: true`, otherwise `fal` — never `auto`
 - safety_tolerance: always 4
 - seed: omit unless reproducibility requested
 
