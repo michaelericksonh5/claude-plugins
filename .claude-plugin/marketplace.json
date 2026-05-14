@@ -39,7 +39,7 @@
       "tags": ["slot-machine", "image-generation", "nano-banana", "gemini", "fal-ai", "game-art"]
     },
         {
-                "name": "veo-video-generator",
+                        "name": "ai-video-generator",
                 "description": "AI video generation for Claude - Veo 3.1 (fal.ai + Gemini), Happy Horse (Alibaba), and Seedance 2.0 (ByteDance). Text-to-video, image-to-video, first+last frame, reference images, and video extension. Supports fal.ai and Google Gemini API keys.",
                 "version": "1.0.0",
                 "author": {
