@@ -73,29 +73,37 @@ If `active_provider === "none"`, ask: "Do you have a fal.ai key, a Google Gemini
 - **fal.ai key** — gives access to all 9 models. Get one at https://fal.ai/dashboard/keys
 - **Gemini key** — gives access to Veo 3.1 (text, image, first/last, reference). Get one at https://aistudio.google.com/app/apikey
 
-### Setting up keys — always use the setup script
+### Setting up keys — one script covers everything
 
-Point users to the setup script. It writes directly to `~/.claude/settings.json` (the shared key
-store for all H5G Claude plugins — set once, works everywhere).
+All H5G Claude plugins share the same key store (`~/.claude/settings.json`). Keys set once
+are available to every plugin — ai-video-generator, slot-art-creator-node, and skill-auditor
+all read from the same place.
 
-**Locate the script first** — use the Glob tool to find it:
+**The most complete setup script is the slot-art one** — it handles FAL_KEY, GEMINI_API_KEY,
+and OPENAI_API_KEY in a single run, covering every key any H5G plugin needs:
+
+Use the Glob tool to find it:
+```
+~/.claude/plugins/marketplaces/h5g-plugins/plugins/slot-art-creator-node/setup-keys.js
+```
+
+Then run:
+```powershell
+node "<full path to setup-keys.js>" --check   # see what's configured right now
+node "<full path to setup-keys.js>" --fal     # add fal.ai key
+node "<full path to setup-keys.js>" --gemini  # add Gemini key
+node "<full path to setup-keys.js>" --openai  # add OpenAI key (for slot-art gpt2 tools)
+node "<full path to setup-keys.js>" --both    # add fal.ai + Gemini together
+```
+
+**Video-plugin-only alternative** (FAL + Gemini only, no OpenAI):
 ```
 ~/.claude/plugins/marketplaces/h5g-plugins/plugins/ai-video-generator/setup-keys.mjs
 ```
-On Windows that expands to:
-```
-C:\Users\<username>\.claude\plugins\marketplaces\h5g-plugins\plugins\ai-video-generator\setup-keys.mjs
-```
+Use this only if the user does NOT have slot-art installed. If they have both, the slot-art
+script is the right one.
 
-**Run it:**
-```powershell
-node "<full path to setup-keys.mjs>" --check   # verify current status
-node "<full path to setup-keys.mjs>" --fal     # add fal.ai key
-node "<full path to setup-keys.mjs>" --gemini  # add Gemini key
-node "<full path to setup-keys.mjs>" --both    # add both
-```
-
-After running the script, **restart Claude Code** so the new key is picked up by the MCP server.
+After running either script, **restart Claude Code** so the MCP server picks up the new keys.
 
 Do not manually edit `settings.json` unless you know what you're doing. The script handles the
 correct JSON structure and validates the key before saving.

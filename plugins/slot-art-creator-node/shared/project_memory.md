@@ -488,6 +488,50 @@ in the QA report and the next-step nudge.
 
 Every skill follows this exact sequence on invocation:
 
+### Step 0: API key gate (generation skills only)
+
+**Applies to:** `/slot-step-02` through `/slot-step-10`.
+**Skip for:** `/slot-step-00`, `/slot-step-01`, `/slot-setup`, `/slot-help`, `/slot-tutorial`, `/slot-compare`.
+
+Before touching project state, verify that the keys required for this
+skill's generation calls are actually configured. Do this once per
+invocation — not before every tool call.
+
+**How to check:**
+
+Use the Glob tool to find the setup script:
+
+```
+~/.claude/plugins/marketplaces/h5g-plugins/plugins/slot-art-creator-node/setup-keys.js
+```
+
+Then run it with the Bash/PowerShell tool:
+
+```powershell
+node "<absolute path from Glob>" --check
+```
+
+**Routing based on the output:**
+
+| Output says | Action |
+|---|---|
+| `GEMINI_API_KEY OK` or `FAL_KEY OK` (either one) | NB2 tools are available — continue startup |
+| Both `GEMINI_API_KEY MISSING` and `FAL_KEY MISSING` | Stop. Tell the user: "No NB2 key is configured — none of the generation tools will work. Run `/slot-setup` and I'll walk you through adding one." Route to `/slot-setup`, then resume the original request. |
+| `OPENAI_API_KEY MISSING` and user is asking for a `gpt2_*` tool specifically | Tell the user: "The gpt-image-2 tools need an OpenAI key. Run `/slot-setup` and I'll help you add it." Route to `/slot-setup`, then return to the original request. |
+| `OPENAI_API_KEY MISSING` but user only needs `nb2_*` tools | Fine — continue. OpenAI is optional. |
+
+**If the Glob finds no script** (e.g. plugin installed differently):
+Skip the programmatic check and proceed, but add a note: "I couldn't
+locate the key validator — if generation fails with an auth error, run
+`/slot-setup` to configure your API keys."
+
+This gate catches the most common first-run failure mode: the user
+installs the plugin and immediately runs a skill without ever setting
+up keys. Rather than surfacing a raw MCP error, the skill routes them
+to `/slot-setup` and comes back to finish the original request.
+
+---
+
 ### Step 1: Find the active project
 
 ```
