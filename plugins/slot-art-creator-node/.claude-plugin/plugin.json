@@ -26,6 +26,7 @@
   "agents": [
     "./agents/slot-art-qa-reviewer.md"
   ],
+  "hooks": "./hooks/hooks.json",
   "mcpServers": {
     "nb2node": {
       "command": "node",
