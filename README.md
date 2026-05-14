@@ -10,6 +10,7 @@ collaborative mode inside the Claude desktop app).
 |---|---|
 | [`skill-auditor`](https://github.com/michaelericksonh5/skill-auditor) | Audits a Claude skill against an 8-dimension quality rubric and returns a **READY / NEEDS WORK / DRAFT** verdict with specific, actionable findings. Checks frontmatter validity, description trigger quality, instruction clarity, reference integrity, completeness (no TODO/FIXME/TBD), output specification, evals coverage, and security. |
 | [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with **two model families**: Nano Banana 2 (Gemini + fal.ai, 4 tools — the bulk of the workflow) and OpenAI's gpt-image-2 (2 tools — optional, for paytables, logos, banners with required copy, photorealistic 4K, and compositional multi-image edits). 13 slash commands (workflow + onboarding), persistent project memory, independent keys per family. |
+| [`veo-video-generator`](https://github.com/michaelericksonh5/veo-video-mcp-server) | Generate AI videos using Veo 3.1, Happy Horse, and Seedance 2.0. Supports text-to-video, image-to-video, first+last frame, reference images, and video extension. Works with fal.ai and Google Gemini API keys. |
 
 ## Add this marketplace
 
@@ -21,6 +22,7 @@ From inside Claude Code, add the marketplace once, then install whichever plugin
 /plugin marketplace add michaelericksonh5/claude-plugins
 /plugin install skill-auditor@h5g-plugins
 /plugin install slot-art-creator-node@h5g-plugins
+/plugin install veo-video-generator@h5g-plugins
 /slot-setup
 ```
 
