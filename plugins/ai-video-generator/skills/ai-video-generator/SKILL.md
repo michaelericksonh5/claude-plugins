@@ -191,12 +191,14 @@ Ask at most 2 questions in one message. Never interrogate the user.
 
 ## Step 5: Generate and Return
 
-Before calling the tool: "Generating your video — this takes 2–5 min for Veo 3.1, up to 2 min for Happy Horse/Seedance. I'll share the link as soon as it's ready."
+Before calling the tool: "Generating your video — this takes 2–5 min for Veo 3.1, up to 2 min for Happy Horse/Seedance. I'll share the local .mov path as soon as it's ready."
 
 When done, return:
-1. The video URL as a clickable link
+1. The **local .mov path** — this is the ready-to-use file (e.g. `C:\Users\..\.h5g-ai-video\output\model_name_ts.mov`)
 2. Model used + resolution + duration
 3. One sentence about what was generated
+
+**Output format note**: All videos are automatically rewrapped to `.mov` (lossless container swap, no re-encode). The `.mov` file is saved to `~/.h5g-ai-video/output/`. The source URL is also shown for reference. On first run, ffmpeg-static (~50 MB) is auto-installed to `~/.h5g-ai-video/` — no user action needed.
 
 ---
 
