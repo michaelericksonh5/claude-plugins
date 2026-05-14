@@ -37,6 +37,21 @@
       "license": "MIT",
       "category": "creative",
       "tags": ["slot-machine", "image-generation", "nano-banana", "gemini", "fal-ai", "game-art"]
-    }
+    },
+        {
+                "name": "veo-video-generator",
+                "description": "AI video generation for Claude - Veo 3.1 (fal.ai + Gemini), Happy Horse (Alibaba), and Seedance 2.0 (ByteDance). Text-to-video, image-to-video, first+last frame, reference images, and video extension. Supports fal.ai and Google Gemini API keys.",
+                "version": "1.0.0",
+                "author": {
+                          "name": "Michael Erickson",
+                          "email": "michael.erickson@high5games.com"
+                },
+                "source": "https://github.com/michaelericksonh5/veo-video-mcp-server",
+                "homepage": "https://github.com/michaelericksonh5/veo-video-mcp-server",
+                "repository": "https://github.com/michaelericksonh5/veo-video-mcp-server",
+                "license": "MIT",
+                "category": "creative",
+                "tags": ["video", "ai-video", "veo", "veo3.1", "fal-ai", "gemini", "happy-horse", "seedance", "image-to-video", "text-to-video"]
+        }
   ]
 }
