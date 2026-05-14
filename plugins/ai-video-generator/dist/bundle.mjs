@@ -30914,6 +30914,8 @@ function resolveProvider(requested) {
 // src/tools/setupTools.ts
 import * as os from "node:os";
 import * as path from "node:path";
+import * as fs from "node:fs";
+import * as child_process from "node:child_process";
 function registerSetupTools(server2) {
   server2.registerTool(
     "veo_check_api_keys",
@@ -31425,6 +31427,88 @@ async function geminiExtendVideo(_apiKey, _params) {
   );
 }
 
+// ── MOV conversion helpers ───────────────────────────────────────────────────
+var _ffmpegChecked = false;
+var _ffmpegBin = null;
+async function ensureFfmpegStatic() {
+  if (_ffmpegChecked) return _ffmpegBin;
+  _ffmpegChecked = true;
+  const ext = process.platform === "win32" ? ".exe" : "";
+  const managedBin = path.join(os.homedir(), ".h5g-ai-video", "node_modules", "ffmpeg-static", `ffmpeg${ext}`);
+  if (fs.existsSync(managedBin)) {
+    _ffmpegBin = managedBin;
+    return _ffmpegBin;
+  }
+  try {
+    const sysCmd = process.platform === "win32" ? "where.exe" : "which";
+    const sysOut = child_process.execFileSync(sysCmd, ["ffmpeg"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    const sysPath = sysOut.split("\n")[0].trim();
+    if (sysPath && fs.existsSync(sysPath)) {
+      _ffmpegBin = sysPath;
+      return _ffmpegBin;
+    }
+  } catch {}
+  process.stderr.write("[ai-video] First video: installing ffmpeg-static (~50 MB) to ~/.h5g-ai-video — one-time only...\n");
+  const ffmpegDir = path.join(os.homedir(), ".h5g-ai-video");
+  try {
+    fs.mkdirSync(ffmpegDir, { recursive: true });
+    const pkgPath = path.join(ffmpegDir, "package.json");
+    if (!fs.existsSync(pkgPath)) {
+      fs.writeFileSync(pkgPath, JSON.stringify({ name: "h5g-ai-video-ffmpeg", version: "1.0.0", private: true }, null, 2));
+    }
+    await new Promise((resolve, reject) => {
+      const proc = child_process.spawn("npm", ["install", "ffmpeg-static", "--no-save"], {
+        cwd: ffmpegDir,
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: process.platform === "win32"
+      });
+      proc.stderr.on("data", (d) => process.stderr.write(d));
+      proc.on("close", (code) => code === 0 ? resolve() : reject(new Error(`npm install exited with code ${code}`)));
+      proc.on("error", reject);
+    });
+    if (fs.existsSync(managedBin)) {
+      _ffmpegBin = managedBin;
+      process.stderr.write("[ai-video] ffmpeg-static installed successfully\n");
+    }
+  } catch (e) {
+    process.stderr.write(`[ai-video] ffmpeg-static install failed: ${e.message}\n`);
+  }
+  return _ffmpegBin;
+}
+async function downloadVideo(url, destPath, provider) {
+  const headers = {};
+  let fetchUrl = url;
+  if (provider === "gemini") {
+    const key = getGeminiKey();
+    if (key) headers["x-goog-api-key"] = key;
+    if (!url.includes("alt=")) fetchUrl = url + (url.includes("?") ? "&" : "?") + "alt=media";
+  }
+  const response = await fetch(fetchUrl, { headers });
+  if (!response.ok) throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+  const buffer = await response.arrayBuffer();
+  fs.writeFileSync(destPath, Buffer.from(buffer));
+}
+async function rewrapToMov(result) {
+  const ffmpegBin = await ensureFfmpegStatic();
+  if (!ffmpegBin) return null;
+  const outDir = path.join(os.homedir(), ".h5g-ai-video", "output");
+  fs.mkdirSync(outDir, { recursive: true });
+  const safeName = (result.model ?? "video").replace(/[^a-z0-9_-]/gi, "_").slice(0, 40);
+  const ts = Date.now();
+  const mp4Path = path.join(outDir, `${safeName}_${ts}_tmp.mp4`);
+  const movPath = path.join(outDir, `${safeName}_${ts}.mov`);
+  try {
+    await downloadVideo(result.video.url, mp4Path, result.provider);
+    await new Promise((resolve, reject) => {
+      child_process.execFile(ffmpegBin, ["-i", mp4Path, "-c", "copy", "-y", movPath], { timeout: 120000 }, (err) => err ? reject(new Error(`ffmpeg: ${err.message}`)) : resolve());
+    });
+    return movPath;
+  } finally {
+    try { fs.unlinkSync(mp4Path); } catch {}
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // src/tools/veoTools.ts
 var providerSchema = external_exports.enum(["auto", "fal", "gemini"]).default("auto").describe(
   "API provider: 'auto' uses fal.ai if FAL_KEY is set, else Gemini. 'fal' forces fal.ai. 'gemini' forces Gemini."
@@ -31432,21 +31516,38 @@ var providerSchema = external_exports.enum(["auto", "fal", "gemini"]).default("a
 var safetySchema = external_exports.enum(["1", "2", "3", "4", "5", "6"]).default("4").describe(
   "Safety tolerance (fal.ai only): 1=most strict, 6=most permissive. Default 4. Not sent to Gemini."
 );
-function formatResult(result) {
+async function formatResult(result) {
+  let movPath = null;
+  let movNote = "";
+  try {
+    movPath = await rewrapToMov(result);
+  } catch (e) {
+    movNote = ` (MOV conversion failed: ${e.message})`;
+  }
   const lines = [
     `\u2705 Video generated successfully!`,
     ``,
     `**Provider**: ${result.provider === "fal" ? "fal.ai" : "Google Gemini"}`,
-    `**Model**: ${result.model}`,
-    `**Video URL**: ${result.video.url}`
+    `**Model**: ${result.model}`
   ];
+  if (movPath) {
+    lines.push(`**Local MOV**: ${movPath}`);
+  } else {
+    lines.push(`**Video URL**: ${result.video.url}${movNote}`);
+  }
   if (result.video.file_size) lines.push(`**File size**: ${(result.video.file_size / 1024 / 1024).toFixed(1)} MB`);
   if (result.video.width && result.video.height) lines.push(`**Resolution**: ${result.video.width}\xD7${result.video.height}`);
   if (result.video.duration) lines.push(`**Duration**: ${result.video.duration}s`);
   if (result.video.fps) lines.push(`**FPS**: ${result.video.fps}`);
   if (result.seed !== void 0) lines.push(`**Seed**: ${result.seed}`);
   if (result.request_id) lines.push(`**Request ID**: ${result.request_id}`);
-  lines.push(``, `Download or open: ${result.video.url}`);
+  lines.push(``);
+  if (movPath) {
+    lines.push(`Open: ${movPath}`);
+    lines.push(`Source URL: ${result.video.url}`);
+  } else {
+    lines.push(`Download or open: ${result.video.url}`);
+  }
   return lines.join("\n");
 }
 function registerVeoTools(server2) {
@@ -31515,7 +31616,7 @@ Returns: Video URL, provider, model, and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31586,7 +31687,7 @@ Returns: Video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31660,7 +31761,7 @@ Returns: Video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31723,7 +31824,7 @@ Returns: Video URL and metadata.`,
             duration_seconds: durationSeconds
           });
         }
-        return { content: [{ type: "text", text: formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31794,7 +31895,7 @@ Returns: Extended video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31803,22 +31904,8 @@ Returns: Extended video URL and metadata.`,
 }
 
 // src/tools/alternativeTools.ts
-function formatResult2(result) {
-  const lines = [
-    `\u2705 Video generated successfully!`,
-    ``,
-    `**Provider**: fal.ai`,
-    `**Model**: ${result.model}`,
-    `**Video URL**: ${result.video.url}`
-  ];
-  if (result.video.file_size) lines.push(`**File size**: ${(result.video.file_size / 1024 / 1024).toFixed(1)} MB`);
-  if (result.video.width && result.video.height) lines.push(`**Resolution**: ${result.video.width}\xD7${result.video.height}`);
-  if (result.video.duration) lines.push(`**Duration**: ${result.video.duration}s`);
-  if (result.video.fps) lines.push(`**FPS**: ${result.video.fps}`);
-  if (result.seed !== void 0) lines.push(`**Seed**: ${result.seed}`);
-  if (result.request_id) lines.push(`**Request ID**: ${result.request_id}`);
-  lines.push(``, `Download or open: ${result.video.url}`);
-  return lines.join("\n");
+async function formatResult2(result) {
+  return formatResult(result); // result.provider is already "fal" from extractVideoResult
 }
 function registerAlternativeTools(server2) {
   server2.registerTool(
@@ -31859,7 +31946,7 @@ Returns: Animated video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falHappyHorseImageToVideo(params);
-        return { content: [{ type: "text", text: formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31903,7 +31990,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falHappyHorseReferenceToVideo(params);
-        return { content: [{ type: "text", text: formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31948,7 +32035,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falSeedanceImageToVideo(params);
-        return { content: [{ type: "text", text: formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31998,7 +32085,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falSeedanceReferenceToVideo(params);
-        return { content: [{ type: "text", text: formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
