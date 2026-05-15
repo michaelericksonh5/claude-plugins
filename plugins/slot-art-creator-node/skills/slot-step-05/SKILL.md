@@ -74,18 +74,57 @@ be dimmer than the dimmest symbol.
       the why and how. The theme has a wider vocabulary than the
       symbol roster — pull from that for environmental motifs.
 
-### Step 4 — Generate
+### Step 4 — Generate at fullscreen delivery size (1536×3324)
+
+**All backgrounds delivered by this skill are 1536×3324** — H5G's iPhone
+portrait fullscreen design size, the size Jon's downstream asset script
+expects as the 3x source (he generates 2x and 1x automatically). This
+applies to every variant (base, freespins, bonus, pickme, wheel) without
+exception. Symbol art (`/slot-step-03`) and UI art (`/slot-step-06`)
+are NOT affected by this rule — they keep their own native sizes.
+
+**Two-call pipeline.** NB2 has no native 19.5:9 aspect (1536/3324 ≈ 0.462),
+so we generate at the closest native aspect (9:16) and recompose to exact
+pixels with `nb2_smart_resize`. Both calls use the same NB2 model end-to-end
+on Gemini-only setups.
+
+**Call 1 — generate the artwork at 9:16:**
 
 Call `mcp__nb2node__nb2_generate`:
 
 | API arg | Value |
 |---|---|
 | `prompt` | composed prompt |
-| `aspect_ratio` | `"9:16"` portrait (default), `"16:9"` landscape, `"4:3"` tablet |
-| `image_size` | `"2K"` default; `"4K"` for marketing (**nb2_generate only** — gpt-image-2 caps at 2K; backgrounds always use NB2) |
-| `output_dir` | `path.join(project_root, "Backgrounds")` — every BG variant lives in this single folder. Folder is created on first write. |
-| `asset_name` | `"BG_<variant>"`, e.g. `"BG_base"`, `"BG_freespins"` (the MCP server appends `_NNN.png` and auto-increments by scanning `Backgrounds/`) |
+| `aspect_ratio` | `"9:16"` |
+| `image_size` | `"2K"` |
+| `output_dir` | `path.join(project_root, "Backgrounds")` |
+| `asset_name` | `"BG_<variant>_src"` (the `_src` suffix marks this as the 9:16 intermediate — gets cleaned up after step 4b succeeds, or kept on iteration so you can re-resize without regenerating) |
 | `references` | absolute paths — resolve `style_anchor.key_art_path` and `assets.sheet.approved` against `project_root` first (`path.join(project_root, stored_relative_path)`), then pass the resolved absolutes. Filter null/undefined entries. |
+
+**Call 2 — recompose to 1536×3324:**
+
+Call `mcp__nb2node__nb2_smart_resize` on the path returned by call 1:
+
+| API arg | Value |
+|---|---|
+| `source` | absolute path to the `BG_<variant>_src_NNN.png` from call 1 |
+| `target_sizes` | `["1536x3324"]` |
+| `output_dir` | `path.join(project_root, "Backgrounds")` |
+| `asset_name` | `"BG_<variant>"` (the MCP appends `_resize_1536_3324.png`; rename to `BG_<variant>_NNN.png` after success — or keep the `_resize_` suffix and update the iteration record to match. The cleanest pattern: rename so downstream skills find `BG_base_001.png` at the expected path). |
+| `prompt` | (optional) one short sentence telling NB2 what the source is — e.g. `"Recompose this slot machine bonus background to the target portrait dimensions, preserving the depth, vignette, and dim center reel zone."` |
+
+**Routing**: with `GEMINI_API_KEY` set, `nb2_smart_resize` routes through
+NB2 (`gemini-3.1-flash-image-preview`) with an oversample-then-crop recipe —
+same model the generation step uses. With only `FAL_KEY` set, it routes
+through fal's `nano-banana-pro` smart-resize endpoint (single API call,
+no local crop). Either path works fully for 1536×3324.
+
+**Override for non-H5G projects:** if the active project's
+`brief.delivery_spec.fullscreen` declares different `{width, height}`
+values, use those instead of 1536×3324. This field doesn't exist in the
+brief schema yet — see the PSD/layout ingest note in the "Future work"
+section at the bottom of this file. Until that's wired up, 1536×3324 is
+the unconditional default.
 
 ### Step 5 — Inline QA check (Gate 2)
 
@@ -146,6 +185,7 @@ Type `/slot-` to see the full numbered workflow.
 
 ## Hard rules
 
+- **Final dimensions are 1536×3324** for every variant. Anything else is a regression.
 - **Bottom 30% always dark.**
 - **Reel zone always dimmed.**
 - **Three-layer depth required.**
@@ -164,3 +204,34 @@ Type `/slot-` to see the full numbered workflow.
 - `shared/art_principles.md` §7 ("Background" bullet — three-layer composition, vignette, ~10–20% brightness drop under the grid), §1 (the ten core principles — especially #1 mobile-first, #6 global light, #7 "the reel is the hero")
 - `shared/nb2_prompting.md` §9.2 (master prompt structure) — note: §9.2.3 covers bracketed-block templates for *symbols*; background prompts use the prose format in `PROMPT_TEMPLATES.md`, not the symbol bracketed-block format
 - `PROMPT_TEMPLATES.md` (per-variant templates)
+
+## Future work — PSD / layout ingest
+
+Right now this skill hardcodes 1536×3324 as the universal H5G iPhone
+fullscreen target. Long-term direction (per Jon Meschino's spec): consume
+a PSD or layout JSON that declares *every* asset's target dimensions
+inside a specific game's full layout, and have each generation skill read
+its target size from that spec instead of hardcoding a value. The data
+shape would live at `project.json.brief.delivery_spec`:
+
+```jsonc
+"delivery_spec": {
+  "platform": "iphone-portrait",
+  "fullscreen": { "width": 1536, "height": 3324 },
+  "symbol_canvas": { "width": <from PSD>, "height": <from PSD> },
+  "ladder_factors": [3, 2, 1],
+  "output_root": "Textures/Portrait"
+  // ...plus a per-surface map from a PSD ingest
+}
+```
+
+A future `/slot-step-00b` (or extension to `/slot-step-00`) would parse a
+PSD via JSX or a Figma file via the Figma API and populate the spec.
+Until that exists, this skill's fullscreen default IS the de-facto spec
+for H5G mobile portrait slots — change the constant in Step 4 if H5G's
+design size ever changes.
+
+For downsampling 3x → 2x → 1x: Jon's own asset pipeline handles that
+deterministically from the 3x source, so this skill does NOT produce
+2x/1x outputs. Single delivery: one PNG per background variant at
+1536×3324.

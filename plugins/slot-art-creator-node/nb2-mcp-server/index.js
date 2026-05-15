@@ -61,13 +61,20 @@
  *     FAL_KEY present        → fal.ai (fal-ai/nano-banana-2)
  *     Neither                → startup error with setup instructions
  *
- * Routing for nb2_smart_resize:
- *   The two paths are materially different. fal.ai has a purpose-built endpoint
- *   (Nano Banana Pro under the hood, single API call). Gemini uses NB2 + N calls
- *   + pngjs center-crop, and can fail with "image smaller than target" on some
- *   sizes. fal.ai wins when both keys are present.
- *     FAL_KEY present        → fal.ai (fal-ai/smart-resize, NB Pro)
+ * Routing for nb2_smart_resize (Gemini-first as of v1.7.2):
+ *   Both paths produce pixel-perfect output at the requested target size.
+ *   - Gemini path uses NB2 (gemini-3.1-flash-image-preview) — same model
+ *     as every other tool in this plugin — with a recompose prompt at the
+ *     closest native aspect, followed by a pngjs center-crop to lock the
+ *     exact pixel dimensions. Single API call per target size.
+ *   - fal.ai path uses fal-ai/smart-resize, a purpose-built endpoint that
+ *     wraps Nano Banana PRO (a different, larger model than NB2). Single
+ *     API call total, returns exact pixels with no local crop.
+ *   Gemini wins when both keys are present — keeps the whole plugin on
+ *   one model family by default. To force fal.ai for a specific call,
+ *   unset GEMINI_API_KEY in the calling process or use a Gemini-less env.
  *     GEMINI_API_KEY present → Gemini path (NB2 + center-crop)
+ *     FAL_KEY present        → fal.ai (fal-ai/smart-resize, NB Pro)
  *     Neither                → tool returns a clean error message
  */
 
@@ -2146,28 +2153,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     if (name === "nb2_smart_resize") {
-      // Dispatch:
-      //   FAL_KEY present       → fal-ai/smart-resize (purpose-built endpoint,
-      //                           uses nano-banana-pro internally, single API call)
-      //   Otherwise GEMINI_KEY  → our Gemini implementation using NB2
-      //                           (gemini-3.1-flash-image-preview), one call per
-      //                           target size + center-crop via pngjs
-      //   Neither               → clear error
+      // Dispatch (Gemini-first as of v1.7.2 per H5G product direction —
+      // GEMINI_API_KEY wins when both keys are set, even though fal's NB Pro
+      // endpoint avoids the final center-crop step):
+      //   GEMINI_API_KEY present → our Gemini implementation using NB2
+      //                            (gemini-3.1-flash-image-preview); calls
+      //                            NB2 with a recompose prompt at the closest
+      //                            native aspect, then pngjs center-crops to
+      //                            exact target pixels. Same NB2 model as the
+      //                            rest of the plugin.
+      //   Otherwise FAL_KEY      → fal-ai/smart-resize (purpose-built endpoint,
+      //                            uses nano-banana-pro internally, single API
+      //                            call, returns exact pixels with no local crop).
+      //   Neither                → clear error
       const targetSizes = validateTargetSizes(args.target_sizes);
       const outputDir = resolveOutputDir(args.output_dir);
       const assetName = sanitizeAssetName(args.asset_name, "resize");
       const source = await validateImageInput(args.source, "source");
-
-      if (FAL_KEY) {
-        const result = await falSmartResize({
-          source,
-          outputDir,
-          assetName,
-          targetSizes,
-          prompt: args.prompt || null,
-        });
-        return { content: formatResult(result, "nb2_smart_resize OK (fal.ai / nano-banana-pro)") };
-      }
 
       if (GEMINI_KEY) {
         const result = await geminiSmartResize({
@@ -2178,6 +2180,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           prompt: args.prompt || null,
         });
         return { content: formatResult(result, "nb2_smart_resize OK (Gemini / NB2)") };
+      }
+
+      if (FAL_KEY) {
+        const result = await falSmartResize({
+          source,
+          outputDir,
+          assetName,
+          targetSizes,
+          prompt: args.prompt || null,
+        });
+        return { content: formatResult(result, "nb2_smart_resize OK (fal.ai / nano-banana-pro)") };
       }
 
       return {

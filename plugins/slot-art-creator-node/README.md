@@ -211,7 +211,7 @@ See `shared/gpt_image2_prompting.md` for the full gpt2 playbook (size mapping, q
 | Tool | Runs on | Why |
 |---|---|---|
 | `nb2_generate`, `nb2_edit`, `nb2_upscale` | Gemini | Same NB2 model underneath, but the direct Google API call is one hop fewer than going through fal.ai's wrapper |
-| `nb2_smart_resize` | fal.ai | fal's purpose-built endpoint uses Nano Banana Pro (better model for this task), single API call, no size-limitation error |
+| `nb2_smart_resize` | **Gemini** (as of v1.7.2) | Keeps the whole plugin on one model family (NB2) by default. fal's NB Pro endpoint is a different model and a single-call recompose without local crop — slightly different output character. To force fal's path, unset `GEMINI_API_KEY` in the calling process. |
 
 ### What each setup gives you
 

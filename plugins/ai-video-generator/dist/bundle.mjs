@@ -30879,8 +30879,8 @@ function getApiKeyStatus() {
   const falKey = getFalKey();
   const geminiKey = getGeminiKey();
   let activeProvider = "none";
-  if (falKey) activeProvider = "fal";
-  else if (geminiKey) activeProvider = "gemini";
+  if (geminiKey) activeProvider = "gemini";
+  else if (falKey) activeProvider = "fal";
   return {
     fal_configured: Boolean(falKey),
     gemini_configured: Boolean(geminiKey),
@@ -30931,7 +30931,7 @@ function registerSetupTools(server2) {
       if (status.active_provider === "none") {
         message = "No API keys configured. Use the veo_setup_api_key tool to get setup instructions.";
       } else if (status.fal_configured && status.gemini_configured) {
-        message = "Both fal.ai and Gemini keys configured. fal.ai is used by default (set provider=gemini to override).";
+        message = "Both fal.ai and Gemini keys configured. Gemini is used by default for Veo 3.1 tools (set provider=fal to override).";
       } else if (status.fal_configured) {
         message = "fal.ai key configured. All Veo 3.1, Happy Horse, and Seedance models available.";
       } else {
@@ -31849,6 +31849,7 @@ Returns: Video URL and metadata.`,
         auto_fix: external_exports.boolean().default(true).describe("Auto-fix policy-violating prompts (fal.ai only)"),
         safety_tolerance: safetySchema,
         provider: providerSchema,
+        seed: external_exports.number().int().min(0).optional().describe("Seed for reproducibility"),
         asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
         animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
@@ -31868,7 +31869,8 @@ Returns: Video URL and metadata.`,
             resolution: params.resolution,
             generate_audio: params.generate_audio,
             auto_fix: params.auto_fix,
-            safety_tolerance: params.safety_tolerance
+            safety_tolerance: params.safety_tolerance,
+            seed: params.seed
           });
         } else {
           const durationSeconds = parseInt(params.duration) || 8;
@@ -31877,7 +31879,8 @@ Returns: Video URL and metadata.`,
             image_urls: params.image_urls,
             aspect_ratio: params.aspect_ratio,
             resolution: params.resolution,
-            duration_seconds: durationSeconds
+            duration_seconds: durationSeconds,
+            seed: params.seed
           });
         }
         return { content: [{ type: "text", text: await formatResult(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
@@ -32287,7 +32290,7 @@ Returns: Path to the resized file and metadata.`,
             vf = `scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H}`;
             break;
           case "fit":
-            vf = `scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2:color=black`;
+            vf = `scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:trunc((ow-iw)/2):trunc((oh-ih)/2):color=black`;
             break;
           default:
             vf = `scale=${W}:${H}`;

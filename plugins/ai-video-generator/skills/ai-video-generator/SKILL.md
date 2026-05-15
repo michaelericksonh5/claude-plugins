@@ -28,9 +28,10 @@ description: >
   - "change the resolution", "scale up/down", "crop to fit", "letterbox", "fill the frame"
   - ffmpeg requests: "use ffmpeg to...", "run ffmpeg on", "transcode this"
 
-  Do NOT trigger for: video editing (subtitles, captions, color grading, trimming, merging),
+  Do NOT trigger for: subtitles/captions, color grading, timeline trimming or merging,
   video transcription or captioning, generating still images only, research questions about
   comparing video models, or downloading/streaming existing videos.
+  (Container conversion and dimension resizing ARE in scope — those use veo_convert_video and veo_resize_video.)
 ---
 
 # AI Video Generator Skill
