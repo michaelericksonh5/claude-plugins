@@ -92,6 +92,7 @@ import { fal } from "@fal-ai/client";
 import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 import { PNG } from "pngjs";
+import jpegJs from "jpeg-js";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -1235,12 +1236,15 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
 
   // The wrapper key on GenerateContentParameters is `config:` (NOT
   // `generationConfig:`). Confirmed against genai.d.ts line 4626-4636.
+  // responseModalities:["IMAGE"] (no TEXT) + thinkingLevel:HIGH match the
+  // config that AI Studio's "Get Code" template uses for this model.
   const t0 = Date.now();
   const response = await client.models.generateContent({
-    model: "gemini-2.5-flash-image",
+    model: "gemini-3.1-flash-image-preview",
     contents: [{ role: "user", parts }],
     config: {
-      responseModalities: ["IMAGE", "TEXT"],
+      responseModalities: ["IMAGE"],
+      thinkingConfig: { thinkingLevel: "HIGH" },
       imageConfig: imgCfg,
     },
   });
@@ -1254,36 +1258,31 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
     for (const part of cand.content?.parts || []) {
       if (part.inlineData?.data) {
         const respMime = (part.inlineData.mimeType || "image/png").toLowerCase();
-        // Pick a file extension that matches the actual bytes Gemini returned.
-        // Gemini picks its own output format (no way to force PNG via the
-        // generateContent API — see comment block above). Saving with the
-        // correct extension keeps downstream tools (pngjs, viewers, asset
-        // pipeline) honest. The asset name is preserved; only the
-        // extension changes. For most aspects Gemini returns PNG; for tall
-        // portraits and some other targets it returns JPEG.
-        let ext = "png";
-        if (respMime === "image/jpeg" || respMime === "image/jpg") ext = "jpg";
-        else if (respMime === "image/webp") ext = "webp";
-        else if (respMime !== "image/png") {
+        // Always save as PNG. gemini-3.1-flash-image-preview's API returns
+        // JPEG-encoded bytes regardless of request parameters (verified
+        // empirically; SDK v2.3.0 ImageResponseFormat.mime_type is typed
+        // as the string literal 'image/jpeg'). When the response is JPEG,
+        // we transcode to PNG locally before writing to disk — mirroring
+        // AI Studio's UI download behavior and fal.ai's output_format:"png"
+        // handling. The image data is the same JPEG-quality content
+        // (lossy compression already happened on Google's side) wrapped
+        // in PNG container format so downstream tools (pngjs, smart-resize,
+        // asset pipeline) see a true PNG byte signature.
+        let buf = Buffer.from(part.inlineData.data, "base64");
+        if (respMime === "image/jpeg" || respMime === "image/jpg") {
+          buf = jpegToPng(buf);
+        } else if (respMime !== "image/png" && respMime !== "image/webp") {
           process.stderr.write(
-            `[nb2_generate] unexpected mime ${respMime} from Gemini; saving as .${ext} (raw bytes preserved)\n`
+            `[nb2_generate] unexpected mime ${respMime} from Gemini — saving raw bytes as .png\n`
           );
         }
-        if (ext !== "png") {
-          process.stderr.write(
-            `[nb2_generate] Gemini returned ${respMime} (no API control over image output format). ` +
-            `Saving as .${ext} so the file matches its bytes. If PNG is required for downstream tools, ` +
-            `set FAL_KEY and re-run — fal.ai's smart-resize endpoint exposes an output_format param.\n`
-          );
-        }
-        const dest = uniqueName(outputDir, assetName, `.${ext}`);
-        const buf = Buffer.from(part.inlineData.data, "base64");
+        const dest = uniqueName(outputDir, assetName, ".png");
         fs.writeFileSync(dest, buf);
         saved.push(dest);
         writeSidecar(dest, {
           tool: "nb2_generate",
           provider: "Gemini",
-          model: "gemini-2.5-flash-image",
+          model: "gemini-3.1-flash-image-preview",
           prompt,
           image_size: imageSize || "2K",
           aspect_ratio: aspectRatio || null,
@@ -1302,7 +1301,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
 
   return {
     provider: "Gemini",
-    model: "gemini-2.5-flash-image",
+    model: "gemini-3.1-flash-image-preview",
     resolution: imageSize || "2K",
     elapsed,
     paths: saved,
@@ -1359,6 +1358,26 @@ function pickGeminiResolutionTier(targetW, targetH) {
   if (max <= 1024) return "2K";  // 2K tier easily covers ≤1024 after preset
   if (max <= 2048) return "4K";  // 4K tier for 1080p–2K targets
   return "4K";                    // largest available; Gemini caps at 4K
+}
+
+// Transcode a JPEG buffer to PNG. gemini-3.1-flash-image-preview always
+// returns JPEG bytes via its API regardless of request parameters — the API
+// itself responds "image/png is not supported, supported values: image/jpeg"
+// and the @google/genai v2.3.0 SDK types ImageResponseFormat.mime_type as
+// the string literal 'image/jpeg'. Tools that "deliver PNG from this model"
+// (AI Studio's UI download, fal.ai's smart-resize, etc.) all do this same
+// JPEG→PNG transcode under the hood. The image data is the same lossy JPEG
+// (encoded by Google's servers); we just wrap it in PNG container so
+// downstream tools (pngjs, asset pipeline, smart-resize crop) see a true
+// PNG byte signature. No quality recovery — that's mathematically
+// impossible after lossy compression — but a real PNG file on disk.
+function jpegToPng(jpegBuf) {
+  const decoded = jpegJs.decode(jpegBuf, { useTArray: true });
+  // jpeg-js returns RGBA (4 bytes per pixel) when useTArray is set. pngjs
+  // also expects RGBA. Hand the raw pixel buffer straight across.
+  const png = new PNG({ width: decoded.width, height: decoded.height });
+  png.data = Buffer.from(decoded.data);
+  return PNG.sync.write(png);
 }
 
 // Center-crop a PNG buffer to exact target dimensions using pngjs (pure JS,
@@ -1420,7 +1439,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     // per-target below (fal's output_format param IS honored).
     const t0 = Date.now();
     const response = await client.models.generateContent({
-      model: "gemini-2.5-flash-image",
+      model: "gemini-3.1-flash-image-preview",
       contents: [{
         role: "user",
         parts: [
@@ -1429,7 +1448,8 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
         ],
       }],
       config: {
-        responseModalities: ["IMAGE", "TEXT"],
+        responseModalities: ["IMAGE"],
+        thinkingConfig: { thinkingLevel: "HIGH" },
         imageConfig: {
           aspectRatio,
           imageSize: tier,
@@ -1439,9 +1459,9 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 
     // Extract image bytes from the response and read its actual mimeType.
-    // pngjs.centerCrop requires PNG. When Gemini returns JPEG (common for
-    // non-native aspect targets), we fall back to fal.ai per-target — that
-    // endpoint's output_format:"png" param is reliably honored.
+    // gemini-3.1-flash-image-preview always returns JPEG bytes regardless
+    // of request parameters. We transcode JPEG→PNG locally before
+    // center-cropping so pngjs sees a valid PNG byte stream.
     let imageBuf = null;
     let imageMime = null;
     const candidates = response.candidates || [];
@@ -1464,24 +1484,18 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       );
     }
 
-    // Center-crop to exact target dimensions. centerCropPng requires PNG
-    // bytes (pngjs has no JPEG decoder and adding one would mean a native
-    // dep we don't want to take). When the outputMimeType:image/png hint
-    // is honored — the common case — we drop straight into centerCropPng
-    // and finish on the Gemini path. When the hint is ignored (rare but
-    // happens on extreme aspect ratios) AND FAL_KEY is available, we
-    // transparently fall back to fal.ai for THIS target size only — the
-    // other sizes in the batch can still complete on the Gemini path.
-    // Without FAL_KEY, we throw with an actionable error.
-    if (!imageMime.startsWith("image/png")) {
+    // Transcode JPEG to PNG so pngjs.centerCrop can work on it. For the
+    // expected case (JPEG from gemini-3.1-flash-image-preview) the
+    // transcode is local + pure JS, ~50ms. For an unusual non-PNG
+    // non-JPEG response and FAL_KEY available, we still fall back to
+    // fal.ai per-target as a final safety net.
+    if (imageMime === "image/jpeg" || imageMime === "image/jpg") {
+      imageBuf = jpegToPng(imageBuf);
+      imageMime = "image/png";
+    } else if (!imageMime.startsWith("image/png")) {
       if (FAL_KEY) {
-        // Per-size fal.ai fallback. Delegate to falSmartResize for THIS
-        // single target — it handles the local-file upload, the API call,
-        // and the download/save with the same naming convention. The other
-        // sizes in the batch can still finish on the Gemini path.
         process.stderr.write(
-          `[nb2_smart_resize] Gemini returned ${imageMime} for ${size} ` +
-          `despite outputMimeType:image/png hint; falling back to fal.ai for this target.\n`
+          `[nb2_smart_resize] Gemini returned unexpected ${imageMime} for ${size}; falling back to fal.ai for this target.\n`
         );
         const falResult = await falSmartResize({
           source,
@@ -1499,10 +1513,10 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
         continue; // next target size
       }
       throw new Error(
-        `Gemini returned ${imageMime} for target ${size} despite outputMimeType:image/png hint, ` +
-        `and FAL_KEY is not set so no fallback is possible. Set FAL_KEY (run /slot-setup or ` +
+        `Gemini returned unexpected ${imageMime} for target ${size}, and FAL_KEY is not ` +
+        `set so no fallback is possible. Set FAL_KEY (run /slot-setup or ` +
         `node setup-keys.js --fal) and re-run — fal.ai's smart-resize endpoint handles ` +
-        `non-PNG output reliably.`
+        `arbitrary output formats reliably.`
       );
     }
     const croppedBuf = centerCropPng(imageBuf, targetW, targetH);
@@ -1516,8 +1530,8 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     writeSidecar(dest, {
       tool: "nb2_smart_resize",
       provider: "Gemini",
-      model: "gemini-2.5-flash-image",
-      underlying_model: "gemini-2.5-flash-image", // stable Gemini image model — returns PNG natively
+      model: "gemini-3.1-flash-image-preview",
+      underlying_model: "gemini-3.1-flash-image-preview", // JPEG returns transcoded to PNG locally before center-crop
       prompt: recomposePrompt,
       image_size: size,
       target_size: size,
@@ -1535,7 +1549,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
   const overallElapsed = ((Date.now() - overallT0) / 1000).toFixed(1);
   return {
     provider: "Gemini",
-    model: "gemini-2.5-flash-image",
+    model: "gemini-3.1-flash-image-preview",
     resolution: sizes.join(", "),
     elapsed: overallElapsed,
     paths: saved,
