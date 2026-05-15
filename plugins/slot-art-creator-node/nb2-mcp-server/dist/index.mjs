@@ -72283,34 +72283,15 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   const imgCfg = {};
   if (aspectRatio && aspectRatio !== "auto") imgCfg.aspectRatio = aspectRatio;
   imgCfg.imageSize = GEMINI_IMAGE_SIZE_MAP[imageSize] || "2K";
-  const baseConfig = {
-    responseModalities: ["IMAGE", "TEXT"],
-    responseMimeType: "image/png",
-    // force PNG (top-level, NOT in imageConfig)
-    imageConfig: imgCfg
-  };
   const t0 = Date.now();
-  let response;
-  try {
-    response = await client.models.generateContent({
-      model: "gemini-3.1-flash-image-preview",
-      contents: [{ role: "user", parts }],
-      config: baseConfig
-    });
-  } catch (err) {
-    const msg = String(err?.message || err);
-    if (/responseMimeType.*not supported|not supported in Gemini API/i.test(msg)) {
-      const fallbackConfig = { ...baseConfig };
-      delete fallbackConfig.responseMimeType;
-      response = await client.models.generateContent({
-        model: "gemini-3.1-flash-image-preview",
-        contents: [{ role: "user", parts }],
-        config: fallbackConfig
-      });
-    } else {
-      throw err;
+  const response = await client.models.generateContent({
+    model: "gemini-3.1-flash-image-preview",
+    contents: [{ role: "user", parts }],
+    config: {
+      responseModalities: ["IMAGE", "TEXT"],
+      imageConfig: imgCfg
     }
-  }
+  });
   const elapsed = ((Date.now() - t0) / 1e3).toFixed(1);
   ensureDir(outputDir);
   const saved = [];
@@ -72330,7 +72311,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
         }
         if (ext !== "png") {
           process.stderr.write(
-            `[nb2_generate] Gemini returned ${respMime} despite responseMimeType:image/png hint. Saving as .${ext} so the file matches its bytes. If you need PNG specifically, set FAL_KEY and re-run \u2014 fal.ai's NB2 wrapper honors PNG output reliably.
+            `[nb2_generate] Gemini returned ${respMime} (no API control over image output format). Saving as .${ext} so the file matches its bytes. If PNG is required for downstream tools, set FAL_KEY and re-run \u2014 fal.ai's smart-resize endpoint exposes an output_format param.
 `
           );
         }
@@ -72426,7 +72407,8 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     const aspectRatio = pickGeminiAspectRatio(targetW, targetH);
     const tier = pickGeminiResolutionTier(targetW, targetH);
     const recomposePrompt = (prompt ? prompt + " " : "") + `Recompose this image at ${aspectRatio} aspect ratio while preserving the subject, palette, style, and overall mood. Adjust framing as needed to fit the target shape; do not crop awkwardly. Keep the hero subject as the focal point. Match the rendering style of the source exactly.`;
-    const baseRequest = {
+    const t0 = Date.now();
+    const response = await client.models.generateContent({
       model: "gemini-3.1-flash-image-preview",
       contents: [{
         role: "user",
@@ -72437,28 +72419,12 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       }],
       config: {
         responseModalities: ["IMAGE", "TEXT"],
-        responseMimeType: "image/png",
-        // force PNG output (top-level, not in imageConfig)
         imageConfig: {
           aspectRatio,
           imageSize: tier
         }
       }
-    };
-    const t0 = Date.now();
-    let response;
-    try {
-      response = await client.models.generateContent(baseRequest);
-    } catch (err) {
-      const msg = String(err?.message || err);
-      if (/responseMimeType.*not supported|not supported in Gemini API/i.test(msg)) {
-        const fallbackRequest = JSON.parse(JSON.stringify(baseRequest));
-        delete fallbackRequest.config.responseMimeType;
-        response = await client.models.generateContent(fallbackRequest);
-      } else {
-        throw err;
-      }
-    }
+    });
     const elapsed = ((Date.now() - t0) / 1e3).toFixed(1);
     let imageBuf = null;
     let imageMime = null;
