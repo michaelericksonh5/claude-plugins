@@ -72082,6 +72082,14 @@ function imageMimeType(ext) {
   if (ext === ".webp") return "image/webp";
   return "image/png";
 }
+function imageMimeTypeFromBytes(buffer, fallbackExt) {
+  if (!Buffer.isBuffer(buffer) || buffer.length < 12) return imageMimeType(fallbackExt);
+  if (buffer[0] === 137 && buffer[1] === 80 && buffer[2] === 78 && buffer[3] === 71) return "image/png";
+  if (buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255) return "image/jpeg";
+  if (buffer[0] === 82 && buffer[1] === 73 && buffer[2] === 70 && buffer[3] === 70 && buffer[8] === 87 && buffer[9] === 69 && buffer[10] === 66 && buffer[11] === 80) return "image/webp";
+  if (buffer[0] === 71 && buffer[1] === 73 && buffer[2] === 70 && buffer[3] === 56) return "image/gif";
+  return imageMimeType(fallbackExt);
+}
 async function fetchRemoteImageBuffer(url) {
   const resp = await fetchValidatedRemoteImage(url);
   if (!resp.ok) throw new Error(`Failed to fetch image URL: ${resp.status} ${url}`);
@@ -72244,7 +72252,7 @@ async function falSmartResize({ source, outputDir, assetName, targetSizes, promp
 function imagePartFromFile(filePath) {
   const data = fs4.readFileSync(filePath);
   const ext = path4.extname(filePath).toLowerCase();
-  const mime = imageMimeType(ext);
+  const mime = imageMimeTypeFromBytes(data, ext);
   return {
     inlineData: {
       data: data.toString("base64"),
@@ -72275,16 +72283,34 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   const imgCfg = {};
   if (aspectRatio && aspectRatio !== "auto") imgCfg.aspectRatio = aspectRatio;
   imgCfg.imageSize = GEMINI_IMAGE_SIZE_MAP[imageSize] || "2K";
-  const config2 = {
+  const baseConfig = {
     responseModalities: ["IMAGE", "TEXT"],
+    responseMimeType: "image/png",
+    // force PNG (top-level, NOT in imageConfig)
     imageConfig: imgCfg
   };
   const t0 = Date.now();
-  const response = await client.models.generateContent({
-    model: "gemini-3.1-flash-image-preview",
-    contents: [{ role: "user", parts }],
-    config: config2
-  });
+  let response;
+  try {
+    response = await client.models.generateContent({
+      model: "gemini-3.1-flash-image-preview",
+      contents: [{ role: "user", parts }],
+      config: baseConfig
+    });
+  } catch (err) {
+    const msg = String(err?.message || err);
+    if (/responseMimeType.*not supported|not supported in Gemini API/i.test(msg)) {
+      const fallbackConfig = { ...baseConfig };
+      delete fallbackConfig.responseMimeType;
+      response = await client.models.generateContent({
+        model: "gemini-3.1-flash-image-preview",
+        contents: [{ role: "user", parts }],
+        config: fallbackConfig
+      });
+    } else {
+      throw err;
+    }
+  }
   const elapsed = ((Date.now() - t0) / 1e3).toFixed(1);
   ensureDir(outputDir);
   const saved = [];
@@ -72292,7 +72318,23 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   for (const cand of candidates) {
     for (const part of cand.content?.parts || []) {
       if (part.inlineData?.data) {
-        const dest = uniqueName(outputDir, assetName);
+        const respMime = (part.inlineData.mimeType || "image/png").toLowerCase();
+        let ext = "png";
+        if (respMime === "image/jpeg" || respMime === "image/jpg") ext = "jpg";
+        else if (respMime === "image/webp") ext = "webp";
+        else if (respMime !== "image/png") {
+          process.stderr.write(
+            `[nb2_generate] unexpected mime ${respMime} from Gemini; saving as .${ext} (raw bytes preserved)
+`
+          );
+        }
+        if (ext !== "png") {
+          process.stderr.write(
+            `[nb2_generate] Gemini returned ${respMime} despite responseMimeType:image/png hint. Saving as .${ext} so the file matches its bytes. If you need PNG specifically, set FAL_KEY and re-run \u2014 fal.ai's NB2 wrapper honors PNG output reliably.
+`
+          );
+        }
+        const dest = uniqueName(outputDir, assetName, `.${ext}`);
         const buf = Buffer.from(part.inlineData.data, "base64");
         fs4.writeFileSync(dest, buf);
         saved.push(dest);
@@ -72305,6 +72347,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
           aspect_ratio: aspectRatio || null,
           reference_images: references || [],
           source_image: null,
+          actual_mime: respMime,
           duration_seconds: Number(elapsed)
         });
       }

@@ -908,6 +908,25 @@ function imageMimeType(ext) {
   return "image/png";
 }
 
+// Sniff the actual image format from the file's magic bytes. More reliable
+// than going by file extension, especially for files produced by earlier
+// versions of this plugin where Gemini's JPEG output was saved with a .png
+// extension. Falls back to extension-based detection if the magic bytes
+// don't match a known format. Pure JS, no extra deps.
+function imageMimeTypeFromBytes(buffer, fallbackExt) {
+  if (!Buffer.isBuffer(buffer) || buffer.length < 12) return imageMimeType(fallbackExt);
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) return "image/png";
+  // JPEG: FF D8 FF
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return "image/jpeg";
+  // WebP: "RIFF" .... "WEBP"
+  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+      buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) return "image/webp";
+  // GIF: "GIF8"
+  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38) return "image/gif";
+  return imageMimeType(fallbackExt);
+}
+
 async function fetchRemoteImageBuffer(url) {
   const resp = await fetchValidatedRemoteImage(url);
   if (!resp.ok) throw new Error(`Failed to fetch image URL: ${resp.status} ${url}`);
@@ -1144,7 +1163,13 @@ async function falSmartResize({ source, outputDir, assetName, targetSizes, promp
 function imagePartFromFile(filePath) {
   const data = fs.readFileSync(filePath);
   const ext = path.extname(filePath).toLowerCase();
-  const mime = imageMimeType(ext);
+  // Sniff actual format from magic bytes — file extension can lie. Older
+  // versions of geminiGenerate saved JPEG bytes with a .png extension; if
+  // we trust the extension here, we tell Gemini "this is image/png" while
+  // sending JPEG bytes, which confuses the model and may cause it to
+  // return JPEG in response. Detecting from bytes is correct regardless
+  // of how the source file was named.
+  const mime = imageMimeTypeFromBytes(data, ext);
   return {
     inlineData: {
       data: data.toString("base64"),
@@ -1179,29 +1204,57 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   }
 
   // GenerateContentConfig schema (verified against @google/genai v1.52.0
-  // genai.d.ts line 4466):
-  //   - responseModalities goes at the top level of config
+  // genai.d.ts line 4466 + Context7 docs):
+  //   - responseModalities, responseMimeType go at the TOP level of config
   //   - aspectRatio and imageSize go INSIDE config.imageConfig (per
   //     ImageConfig interface at line 6197)
   //   - numberOfImages does NOT exist on this interface — it's on
   //     GenerateImagesConfig (Imagen API) which we don't use here
+  //
+  // CRITICAL: without responseMimeType:"image/png", gemini-3.1-flash-image-preview
+  // returns JPEG bytes for many aspect ratios while the SDK still wraps them
+  // in inlineData with mimeType:"image/jpeg". If we saved those bytes as ".png"
+  // we'd produce JPEG-as-PNG files that fail in any pngjs-based downstream
+  // tool (smart_resize being the obvious one). The hint is at the top level
+  // of config — putting it inside imageConfig.outputMimeType (the SDK type
+  // does declare that field) is rejected at runtime by Gemini.
   const imgCfg = {};
   if (aspectRatio && aspectRatio !== "auto") imgCfg.aspectRatio = aspectRatio;
   imgCfg.imageSize = GEMINI_IMAGE_SIZE_MAP[imageSize] || "2K";
 
-  const config = {
+  const baseConfig = {
     responseModalities: ["IMAGE", "TEXT"],
+    responseMimeType: "image/png",  // force PNG (top-level, NOT in imageConfig)
     imageConfig: imgCfg,
   };
 
   // The wrapper key on GenerateContentParameters is `config:` (NOT
   // `generationConfig:`). Confirmed against genai.d.ts line 4626-4636.
   const t0 = Date.now();
-  const response = await client.models.generateContent({
-    model: "gemini-3.1-flash-image-preview",
-    contents: [{ role: "user", parts }],
-    config,
-  });
+  let response;
+  try {
+    response = await client.models.generateContent({
+      model: "gemini-3.1-flash-image-preview",
+      contents: [{ role: "user", parts }],
+      config: baseConfig,
+    });
+  } catch (err) {
+    // Some Gemini API versions reject responseMimeType for image-output
+    // models. Retry without the hint — we'll catch JPEG returns at the
+    // mime-check below and save with the correct extension.
+    const msg = String(err?.message || err);
+    if (/responseMimeType.*not supported|not supported in Gemini API/i.test(msg)) {
+      const fallbackConfig = { ...baseConfig };
+      delete fallbackConfig.responseMimeType;
+      response = await client.models.generateContent({
+        model: "gemini-3.1-flash-image-preview",
+        contents: [{ role: "user", parts }],
+        config: fallbackConfig,
+      });
+    } else {
+      throw err;
+    }
+  }
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 
   ensureDir(outputDir);
@@ -1211,7 +1264,29 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   for (const cand of candidates) {
     for (const part of cand.content?.parts || []) {
       if (part.inlineData?.data) {
-        const dest = uniqueName(outputDir, assetName);
+        const respMime = (part.inlineData.mimeType || "image/png").toLowerCase();
+        // Pick a file extension that matches the actual bytes Gemini returned.
+        // If responseMimeType was honored, this is "png" (the common case).
+        // If Gemini ignored the hint and returned JPEG/WEBP, we save with
+        // the correct extension so downstream tools (pngjs, viewers, asset
+        // pipeline) see honest bytes instead of mislabeled files. The asset
+        // name is preserved; only the extension changes.
+        let ext = "png";
+        if (respMime === "image/jpeg" || respMime === "image/jpg") ext = "jpg";
+        else if (respMime === "image/webp") ext = "webp";
+        else if (respMime !== "image/png") {
+          process.stderr.write(
+            `[nb2_generate] unexpected mime ${respMime} from Gemini; saving as .${ext} (raw bytes preserved)\n`
+          );
+        }
+        if (ext !== "png") {
+          process.stderr.write(
+            `[nb2_generate] Gemini returned ${respMime} despite responseMimeType:image/png hint. ` +
+            `Saving as .${ext} so the file matches its bytes. If you need PNG specifically, set FAL_KEY ` +
+            `and re-run — fal.ai's NB2 wrapper honors PNG output reliably.\n`
+          );
+        }
+        const dest = uniqueName(outputDir, assetName, `.${ext}`);
         const buf = Buffer.from(part.inlineData.data, "base64");
         fs.writeFileSync(dest, buf);
         saved.push(dest);
@@ -1224,6 +1299,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
           aspect_ratio: aspectRatio || null,
           reference_images: references || [],
           source_image: null,
+          actual_mime: respMime,
           duration_seconds: Number(elapsed),
         });
       }
