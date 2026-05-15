@@ -5,7 +5,7 @@ High 5 Games slot machine art generation plugin for Claude Code and Claude Cowor
 
 **Two model families, your choice per call:**
 
-- **Nano Banana 2** ([fal.ai/models/fal-ai/nano-banana-2](https://fal.ai/models/fal-ai/nano-banana-2)) — 4 tools (`nb2_generate`, `nb2_edit`, `nb2_upscale`, `nb2_smart_resize`). Either Google Gemini OR fal.ai works fully. With both keys set, generate/edit/upscale routes to Gemini (direct API, same NB2 model) and smart-resize routes to fal.ai (purpose-built Nano Banana Pro endpoint).
+- **Nano Banana 2** ([fal.ai/models/fal-ai/nano-banana-2](https://fal.ai/models/fal-ai/nano-banana-2)) — 4 tools (`nb2_generate`, `nb2_edit`, `nb2_upscale`, `nb2_smart_resize`). Either Google Gemini OR fal.ai works fully. As of v1.7.2 all four tools route to Gemini when both keys are set — keeps the plugin on one model family (NB2) end-to-end. fal.ai is the fallback when only `FAL_KEY` is set, and runs `nb2_smart_resize` against fal's purpose-built `nano-banana-pro` endpoint.
 - **GPT Image 2** ([OpenAI gpt-image-2](https://developers.openai.com/api/docs/models/gpt-image-2), released April 2026) — 2 tools (`gpt2_generate`, `gpt2_edit`) at 1K or 2K resolution. Best for **accurate in-image text** (paytables, logos, banners with copy), **stable 2K photorealism**, and **compositional multi-image edits**. More expensive per call than NB2 — use selectively for hero and text-heavy assets. For 4K marketing output: generate at 2K with `gpt2_generate`, then run `nb2_upscale` (tested path). **No faithful upscale mode** in gpt-image-2 (always regenerates); use `nb2_upscale` for true source-preserving upscales. **Multi-aspect resize stays on `nb2_smart_resize`** — a gpt2-based smart resize was prototyped but not shipped in v1.5.3 because output quality wasn't verified against the well-tested fal.ai path.
 
 Both families are independent — set whichever keys you need. The NB2
@@ -199,7 +199,7 @@ Should show `slot-art-creator-node@h5g-plugins ... Status: √ enabled`.
 | Photorealistic 2K (marketing hero shots — gpt-image-2's stable ceiling) | `gpt2_generate` (size `2K`, quality `high`) — for genuine 4K, generate at 2K then run `nb2_upscale` |
 | Compositional editing combining 2-16 reference images | `gpt2_edit` with `extra_references` |
 | Routine slot symbols at thumbnail size | `nb2_generate` (NB2 is purpose-tuned, gpt2 is overkill and pricier) |
-| Multi-aspect resize of any source | `nb2_smart_resize` (fal.ai NB Pro purpose-built endpoint, single call, cheapest; falls back to Gemini + pngjs when only `GEMINI_API_KEY` is set) |
+| Multi-aspect resize of any source | `nb2_smart_resize` — routes to Gemini (NB2 recompose + pngjs crop) by default; routes to fal.ai's NB Pro single-call endpoint when only `FAL_KEY` is set |
 | Multi-aspect resize where wordmark text must stay readable | Generate the new aspect ratio fresh at 2K with `gpt2_generate` and a recompose prompt — gpt2-based smart resize was prototyped but not shipped (output quality wasn't verified) |
 | Genuine 4K marketing output | `gpt2_generate` at `2K` → `nb2_upscale` to 4K (tested path) |
 | Upscale an approved 2K asset to 4K | `nb2_upscale` (gpt-image-2 doesn't faithfully upscale — it generates fresh) |
@@ -219,7 +219,7 @@ See `shared/gpt_image2_prompting.md` for the full gpt2 playbook (size mapping, q
 |---|---|
 | **Gemini only** | All 4 tools work. `nb2_smart_resize` uses the NB2 + pngjs path; may fail on certain target sizes (see limitation above) |
 | **fal.ai only** | All 4 tools work. Generate / edit / upscale go through fal's wrapper of NB2; smart_resize uses NB Pro |
-| **Both (recommended)** | All 4 tools work, each routed to its strongest backend (table above) |
+| **Both (recommended)** | All 4 tools work, routed to Gemini end-to-end (one model family, fewer hops). To force smart-resize through fal's NB Pro endpoint for a specific call, unset `GEMINI_API_KEY` in that process. |
 
 ### Where to put your keys
 

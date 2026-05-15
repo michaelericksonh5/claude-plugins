@@ -47,9 +47,12 @@ the "no active project — guide through setup" pattern.
    so the user can build up the source asset, then return here for
    the multi-aspect variants.
 2. Load `project.json`.
-3. Detect available API key(s):
-   - If `FAL_KEY` is set → fal.ai backend
-   - Else if `GEMINI_API_KEY` / `GOOGLE_API_KEY` is set → Gemini backend
+3. Detect available API key(s) — `nb2_smart_resize` is Gemini-first
+   as of v1.7.2:
+   - If `GEMINI_API_KEY` / `GOOGLE_API_KEY` is set → Gemini backend
+     (NB2 recompose + pngjs crop to exact target pixels)
+   - Else if `FAL_KEY` is set → fal.ai backend (fal-ai/smart-resize
+     endpoint using nano-banana-pro, single call per target)
    - Else → route the user to `/slot-setup` (or have them run
      `setup-keys.js`) to configure at least one key. The resize work
      can resume once a key is in place.

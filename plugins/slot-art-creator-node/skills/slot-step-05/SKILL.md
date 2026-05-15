@@ -98,7 +98,7 @@ Call `mcp__nb2node__nb2_generate`:
 | `aspect_ratio` | `"9:16"` |
 | `image_size` | `"2K"` |
 | `output_dir` | `path.join(project_root, "Backgrounds")` |
-| `asset_name` | `"BG_<variant>_src"` (the `_src` suffix marks this as the 9:16 intermediate — gets cleaned up after step 4b succeeds, or kept on iteration so you can re-resize without regenerating) |
+| `asset_name` | `"BG_<variant>_src"` (the `_src` suffix marks this as a temporary 9:16 intermediate; will be deleted in step 4c) |
 | `references` | absolute paths — resolve `style_anchor.key_art_path` and `assets.sheet.approved` against `project_root` first (`path.join(project_root, stored_relative_path)`), then pass the resolved absolutes. Filter null/undefined entries. |
 
 **Call 2 — recompose to 1536×3324:**
@@ -110,8 +110,21 @@ Call `mcp__nb2node__nb2_smart_resize` on the path returned by call 1:
 | `source` | absolute path to the `BG_<variant>_src_NNN.png` from call 1 |
 | `target_sizes` | `["1536x3324"]` |
 | `output_dir` | `path.join(project_root, "Backgrounds")` |
-| `asset_name` | `"BG_<variant>"` (the MCP appends `_resize_1536_3324.png`; rename to `BG_<variant>_NNN.png` after success — or keep the `_resize_` suffix and update the iteration record to match. The cleanest pattern: rename so downstream skills find `BG_base_001.png` at the expected path). |
+| `asset_name` | `"BG_<variant>_tmp"` (the MCP appends `_resize_1536_3324.png`; this lands as `BG_<variant>_tmp_resize_1536_3324_NNN.png`. Step 4c renames it to the canonical `BG_<variant>_NNN.png` form so downstream skills find it at the expected path.) |
 | `prompt` | (optional) one short sentence telling NB2 what the source is — e.g. `"Recompose this slot machine bonus background to the target portrait dimensions, preserving the depth, vignette, and dim center reel zone."` |
+
+**Call 4c — cleanup (mandatory, not optional):**
+
+After call 2 succeeds:
+
+1. **Rename** the resize output to the canonical filename. Use the next available `NNN` counter scanning `Backgrounds/` for existing `BG_<variant>_<NNN>.png` files:
+   ```
+   Backgrounds/BG_<variant>_tmp_resize_1536_3324_NNN.png  →  Backgrounds/BG_<variant>_NNN.png
+   ```
+2. **Delete** the 9:16 intermediate: `Backgrounds/BG_<variant>_src_NNN.png` (the source from call 1) AND its sidecar `.meta.json`. The intermediate has no value once the resized version exists; keeping it around clutters the project folder and confuses `/slot-compare`.
+3. **Rename the sidecar** too: `BG_<variant>_tmp_resize_1536_3324_NNN.meta.json` → `BG_<variant>_NNN.meta.json`. Update the `filename` field inside it to match the new name. (The other sidecar fields — prompt, model, references, dimensions — stay accurate.)
+
+The canonical filename `BG_<variant>_NNN.png` is what step 6 records in `project.json.assets.backgrounds.<variant>.iterations[].path` and what every downstream skill (`/slot-step-06`, `/slot-step-08`, `/slot-compare`) reads. There is no ambiguity — the two-call pipeline is hidden from anyone reading `project.json`.
 
 **Routing**: with `GEMINI_API_KEY` set, `nb2_smart_resize` routes through
 NB2 (`gemini-3.1-flash-image-preview`) with an oversample-then-crop recipe —
