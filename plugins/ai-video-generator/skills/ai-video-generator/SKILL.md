@@ -23,10 +23,14 @@ description: >
   - User drops/uploads an image file and asks for any kind of animation or video
   - "win animation", "spin reveal", "bonus trigger", "symbol animation", "reel transition"
   - "lobby video", "loading screen animation", "jackpot sequence"
+  - "convert this video", "convert to MOV", "convert to MP4", "rewrap", "lossless conversion"
+  - "resize this video", "scale to X by Y", "make it 1280x852", "fit game dimensions", "output at [WxH]"
+  - "change the resolution", "scale up/down", "crop to fit", "letterbox", "fill the frame"
+  - ffmpeg requests: "use ffmpeg to...", "run ffmpeg on", "transcode this"
 
-  Do NOT trigger for: video editing (subtitles, captions, compression, ffmpeg, format conversion,
-  trimming, merging), video transcription or captioning, generating still images only, research
-  questions about comparing video models, or downloading/streaming existing videos.
+  Do NOT trigger for: video editing (subtitles, captions, color grading, trimming, merging),
+  video transcription or captioning, generating still images only, research questions about
+  comparing video models, or downloading/streaming existing videos.
 ---
 
 # AI Video Generator Skill
@@ -481,3 +485,71 @@ Check billing at https://aistudio.google.com."
 - Slot use: complex assembled sequences using approved art + existing clips + audio stems
 - Key params: prompt (use @Image1, @Video1, @Audio1...), image_urls, video_urls, audio_urls
 - Limits: up to 9 images, 3 videos (combined 2–15s), 3 audio files (combined max 15s)
+
+**veo_convert_video** — lossless container rewrap (no re-encode)
+- Use when: changing file format without touching quality (MP4→MOV, MOV→MP4)
+- Key params: input_path (required), output_format ("mov" or "mp4"), output_path (optional)
+- Output: same directory as input by default, new extension
+
+**veo_resize_video** — scale to exact game dimensions
+- Use when: game engine needs a specific pixel size (e.g. 1280×852 for a particular slot game)
+- Key params: input_path, width, height (all required); fit_mode, codec, output_format (optional)
+- Output: same directory as input, `{basename}_{W}x{H}.mov` by default
+
+---
+
+## ffmpeg Post-Processing Workflow
+
+These tools operate on **already-generated local files** — they don't call any AI service.
+ffmpeg is the same binary used for the automatic MP4→MOV rewrap; no separate install needed.
+
+### When to use each tool
+
+| Situation | Tool | Notes |
+|---|---|---|
+| Change container format without quality loss | `veo_convert_video` | Uses `-c copy` — instant, lossless |
+| Scale to game-specific dimensions | `veo_resize_video` | Re-encodes; ProRes by default |
+| Output from AI gen is MP4, need MOV for AE | `veo_convert_video` | Usually already done automatically |
+| Game needs 1280×852 but video is 1280×720 | `veo_resize_video` | fill mode: scales up, crops excess |
+| Game needs 854×480 (letterboxed) | `veo_resize_video` | fit mode: scales down, adds black bars |
+
+### Fit mode guide
+
+```
+Source: 1280×720  →  Target: 1280×852
+
+fill (default):  Scale until 1280 wide and 852 tall are both covered.
+                 1280×720 scales to 1280×853, then crops 1px from top/bottom.
+                 Result: 1280×852, no black bars, slight vertical crop.
+
+fit:             Scale until both dimensions fit inside 1280×852.
+                 1280×720 stays 1280×720, padded with black bars top/bottom.
+                 Result: 1280×852 with 66px black bars top and bottom.
+
+stretch:         Force 1280×852 by distorting.
+                 Only use if the game explicitly stretches sprites.
+```
+
+### Codec guide
+
+| Codec | Container | File size | Use when |
+|---|---|---|---|
+| prores (default for MOV) | MOV only | Large (~150MB/min) | Delivering to AE or game engine — maximum quality |
+| h264 | MOV or MP4 | Medium (~20MB/min) | Web preview, email delivery, smaller file needed |
+| h265 | MOV or MP4 | Small (~10MB/min) | Mobile-first delivery, modern game engines only |
+
+### Natural language patterns → tool mapping
+
+- "convert HP1_idle to MOV" → `veo_convert_video` with `output_format="mov"`
+- "resize the idle animation to 1280 by 852" → `veo_resize_video` with `width=1280, height=852`
+- "make it fit the Blazing game dimensions" → ask for the exact pixel dimensions, then `veo_resize_video`
+- "I need ProRes for After Effects" → `veo_resize_video` or `veo_convert_video` — ProRes requires re-encode (use resize even at same dimensions if ProRes is needed)
+- "lossless MP4 to MOV" → `veo_convert_video` — `-c copy` is truly lossless
+- "scale up and crop to fill 1280x852" → `veo_resize_video` with `fit_mode="fill"`
+
+### Important: dimensions are game-specific
+
+Do not assume dimensions. Every game has its own art spec. Ask the user for the target
+width and height if not stated. Common patterns:
+- "Blazing game" (or similar) → user will provide exact dimensions
+- Game engine slot sizes vary per project — never hardcode guesses
