@@ -72285,7 +72285,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   imgCfg.imageSize = GEMINI_IMAGE_SIZE_MAP[imageSize] || "2K";
   const t0 = Date.now();
   const response = await client.models.generateContent({
-    model: "gemini-3.1-flash-image-preview",
+    model: "gemini-2.5-flash-image",
     contents: [{ role: "user", parts }],
     config: {
       responseModalities: ["IMAGE", "TEXT"],
@@ -72322,7 +72322,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
         writeSidecar2(dest, {
           tool: "nb2_generate",
           provider: "Gemini",
-          model: "gemini-3.1-flash-image-preview",
+          model: "gemini-2.5-flash-image",
           prompt,
           image_size: imageSize || "2K",
           aspect_ratio: aspectRatio || null,
@@ -72339,7 +72339,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   );
   return {
     provider: "Gemini",
-    model: "gemini-3.1-flash-image-preview",
+    model: "gemini-2.5-flash-image",
     resolution: imageSize || "2K",
     elapsed,
     paths: saved
@@ -72409,7 +72409,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     const recomposePrompt = (prompt ? prompt + " " : "") + `Recompose this image at ${aspectRatio} aspect ratio while preserving the subject, palette, style, and overall mood. Adjust framing as needed to fit the target shape; do not crop awkwardly. Keep the hero subject as the focal point. Match the rendering style of the source exactly.`;
     const t0 = Date.now();
     const response = await client.models.generateContent({
-      model: "gemini-3.1-flash-image-preview",
+      model: "gemini-2.5-flash-image",
       contents: [{
         role: "user",
         parts: [
@@ -72475,9 +72475,9 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     writeSidecar2(dest, {
       tool: "nb2_smart_resize",
       provider: "Gemini",
-      model: "gemini-3.1-flash-image-preview",
-      underlying_model: "gemini-3.1-flash-image-preview",
-      // = Nano Banana 2
+      model: "gemini-2.5-flash-image",
+      underlying_model: "gemini-2.5-flash-image",
+      // stable Gemini image model — returns PNG natively
       prompt: recomposePrompt,
       image_size: size,
       target_size: size,
@@ -72494,7 +72494,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
   const overallElapsed = ((Date.now() - overallT0) / 1e3).toFixed(1);
   return {
     provider: "Gemini",
-    model: "gemini-3.1-flash-image-preview",
+    model: "gemini-2.5-flash-image",
     resolution: sizes.join(", "),
     elapsed: overallElapsed,
     paths: saved

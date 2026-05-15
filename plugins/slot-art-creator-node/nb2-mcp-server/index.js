@@ -53,20 +53,22 @@
  * each tool to its strongest backend (see below).
  *
  * Routing for generate / edit / upscale:
- *   Both providers wrap the SAME underlying model (Nano Banana 2 =
- *   gemini-3.1-flash-image-preview = fal-ai/nano-banana-2). Output quality is
- *   ~identical. Gemini wins when both keys are set because the direct Google
- *   API call is one hop fewer than going through fal.ai's wrapper.
- *     GEMINI_API_KEY present → Google Gemini (gemini-3.1-flash-image-preview)
+ *   Gemini path uses `gemini-2.5-flash-image` — the stable, production-ready
+ *   Gemini image model that returns PNG natively (verified empirically
+ *   v1.7.8). We previously used `gemini-3.1-flash-image-preview` but that
+ *   preview model returns JPEG-only with no API surface to change it. fal.ai
+ *   path wraps `fal-ai/nano-banana-2` — closely related lineage, returns PNG
+ *   via output_format param. Output quality is comparable.
+ *     GEMINI_API_KEY present → Google Gemini (gemini-2.5-flash-image)
  *     FAL_KEY present        → fal.ai (fal-ai/nano-banana-2)
  *     Neither                → startup error with setup instructions
  *
  * Routing for nb2_smart_resize (Gemini-first as of v1.7.2):
  *   Both paths produce pixel-perfect output at the requested target size.
- *   - Gemini path uses NB2 (gemini-3.1-flash-image-preview) — same model
- *     as every other tool in this plugin — with a recompose prompt at the
- *     closest native aspect, followed by a pngjs center-crop to lock the
- *     exact pixel dimensions. Single API call per target size.
+ *   - Gemini path uses gemini-2.5-flash-image (same model as the other
+ *     tools above) — returns PNG natively for the recompose call, then
+ *     pngjs center-crop locks exact pixel dimensions. Single API call
+ *     per target size.
  *   - fal.ai path uses fal-ai/smart-resize, a purpose-built endpoint that
  *     wraps Nano Banana PRO (a different, larger model than NB2). Single
  *     API call total, returns exact pixels with no local crop.
@@ -1235,7 +1237,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
   // `generationConfig:`). Confirmed against genai.d.ts line 4626-4636.
   const t0 = Date.now();
   const response = await client.models.generateContent({
-    model: "gemini-3.1-flash-image-preview",
+    model: "gemini-2.5-flash-image",
     contents: [{ role: "user", parts }],
     config: {
       responseModalities: ["IMAGE", "TEXT"],
@@ -1281,7 +1283,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
         writeSidecar(dest, {
           tool: "nb2_generate",
           provider: "Gemini",
-          model: "gemini-3.1-flash-image-preview",
+          model: "gemini-2.5-flash-image",
           prompt,
           image_size: imageSize || "2K",
           aspect_ratio: aspectRatio || null,
@@ -1300,7 +1302,7 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
 
   return {
     provider: "Gemini",
-    model: "gemini-3.1-flash-image-preview",
+    model: "gemini-2.5-flash-image",
     resolution: imageSize || "2K",
     elapsed,
     paths: saved,
@@ -1418,7 +1420,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     // per-target below (fal's output_format param IS honored).
     const t0 = Date.now();
     const response = await client.models.generateContent({
-      model: "gemini-3.1-flash-image-preview",
+      model: "gemini-2.5-flash-image",
       contents: [{
         role: "user",
         parts: [
@@ -1514,8 +1516,8 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     writeSidecar(dest, {
       tool: "nb2_smart_resize",
       provider: "Gemini",
-      model: "gemini-3.1-flash-image-preview",
-      underlying_model: "gemini-3.1-flash-image-preview", // = Nano Banana 2
+      model: "gemini-2.5-flash-image",
+      underlying_model: "gemini-2.5-flash-image", // stable Gemini image model — returns PNG natively
       prompt: recomposePrompt,
       image_size: size,
       target_size: size,
@@ -1533,7 +1535,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
   const overallElapsed = ((Date.now() - overallT0) / 1000).toFixed(1);
   return {
     provider: "Gemini",
-    model: "gemini-3.1-flash-image-preview",
+    model: "gemini-2.5-flash-image",
     resolution: sizes.join(", "),
     elapsed: overallElapsed,
     paths: saved,
