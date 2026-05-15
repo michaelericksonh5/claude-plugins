@@ -74637,7 +74637,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     const targetH = parseInt(match[2], 10);
     const aspectRatio = pickGeminiAspectRatio(targetW, targetH);
     const tier = pickGeminiResolutionTier(targetW, targetH);
-    const recomposePrompt = (prompt ? prompt + " " : "") + `Recompose this image at ${aspectRatio} aspect ratio while preserving the subject, palette, style, and overall mood. Adjust framing as needed to fit the target shape; do not crop awkwardly. Keep the hero subject as the focal point. Match the rendering style of the source exactly.`;
+    const recomposePrompt = (prompt ? prompt + " " : "") + `EXTEND this image to a ${aspectRatio} aspect ratio. The input image is the fixed centerpiece \u2014 preserve its content, subject placement, palette, lighting, and style EXACTLY as-is in the center of the new canvas. To fit the new aspect, paint MORE of the same scene at the edges where space is needed: if the target is taller, add more sky/atmosphere above and more ground/seafloor/foreground below, matching the existing style precisely; if the target is wider, add more scene to the left and right edges in the same style. Do NOT redraw, restyle, or recompose the existing content \u2014 only extend the surrounding area outward like a vertical or horizontal outpaint. The result should look like one continuous scene that has been expanded outward, not a new composition.`;
     const t0 = Date.now();
     const response = await client.models.generateContent({
       model: "gemini-3.1-flash-image-preview",

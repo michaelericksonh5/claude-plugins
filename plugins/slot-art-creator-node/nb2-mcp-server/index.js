@@ -1427,12 +1427,27 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     const aspectRatio = pickGeminiAspectRatio(targetW, targetH);
     const tier = pickGeminiResolutionTier(targetW, targetH);
 
+    // Outpaint-semantic prompt (v1.7.10+). Earlier versions said "Recompose"
+    // which Gemini interpreted as "re-imagine the composition" — that
+    // produced multi-band hallucinated outputs for non-native aspects
+    // (e.g. extending 9:16 toward 19.5:9 yielded three stacked unrelated
+    // scenes). The phrasing below tells the model to treat the input as
+    // a fixed centerpiece and only generate NEW content at the edges to
+    // fill the target aspect. This is the same intent fal.ai's
+    // nano-banana-pro endpoint expresses via its built-in algorithm.
     const recomposePrompt =
       (prompt ? prompt + " " : "") +
-      `Recompose this image at ${aspectRatio} aspect ratio while preserving the ` +
-      `subject, palette, style, and overall mood. Adjust framing as needed to fit ` +
-      `the target shape; do not crop awkwardly. Keep the hero subject as the ` +
-      `focal point. Match the rendering style of the source exactly.`;
+      `EXTEND this image to a ${aspectRatio} aspect ratio. The input image is ` +
+      `the fixed centerpiece — preserve its content, subject placement, palette, ` +
+      `lighting, and style EXACTLY as-is in the center of the new canvas. To fit ` +
+      `the new aspect, paint MORE of the same scene at the edges where space is ` +
+      `needed: if the target is taller, add more sky/atmosphere above and more ` +
+      `ground/seafloor/foreground below, matching the existing style precisely; ` +
+      `if the target is wider, add more scene to the left and right edges in the ` +
+      `same style. Do NOT redraw, restyle, or recompose the existing content — ` +
+      `only extend the surrounding area outward like a vertical or horizontal ` +
+      `outpaint. The result should look like one continuous scene that has been ` +
+      `expanded outward, not a new composition.`;
 
     // No way to force PNG output on this endpoint — the Gemini API rejects
     // `response_mime_type` as text-only ("allowed mimetypes are text/plain,

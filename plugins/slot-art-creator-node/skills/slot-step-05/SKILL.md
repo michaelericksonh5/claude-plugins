@@ -88,7 +88,7 @@ so we generate at the closest native aspect (9:16) and recompose to exact
 pixels with `nb2_smart_resize`. Both calls use the same NB2 model end-to-end
 on Gemini-only setups.
 
-**Call 1 — generate the artwork at 9:16:**
+**Call 1 — generate the artwork at 9:16 (this is your "source"):**
 
 Call `mcp__nb2node__nb2_generate`:
 
@@ -98,33 +98,41 @@ Call `mcp__nb2node__nb2_generate`:
 | `aspect_ratio` | `"9:16"` |
 | `image_size` | `"2K"` |
 | `output_dir` | `path.join(project_root, "Backgrounds")` |
-| `asset_name` | `"BG_<variant>_src"` (the `_src` suffix marks this as a temporary 9:16 intermediate; will be deleted in step 4c) |
+| `asset_name` | `"BG_<variant>_src"` — the 9:16 source generation. **This file is preserved permanently.** It's the human-reviewable composition the user approves; the 1536×3324 derivative in call 2 is just a delivery-format wrapper around the same content. |
 | `references` | absolute paths — resolve `style_anchor.key_art_path` and `assets.sheet.approved` against `project_root` first (`path.join(project_root, stored_relative_path)`), then pass the resolved absolutes. Filter null/undefined entries. |
 
-**Call 2 — recompose to 1536×3324:**
+**Call 2 — extend to 1536×3324 (the delivery format):**
 
-Call `mcp__nb2node__nb2_smart_resize` on the path returned by call 1:
+Call `mcp__nb2node__nb2_smart_resize` on the path returned by call 1. The MCP server's geminiSmartResize uses an **outpaint-semantic prompt by default** (added in v1.7.10) — it tells Gemini to *preserve the input content exactly and extend the canvas at edges*, NOT to recompose. This is what makes a coherent 1536×3324 deliverable instead of three-banded hallucinations.
 
 | API arg | Value |
 |---|---|
-| `source` | absolute path to the `BG_<variant>_src_NNN.png` from call 1 |
+| `source` | absolute path to `BG_<variant>_src_NNN.png` from call 1 |
 | `target_sizes` | `["1536x3324"]` |
 | `output_dir` | `path.join(project_root, "Backgrounds")` |
-| `asset_name` | `"BG_<variant>_tmp"` (the MCP appends `_resize_1536_3324.png`; this lands as `BG_<variant>_tmp_resize_1536_3324_NNN.png`. Step 4c renames it to the canonical `BG_<variant>_NNN.png` form so downstream skills find it at the expected path.) |
-| `prompt` | (optional) one short sentence telling NB2 what the source is — e.g. `"Recompose this slot machine bonus background to the target portrait dimensions, preserving the depth, vignette, and dim center reel zone."` |
+| `asset_name` | `"BG_<variant>"` (the MCP appends `_resize_1536_3324.png` → file lands as `BG_<variant>_resize_1536_3324_NNN.png` next to the source) |
+| `prompt` | (optional but recommended) one short sentence reinforcing what to preserve in the center — e.g. `"Preserve the sunken Greek ruins, the central reel zone, and the dark bottom third exactly. Only extend the sky above and the seafloor below."` |
 
-**Call 4c — cleanup (mandatory, not optional):**
+**Call 4c — record outputs (NOT cleanup, NOT delete):**
 
-After call 2 succeeds:
+After call 2 succeeds, BOTH files stay on disk:
 
-1. **Rename** the resize output to the canonical filename. Use the next available `NNN` counter scanning `Backgrounds/` for existing `BG_<variant>_<NNN>.png` files:
-   ```
-   Backgrounds/BG_<variant>_tmp_resize_1536_3324_NNN.png  →  Backgrounds/BG_<variant>_NNN.png
-   ```
-2. **Delete** the 9:16 intermediate: `Backgrounds/BG_<variant>_src_NNN.png` (the source from call 1) AND its sidecar `.meta.json`. The intermediate has no value once the resized version exists; keeping it around clutters the project folder and confuses `/slot-compare`.
-3. **Rename the sidecar** too: `BG_<variant>_tmp_resize_1536_3324_NNN.meta.json` → `BG_<variant>_NNN.meta.json`. Update the `filename` field inside it to match the new name. (The other sidecar fields — prompt, model, references, dimensions — stay accurate.)
+```
+Backgrounds/BG_<variant>_src_NNN.png                     ← the 9:16 source (your approved composition)
+Backgrounds/BG_<variant>_resize_1536_3324_NNN.png        ← the 1536×3324 delivery format
+Backgrounds/BG_<variant>_src_NNN.meta.json
+Backgrounds/BG_<variant>_resize_1536_3324_NNN.meta.json
+```
 
-The canonical filename `BG_<variant>_NNN.png` is what step 6 records in `project.json.assets.backgrounds.<variant>.iterations[].path` and what every downstream skill (`/slot-step-06`, `/slot-step-08`, `/slot-compare`) reads. There is no ambiguity — the two-call pipeline is hidden from anyone reading `project.json`.
+**Never delete the `_src` file.** It's the user's reviewable original. Earlier versions of this skill (pre-v1.7.10) auto-deleted sources after a successful resize — that was destructive when the resize produced bad output. The two-file layout is now the standard.
+
+If the user explicitly approves a delivery and wants to clean up the source manually, that's their call. The skill does not auto-archive or auto-delete.
+
+Step 6 records both paths in `project.json.assets.backgrounds.<variant>`:
+- `iterations[N].path` — the `_src` path (the human-reviewable source)
+- `iterations[N].delivery_path` — the `_resize_1536_3324` path (the engineering deliverable)
+
+`/slot-compare`, `/slot-step-08`, and `/slot-step-06` should read `delivery_path` for the fullscreen-size asset, `path` for the original-aspect reference.
 
 **Routing**: with `GEMINI_API_KEY` set, `nb2_smart_resize` routes through
 NB2 (`gemini-3.1-flash-image-preview`) with an oversample-then-crop recipe —
@@ -162,13 +170,18 @@ Read the output:
 - Append an iteration record to
   `project.json.assets.backgrounds.<variant>.iterations` per
   `shared/project_memory.md` → "Writing an iteration record
-  (checklist for skills)". Background specifics:
-  `path` = `"Backgrounds/BG_<variant>_NNN.png"`;
+  (checklist for skills)". Background specifics (v1.7.10+ two-file layout):
+  `path` = `"Backgrounds/BG_<variant>_src_NNN.png"` (the 9:16 source);
+  `delivery_path` = `"Backgrounds/BG_<variant>_resize_1536_3324_NNN.png"` (the fullscreen delivery — if call 2 ran);
   `references` = `[<key art path>, <approved sheet path if any>]`;
   `parent_path` = `null` (backgrounds are always fresh `nb2_generate`);
   `attempt_index` increments for retries within this variant.
 - If user approves, set `project.json.assets.backgrounds.<variant>.approved`
-  to that same relative path (matches one of `iterations[].path`).
+  to the SOURCE path (`BG_<variant>_src_NNN.png`) — that's the canonical
+  reviewable artifact. The delivery file is tracked via `delivery_path`
+  on the same iteration record. Downstream skills should read
+  `approved` for composition reference and the matching iteration's
+  `delivery_path` for the fullscreen delivery format.
 - Set `current_step: "backgrounds_in_progress"` (or check if all needed
   variants are approved → `"ui_in_progress"` is the next natural state once
   the user moves on)
