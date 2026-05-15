@@ -72397,7 +72397,14 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
         responseModalities: ["IMAGE", "TEXT"],
         imageConfig: {
           aspectRatio,
-          imageSize: tier
+          imageSize: tier,
+          // Force PNG so pngjs.centerCrop downstream doesn't choke. Without
+          // this hint, gemini-3.1-flash-image-preview picks its own output
+          // format and chooses JPEG for tall portrait aspect ratios (e.g.
+          // recompose-to-1536x3324 always returns JPEG without this set).
+          // Mirrors fal-ai/smart-resize's `output_format: "png"` parameter.
+          // Confirmed against @google/genai ImageConfig interface.
+          outputMimeType: "image/png"
         }
       }
     });
@@ -72420,8 +72427,28 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       );
     }
     if (!imageMime.startsWith("image/png")) {
+      if (FAL_KEY) {
+        process.stderr.write(
+          `[nb2_smart_resize] Gemini returned ${imageMime} for ${size} despite outputMimeType:image/png hint; falling back to fal.ai for this target.
+`
+        );
+        const falResult = await falSmartResize({
+          source,
+          outputDir,
+          assetName,
+          targetSizes: [size],
+          prompt: prompt || null
+        });
+        if (!falResult?.paths?.length) {
+          throw new Error(
+            `Gemini returned ${imageMime} for ${size} and fal.ai fallback also returned no output. Retry the call, or try a different target size.`
+          );
+        }
+        saved.push(...falResult.paths);
+        continue;
+      }
       throw new Error(
-        `Gemini returned ${imageMime} for target ${size}; smart_resize Gemini path requires PNG. Re-run, or switch to fal.ai (FAL_KEY) which uses the purpose-built smart-resize endpoint and is not subject to this failure mode.`
+        `Gemini returned ${imageMime} for target ${size} despite outputMimeType:image/png hint, and FAL_KEY is not set so no fallback is possible. Set FAL_KEY (run /slot-setup or node setup-keys.js --fal) and re-run \u2014 fal.ai's smart-resize endpoint handles non-PNG output reliably.`
       );
     }
     const croppedBuf = centerCropPng(imageBuf, targetW, targetH);

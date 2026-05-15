@@ -1360,16 +1360,24 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
         imageConfig: {
           aspectRatio,
           imageSize: tier,
+          // Force PNG so pngjs.centerCrop downstream doesn't choke. Without
+          // this hint, gemini-3.1-flash-image-preview picks its own output
+          // format and chooses JPEG for tall portrait aspect ratios (e.g.
+          // recompose-to-1536x3324 always returns JPEG without this set).
+          // Mirrors fal-ai/smart-resize's `output_format: "png"` parameter.
+          // Confirmed against @google/genai ImageConfig interface.
+          outputMimeType: "image/png",
         },
       },
     });
     const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 
-    // Extract image bytes from the response. Gemini's SDK occasionally returns
-    // JPEG instead of PNG depending on internal heuristics — we must read the
-    // mimeType, not assume PNG, since pngjs's PNG.sync.read crashes on a JPEG
-    // byte stream. We also surface the mimeType to centerCropPng so it can
-    // transcode JPEG→PNG before the pngjs crop step.
+    // Extract image bytes from the response. Even with outputMimeType:image/png
+    // requested above, the SDK can rarely still return JPEG (the model's
+    // internal heuristics override the hint for some target dims). We read
+    // the actual mimeType and fall back to fal.ai for any non-PNG response
+    // when FAL_KEY is set — that endpoint's output_format param is reliably
+    // honored regardless of aspect.
     let imageBuf = null;
     let imageMime = null;
     const candidates = response.candidates || [];
@@ -1392,17 +1400,45 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       );
     }
 
-    // Center-crop to exact target dimensions. The crop function only operates
-    // on PNG buffers; if Gemini returned JPEG we'd need a JPEG decoder. We
-    // don't ship one (would add a native dep), so for now we error with a
-    // clear message and let the caller retry. In practice Gemini returns PNG
-    // when responseModalities includes "IMAGE" — JPEG returns are rare.
+    // Center-crop to exact target dimensions. centerCropPng requires PNG
+    // bytes (pngjs has no JPEG decoder and adding one would mean a native
+    // dep we don't want to take). When the outputMimeType:image/png hint
+    // is honored — the common case — we drop straight into centerCropPng
+    // and finish on the Gemini path. When the hint is ignored (rare but
+    // happens on extreme aspect ratios) AND FAL_KEY is available, we
+    // transparently fall back to fal.ai for THIS target size only — the
+    // other sizes in the batch can still complete on the Gemini path.
+    // Without FAL_KEY, we throw with an actionable error.
     if (!imageMime.startsWith("image/png")) {
+      if (FAL_KEY) {
+        // Per-size fal.ai fallback. Delegate to falSmartResize for THIS
+        // single target — it handles the local-file upload, the API call,
+        // and the download/save with the same naming convention. The other
+        // sizes in the batch can still finish on the Gemini path.
+        process.stderr.write(
+          `[nb2_smart_resize] Gemini returned ${imageMime} for ${size} ` +
+          `despite outputMimeType:image/png hint; falling back to fal.ai for this target.\n`
+        );
+        const falResult = await falSmartResize({
+          source,
+          outputDir,
+          assetName,
+          targetSizes: [size],
+          prompt: prompt || null,
+        });
+        if (!falResult?.paths?.length) {
+          throw new Error(
+            `Gemini returned ${imageMime} for ${size} and fal.ai fallback also returned no output. Retry the call, or try a different target size.`
+          );
+        }
+        saved.push(...falResult.paths);
+        continue; // next target size
+      }
       throw new Error(
-        `Gemini returned ${imageMime} for target ${size}; smart_resize Gemini ` +
-        `path requires PNG. Re-run, or switch to fal.ai (FAL_KEY) which uses ` +
-        `the purpose-built smart-resize endpoint and is not subject to this ` +
-        `failure mode.`
+        `Gemini returned ${imageMime} for target ${size} despite outputMimeType:image/png hint, ` +
+        `and FAL_KEY is not set so no fallback is possible. Set FAL_KEY (run /slot-setup or ` +
+        `node setup-keys.js --fal) and re-run — fal.ai's smart-resize endpoint handles ` +
+        `non-PNG output reliably.`
       );
     }
     const croppedBuf = centerCropPng(imageBuf, targetW, targetH);
