@@ -31488,9 +31488,9 @@ async function downloadVideo(url, destPath, provider) {
   const buffer = await response.arrayBuffer();
   fs.writeFileSync(destPath, Buffer.from(buffer));
 }
-function slugifyPrompt(prompt) {
-  if (!prompt) return null;
-  const slug = prompt
+function slugifyText(text) {
+  if (!text) return null;
+  const slug = String(text)
     .trim()
     .slice(0, 50)
     .replace(/[^a-z0-9]+/gi, "_")
@@ -31499,19 +31499,52 @@ function slugifyPrompt(prompt) {
     .slice(0, 40);
   return slug || null;
 }
-async function rewrapToMov(result, prompt) {
+function buildFilename(opts, result) {
+  const assetPart = slugifyText(opts?.assetName);
+  const typePart = slugifyText(opts?.animationType);
+  if (assetPart && typePart) return `${assetPart}_${typePart}`;
+  if (assetPart) return assetPart;
+  return slugifyText(opts?.prompt) ?? (result.model ?? "video").replace(/[^a-z0-9_-]/gi, "_").slice(0, 40);
+}
+function writeSidecar(movPath, meta) {
+  const sidecarPath = movPath.replace(/\.mov$/i, ".meta.json");
+  const payload = {
+    schema: "h5g_video.meta.v1",
+    filename: path.basename(movPath),
+    full_path: movPath,
+    generated_at: new Date().toISOString(),
+    ...meta
+  };
+  try {
+    fs.writeFileSync(sidecarPath, JSON.stringify(payload, null, 2));
+  } catch (e) {
+    process.stderr.write(`[ai-video] failed to write sidecar ${sidecarPath}: ${e.message}\n`);
+  }
+}
+async function rewrapToMov(result, opts) {
   const ffmpegBin = await ensureFfmpegStatic();
   if (!ffmpegBin) return null;
   const outDir = path.join(os.homedir(), ".h5g-ai-video", "output");
   fs.mkdirSync(outDir, { recursive: true });
-  const slug = slugifyPrompt(prompt) ?? (result.model ?? "video").replace(/[^a-z0-9_-]/gi, "_").slice(0, 40);
+  const slug = buildFilename(opts, result);
   const ts = Date.now();
+  const t0 = Date.now();
   const mp4Path = path.join(outDir, `${slug}_${ts}_tmp.mp4`);
   const movPath = path.join(outDir, `${slug}_${ts}.mov`);
   try {
     await downloadVideo(result.video.url, mp4Path, result.provider);
     await new Promise((resolve, reject) => {
       child_process.execFile(ffmpegBin, ["-i", mp4Path, "-c", "copy", "-y", movPath], { timeout: 120000 }, (err) => err ? reject(new Error(`ffmpeg: ${err.message}`)) : resolve());
+    });
+    writeSidecar(movPath, {
+      provider: result.provider === "fal" ? "fal.ai" : "Google Gemini",
+      model: result.model,
+      asset_name: opts?.assetName ?? null,
+      animation_type: opts?.animationType ?? null,
+      prompt: opts?.prompt ?? null,
+      source_image_url: opts?.sourceImageUrl ?? null,
+      request_id: result.request_id ?? null,
+      duration_seconds: (Date.now() - t0) / 1e3
     });
     return movPath;
   } finally {
@@ -31527,11 +31560,11 @@ var providerSchema = external_exports.enum(["auto", "fal", "gemini"]).default("a
 var safetySchema = external_exports.enum(["1", "2", "3", "4", "5", "6"]).default("4").describe(
   "Safety tolerance (fal.ai only): 1=most strict, 6=most permissive. Default 4. Not sent to Gemini."
 );
-async function formatResult(result, prompt) {
+async function formatResult(result, opts) {
   let movPath = null;
   let movNote = "";
   try {
-    movPath = await rewrapToMov(result, prompt);
+    movPath = await rewrapToMov(result, opts);
   } catch (e) {
     movNote = ` (MOV conversion failed: ${e.message})`;
   }
@@ -31541,6 +31574,10 @@ async function formatResult(result, prompt) {
     `**Provider**: ${result.provider === "fal" ? "fal.ai" : "Google Gemini"}`,
     `**Model**: ${result.model}`
   ];
+  if (opts?.assetName || opts?.animationType) {
+    const label = [opts.assetName, opts.animationType].filter(Boolean).join(" \u2014 ");
+    lines.push(`**Asset**: ${label}`);
+  }
   if (movPath) {
     lines.push(`**Saved to**: ${movPath}`);
   } else {
@@ -31595,7 +31632,9 @@ Returns: Video URL, provider, model, and metadata.`,
         seed: external_exports.number().int().optional().describe("Seed for reproducibility"),
         auto_fix: external_exports.boolean().default(true).describe("Auto-fix policy-violating prompts (fal.ai only)"),
         safety_tolerance: safetySchema,
-        provider: providerSchema
+        provider: providerSchema,
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -31627,7 +31666,7 @@ Returns: Video URL, provider, model, and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31664,7 +31703,9 @@ Returns: Video URL and metadata.`,
         seed: external_exports.number().int().optional().describe("Seed for reproducibility"),
         auto_fix: external_exports.boolean().default(true).describe("Auto-fix policy-violating prompts (fal.ai only)"),
         safety_tolerance: safetySchema,
-        provider: providerSchema
+        provider: providerSchema,
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -31698,7 +31739,7 @@ Returns: Video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31736,7 +31777,9 @@ Returns: Video URL and metadata.`,
         seed: external_exports.number().int().optional().describe("Seed for reproducibility"),
         auto_fix: external_exports.boolean().default(true).describe("Auto-fix policy-violating prompts (fal.ai only)"),
         safety_tolerance: safetySchema,
-        provider: providerSchema
+        provider: providerSchema,
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -31772,7 +31815,7 @@ Returns: Video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31805,7 +31848,9 @@ Returns: Video URL and metadata.`,
         generate_audio: external_exports.boolean().default(true).describe("Generate audio (fal.ai only)"),
         auto_fix: external_exports.boolean().default(true).describe("Auto-fix policy-violating prompts (fal.ai only)"),
         safety_tolerance: safetySchema,
-        provider: providerSchema
+        provider: providerSchema,
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -31835,7 +31880,7 @@ Returns: Video URL and metadata.`,
             duration_seconds: durationSeconds
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31875,7 +31920,9 @@ Returns: Extended video URL and metadata.`,
         seed: external_exports.number().int().optional().describe("Seed for reproducibility"),
         auto_fix: external_exports.boolean().optional().describe("Auto-fix policy-violating prompts (fal.ai only)"),
         safety_tolerance: safetySchema,
-        provider: providerSchema
+        provider: providerSchema,
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -31906,7 +31953,7 @@ Returns: Extended video URL and metadata.`,
             seed: params.seed
           });
         }
-        return { content: [{ type: "text", text: await formatResult(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31915,8 +31962,8 @@ Returns: Extended video URL and metadata.`,
 }
 
 // src/tools/alternativeTools.ts
-async function formatResult2(result, prompt) {
-  return formatResult(result, prompt); // result.provider is already "fal" from extractVideoResult
+async function formatResult2(result, opts) {
+  return formatResult(result, opts); // result.provider is already "fal" from extractVideoResult
 }
 function registerAlternativeTools(server2) {
   server2.registerTool(
@@ -31948,7 +31995,9 @@ Returns: Animated video URL and metadata.`,
         resolution: external_exports.enum(["720p", "1080p"]).default("1080p").describe("Output resolution"),
         duration: external_exports.number().int().min(3).max(15).default(5).describe("Duration in seconds (3\u201315)"),
         seed: external_exports.number().int().min(0).max(2147483647).optional().describe("Seed for reproducibility"),
-        enable_safety_checker: external_exports.boolean().default(true).describe("Enable content moderation")
+        enable_safety_checker: external_exports.boolean().default(true).describe("Enable content moderation"),
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -31957,7 +32006,7 @@ Returns: Animated video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falHappyHorseImageToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -31992,7 +32041,9 @@ Returns: Video URL and metadata.`,
         resolution: external_exports.enum(["720p", "1080p"]).default("1080p").describe("Output resolution"),
         duration: external_exports.number().int().min(3).max(15).default(5).describe("Duration in seconds (3\u201315)"),
         seed: external_exports.number().int().min(0).max(2147483647).optional().describe("Seed for reproducibility"),
-        enable_safety_checker: external_exports.boolean().default(true).describe("Enable content moderation")
+        enable_safety_checker: external_exports.boolean().default(true).describe("Enable content moderation"),
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -32001,7 +32052,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falHappyHorseReferenceToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -32037,7 +32088,9 @@ Returns: Video URL and metadata.`,
         duration: external_exports.enum(["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]).default("auto").describe("Duration in seconds or 'auto'"),
         aspect_ratio: external_exports.enum(["auto", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]).default("auto").describe("Video aspect ratio"),
         generate_audio: external_exports.boolean().default(true).describe("Generate synchronized audio"),
-        seed: external_exports.number().int().optional().describe("Seed for reproducibility")
+        seed: external_exports.number().int().optional().describe("Seed for reproducibility"),
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -32046,7 +32099,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falSeedanceImageToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }
@@ -32087,7 +32140,9 @@ Returns: Video URL and metadata.`,
         duration: external_exports.enum(["auto", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]).default("auto").describe("Duration in seconds or 'auto'"),
         aspect_ratio: external_exports.enum(["auto", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]).default("auto").describe("Video aspect ratio"),
         generate_audio: external_exports.boolean().default(true).describe("Generate synchronized audio"),
-        seed: external_exports.number().int().optional().describe("Seed for reproducibility")
+        seed: external_exports.number().int().optional().describe("Seed for reproducibility"),
+        asset_name: external_exports.string().optional().describe("Slot asset being animated (e.g. 'HP1', 'HP2', 'BG_base', 'WD1'). Sets the output filename."),
+        animation_type: external_exports.enum(["idle", "win", "land", "ambient", "intro", "outro", "bonus", "jackpot", "general"]).optional().describe("Animation type for slot game use — idle, win, land, ambient, etc. Sets the filename suffix.")
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
     },
@@ -32096,7 +32151,7 @@ Returns: Video URL and metadata.`,
         const { key } = resolveProvider("fal");
         configureFal(key);
         const result = await falSeedanceReferenceToVideo(params);
-        return { content: [{ type: "text", text: await formatResult2(result, params.prompt) }], structuredContent: JSON.parse(JSON.stringify(result)) };
+        return { content: [{ type: "text", text: await formatResult2(result, { prompt: params.prompt, assetName: params.asset_name, animationType: params.animation_type }) }], structuredContent: JSON.parse(JSON.stringify(result)) };
       } catch (e) {
         return { content: [{ type: "text", text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
       }

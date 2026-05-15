@@ -187,6 +187,72 @@ Ask at most 2 questions in one message. Never interrogate the user.
 - safety_tolerance: always 4
 - seed: omit unless reproducibility requested
 
+**Always pass for slot machine content (no need to ask):**
+- `asset_name`: the asset ID being animated — derive from context (e.g. `"HP1"`, `"HP2"`, `"LP1"`, `"WD1"`, `"SC"`, `"BG_base"`, `"BG_freespins"`)
+- `animation_type`: the animation purpose (see slot machine workflow below) — derive from context
+
+---
+
+## Slot Machine Video Workflow
+
+This is the primary use case. Most videos will be symbol animations, background loops, or bonus sequences.
+
+### Asset naming conventions
+
+Match the slot-art project's naming exactly:
+
+| Asset | `asset_name` value |
+|---|---|
+| High-pay symbols | `HP1`, `HP2`, `HP3`, `HP4`, `HP5` |
+| Mid-pay symbols | `MP1`, `MP2`, `MP3` |
+| Low-pay symbols | `LP1`, `LP2`, `LP3`, `LP4`, `LP5`, `LP6` |
+| Wild | `WD1` (or `WD1_freespins` for FS variant) |
+| Scatter | `SC` |
+| Background (base game) | `BG_base` |
+| Background (freespins) | `BG_freespins` |
+| Bonus screen | `Bonus_Screen` |
+| Win banner | `Banner_big`, `Banner_small` |
+| Effects | `FX_coin_shower`, `FX_sparkle`, etc. |
+
+### Animation types
+
+Every symbol needs three animations. Always use the exact `animation_type` values below:
+
+| `animation_type` | What it is | Duration | Notes |
+|---|---|---|---|
+| `idle` | Symbol gently animates while the reels are at rest — subtle loop, no excitement | 4–8s loop | Must loop seamlessly; no win energy |
+| `win` | Symbol celebrates when it's part of a winning payline — excited, particles, glow | 4–6s | Can be non-looping; high energy |
+| `land` | Symbol arrives on the reel — a quick impact/entrance animation | 1–3s | One-shot, plays once on landing |
+| `ambient` | Background or environment loop — atmospheric motion | 8s loop | Seamless; no symbols, no UI |
+| `intro` | Transition into a bonus/freespins mode | 3–6s | One-shot cinematic |
+| `outro` | Transition back to base game | 3–6s | One-shot cinematic |
+| `bonus` | Bonus game feature animation (wheel spin, pick-em, etc.) | varies | |
+| `jackpot` | Jackpot celebration / top prize reveal | 6–12s | Maximum spectacle |
+| `general` | Lobby trailer, loading screen, marketing clip | varies | |
+
+### Prompt discipline by animation type
+
+**idle** — subtle, looping, no excitement:
+> "The [symbol] gently breathes with ambient energy. [Specific subtle motion e.g. robes shifting, flame flickering, eyes scanning]. Smooth 8-second seamless loop. No sudden movements. Casino game animation quality."
+
+**win** — high energy, celebratory:
+> "The [symbol] erupts in celebration — [specific win FX e.g. lightning arcs, coins burst outward, golden glow pulses]. Camera holds on symbol, particles radiate outward. 5-second burst, high energy. Premium slot game win animation."
+
+**land** — quick entrance/impact:
+> "Quick 2-second entrance: the [symbol] slams into frame from above with an impact flash and brief settle. Single camera cut, punchy. Slot reel landing animation."
+
+**ambient** — background loop:
+> "Aerial/establishing shot [scene description]. [Environmental motion e.g. torches flicker, clouds drift, water ripples]. 8-second seamless loop. No characters, no UI, no text."
+
+### File output
+
+All videos are saved to `~/.h5g-ai-video/output/` as `.mov` files:
+- `HP1_idle_1747234567890.mov` + `HP1_idle_1747234567890.meta.json`
+- `HP1_win_1747234567890.mov` + `HP1_win_1747234567890.meta.json`
+- `HP1_land_1747234567890.mov` + `HP1_land_1747234567890.meta.json`
+
+The `.meta.json` sidecar contains the full prompt, model, provider, asset name, animation type, source image URL, and generation timestamp — same schema as the slot-art image gen sidecars.
+
 ---
 
 ## Step 5: Generate and Return
