@@ -28,10 +28,9 @@ description: >
   - "change the resolution", "scale up/down", "crop to fit", "letterbox", "fill the frame"
   - ffmpeg requests: "use ffmpeg to...", "run ffmpeg on", "transcode this"
 
-  Do NOT trigger for: subtitles/captions, color grading, timeline trimming or merging,
+  Do NOT trigger for: video editing (subtitles, captions, color grading, trimming, merging),
   video transcription or captioning, generating still images only, research questions about
   comparing video models, or downloading/streaming existing videos.
-  (Container conversion and dimension resizing ARE in scope — those use veo_convert_video and veo_resize_video.)
 ---
 
 # AI Video Generator Skill
@@ -137,6 +136,108 @@ If the user has dropped or mentioned a local file:
 - If the path doesn't work: ask them to right-click the file and copy the full path
 
 If the user gives a public https:// URL, use it directly — no upload needed.
+
+---
+
+## Step 2b: Asset Discovery & Source Resolution
+
+**The most common request pattern is "animate the symbols/backgrounds from my slot game."** Before asking the user for image URLs one at a time, look for an existing asset source. There are three discovery paths — try them in order.
+
+### Path A — slot-art-creator-node project (most common)
+
+If the user is working on an H5G slot game, their approved symbols and backgrounds were almost certainly produced by `slot-art-creator-node` and live in a project folder under the H5G shared Drive Stream. The active project pointer is at:
+
+```
+~/.h5g-slot-active-project.json
+```
+
+Read that file to get `project_root`. Inside the project folder, the canonical layout is:
+
+| Subfolder | Contents | Filename pattern |
+|---|---|---|
+| `Symbol_Art/` | Individual reel symbols | `HP1_001.png`, `WD1_002.png`, `WY1_001.png`, `JP1_001.png`, `LP1_001.png`, etc. |
+| `Backgrounds/` | Base + variant backgrounds | `BG_base.png`, `BG_freespins.png`, `BG_bonus.png`, `BG_pickme.png`, `BG_wheel.png` |
+| `Key_Art/` | Master key art | `Key_Art_001.png`, `Key_Art_002.png`, etc. |
+| `Avatars/` | In-game animated characters | `Avatar1_001.png` through `Avatar5_001.png` |
+| `Symbol_Sheets/` | Full-set contact sheets | `Symbol_Sheet_001.png` |
+| `Bezels/`, `HUD/`, `Logos/`, `Win_Banners/`, `Wheels/` | UI surfaces | per-category names |
+
+**Canonical asset metadata lives in `<project_root>/project.json`.** Read it to find the *approved* version of each asset:
+
+```jsonc
+{
+  "assets": {
+    "symbols": {
+      "HP1": { "approved": "Symbol_Art/HP1_002.png", "iterations": [...] },
+      "WD1": { "approved": "Symbol_Art/WD1_001.png", ... }
+    },
+    "backgrounds": {
+      "base":      { "approved": "Backgrounds/BG_base.png", ... },
+      "freespins": { "approved": "Backgrounds/BG_freespins.png", ... }
+    },
+    "avatars": {
+      "Avatar1":   { "approved": "Avatars/Avatar1_001.png", ... }
+    }
+  }
+}
+```
+
+**Always use the `approved` path when present.** If `approved` is null, the asset is still being iterated — ask the user which iteration to animate (or fall back to the most recent `iterations[N].path`).
+
+### Path B — user-provided folder with labeled files
+
+If the user points at any folder and the filenames follow recognizable conventions, you can identify assets the same way slot-art does. Filename decoder:
+
+| Filename prefix | Asset role | Suggested `asset_name` value |
+|---|---|---|
+| `HP1`, `HP2`, ... | High-pay symbol N | `HP1`, `HP2` |
+| `MP1`, `MP2`, ... | Mid-pay symbol N | `MP1`, `MP2` |
+| `LP1`, `LP2`, ... | Low-pay symbol N | `LP1`, `LP2` |
+| `WD1`, `WD2`, ... | Wild (1 = standard, 2+ = variants) | `WD1`, `WD2` |
+| `SC` | Classic scatter | `SC` |
+| `WY1`, `WY2`, ... `WYS<N>` | WYS family (coins, portals, feature tokens) | `WY1`, `WY2` |
+| `SF1`, `SF2`, ... | Special-feature tokens | `SF1`, `SF2` |
+| `JP1`–`JP6` | Jackpot tier symbols | `JP1`, `JP2`, etc. |
+| `BO`, `BO1`, `BO2` | Bonus trigger | `BO1` |
+| `BL`, `BL1`, `BL2` | Blocker / blank filler | `BL` |
+| `R1`, `R2` | Replacement / runtime swap | `R1` |
+| `BG_base` | Base-game background | `BG_base` |
+| `BG_freespins` | Free-spins background | `BG_freespins` |
+| `BG_bonus`, `BG_pickme`, `BG_wheel` | Bonus / pick-me / wheel backgrounds | as-is |
+| `Avatar1`–`Avatar5` | In-game animated character | `Avatar1`, etc. |
+| `Key_Art_NNN` | Master key art (often used as image-to-video seed) | `Key_Art` |
+| `Wheel_jackpot`, `Wheel_bonus`, `Wheel_multiplier`, `Wheel_pickem` | Bonus wheels | as-is |
+| `Bezel`, `HUD`, `Logo_*`, `Banner_*`, `Lobby_Tile`, `Paytable` | UI surfaces | per-name |
+
+Filename suffix conventions: `_NNN` = iteration counter (use the highest). `_upscl_xN` = upscaled variant. `_resize_WxH` = pixel-precise resize. `_src` (legacy) = pre-resize source. Strip these for `asset_name` purposes.
+
+**Compound prefixes** (less common): `BWY` = bonus+WYS, `WJP` = wild+jackpot, `WDWY` = wild+WYS scatter-wild hybrid, `WDSF` = wild+SF, `MUWD` = multiplier wild, `MUWDBO` = multiplier wild + bonus, `SFWY` = SF+WYS. Treat as the dominant role for `asset_name`.
+
+### Path C — GAMEFORGE delivery structure (handoff target)
+
+If the user is integrating with an H5G GameForge game, the **runtime-ready delivery target** is:
+
+```
+<gamefolder>/ASSETS/LOCAL/texture/portrait/symbols/        ← runtime symbol textures (lowercase .webp)
+<gamefolder>/ASSETS/LOCAL/texture/portrait/backgrounds/   ← runtime backgrounds
+<gamefolder>/ASSETS/LOCAL/texture/portrait/animations/video/  ← FINAL VIDEO OUTPUTS LAND HERE
+<gamefolder>/ASSETS/LOCAL/texture/portrait/avatars/       ← character portraits
+```
+
+In GAMEFORGE, filenames are lowercase with no iteration counter: `hp1.webp`, `lp1.webp`, `wd1.webp`, `bg_base.webp`. They may also have `@2x` and `@3x` resolution-tier suffixes (the game's asset script generates those from a single 3x source).
+
+When animating directly from GameForge runtime assets:
+- Source PNG/WEBP is in `LOCAL/texture/portrait/symbols/` or `LOCAL/texture/portrait/backgrounds/`
+- The `asset_name` is the filename without extension or `@Nx` suffix (e.g. `hp1` → use `HP1` to match slot-art conventions, or keep lowercase if the user prefers)
+- Final video belongs in `LOCAL/texture/portrait/animations/video/<asset_name>_<animation_type>.mov`
+
+### How to use this discovery info
+
+1. **When the user says "animate the symbols"**: Read `~/.h5g-slot-active-project.json` → load `project.json` → enumerate `assets.symbols.*.approved` → animate each one as a triad (idle + land + win).
+2. **When the user says "animate the backgrounds"**: Same approach with `assets.backgrounds.*.approved` → generate an `ambient` loop for each.
+3. **When the user points at a folder**: Glob it for PNG files, decode each filename per the table above, present a short list ("I see HP1, HP2, WD1, BG_base, BG_freespins — animate all five?"), then proceed.
+4. **When the user names a specific asset** ("animate HP1"): Look it up in `project.json.assets.symbols.HP1.approved` first; fall back to filesystem search if no project context.
+5. **Never guess source paths.** If the asset can't be located through one of the three paths above, ask the user for the exact file or folder.
 
 ---
 
@@ -249,6 +350,51 @@ Every symbol needs three animations. Always use the exact `animation_type` value
 **ambient** — background loop:
 > "Aerial/establishing shot [scene description]. [Environmental motion e.g. torches flicker, clouds drift, water ripples]. 8-second seamless loop. No characters, no UI, no text."
 
+### Seamless-loop discipline (critical for `idle` and `ambient`)
+
+A loop is **only useful in-game if it plays repeatedly without a visible cut**. The single most common reason a slot loop fails is that the last frame doesn't match the first — the playback shows a hard pop every cycle.
+
+Two techniques, ranked by reliability:
+
+**Technique 1 — `veo_first_last_frame_to_video` with the SAME image for both frames** (most reliable). Pass the same approved symbol/background PNG as both `first_frame_url` and `last_frame_url`. Veo fills the middle with motion that returns to the start. The result is a guaranteed seamless loop because the boundary frames are mathematically identical.
+
+```
+veo_first_last_frame_to_video({
+  first_frame_url: <approved HP1 image>,
+  last_frame_url:  <same approved HP1 image>,
+  prompt: "<motion description that returns to rest> 8-second loop.",
+  asset_name: "HP1",
+  animation_type: "idle"
+})
+```
+
+**Technique 2 — `veo_image_to_video` with explicit loop-closure prompt** (use when an end-frame technique isn't available). The prompt must explicitly direct the motion to return to start, and must avoid one-way camera moves.
+
+Prompt patterns that produce loopable output:
+- "All motion completes a full cycle and returns to the starting pose by the end of the clip."
+- "Particle effects rise then settle back to neutral; the final frame matches the opening frame."
+- "Camera holds steady throughout — no panning, no zoom that doesn't return."
+
+Prompt patterns that **break loops**:
+- "Slow push in" / "tracking shot" / "pan across" → camera doesn't return
+- "The character takes a step forward" / "the door opens" → state changes, no return
+- "Particles explode outward" → energy released, no recovery in time
+
+Use Technique 1 (`first_last_frame`) for `idle` and `ambient` whenever possible. Reserve Technique 2 for cases where the source image is the seed of a one-direction motion that genuinely shouldn't return (which is rare for idle/ambient).
+
+### Batch workflow — animating an entire game's assets
+
+When the user says "animate all the symbols" or "animate all the backgrounds" or "create the full animation set":
+
+1. **Discover assets** per Step 2b (project.json or folder enumeration)
+2. **For each approved symbol** → generate the triad (idle + land + win). Three calls per symbol.
+3. **For each approved background** → generate one `ambient` loop. One call per BG variant.
+4. **For each approved avatar** (if present) → generate one `idle` loop per Avatar slot.
+5. **Display every output inline via Read after generation** (see § "Mandatory inline display" below).
+6. **Show the user a final summary table**: asset → animation type → output path.
+
+Order of operations: animate symbols first (most numerous), then backgrounds, then avatars. Do them in parallel within an asset class if your provider supports concurrent calls.
+
 ### File output
 
 All videos are saved to `~/.h5g-ai-video/output/` as `.mov` files:
@@ -257,6 +403,49 @@ All videos are saved to `~/.h5g-ai-video/output/` as `.mov` files:
 - `HP1_land_1747234567890.mov` + `HP1_land_1747234567890.meta.json`
 
 The `.meta.json` sidecar contains the full prompt, model, provider, asset name, animation type, source image URL, and generation timestamp — same schema as the slot-art image gen sidecars.
+
+### Mandatory inline display after every generation
+
+After every video generation, **the user expects to see the result in chat immediately, not just a file path.** Display the result by calling `Read` on the output `.mov` file's poster frame *if* the user has a video viewer mapped to chat, OR by stating the path clearly and offering to play it.
+
+For batch workflows, follow the slot-art-creator-node pattern of one Markdown header per output:
+
+```
+### HP1_idle
+[path]
+### HP1_land
+[path]
+### HP1_win
+[path]
+### HP2_idle
+[path]
+...
+```
+
+Each output gets its own visual beat in the chat — batched paths without framing collapse into a wall of text and the user loses track.
+
+### GAMEFORGE final-delivery output
+
+The default save location `~/.h5g-ai-video/output/` is the **working / review** location. For game handoff, videos belong in the GAMEFORGE delivery tree:
+
+```
+<gamefolder>/ASSETS/LOCAL/texture/portrait/animations/video/<asset>_<animation>.mov
+```
+
+Examples:
+```
+ASSETS/LOCAL/texture/portrait/animations/video/HP1_idle.mov
+ASSETS/LOCAL/texture/portrait/animations/video/HP1_land.mov
+ASSETS/LOCAL/texture/portrait/animations/video/HP1_win.mov
+ASSETS/LOCAL/texture/portrait/animations/video/BG_base_ambient.mov
+ASSETS/LOCAL/texture/portrait/animations/video/Avatar1_idle.mov
+```
+
+GAMEFORGE filenames drop the timestamp suffix. When delivering, copy the approved `.mov` from `~/.h5g-ai-video/output/` to the GAMEFORGE path **with a clean filename** (no timestamp). Do not delete the working file in `~/.h5g-ai-video/output/` — keep it for revisions.
+
+Spine animations (handled by the slot-art tools, not this plugin) deliver to `ASSETS/LOCAL/texture/portrait/animations/spine/`. Don't confuse the two folders.
+
+If the user hasn't told you the `<gamefolder>` path yet, ask before copying. Don't guess. Output stays in the working folder until they confirm the destination.
 
 ---
 
