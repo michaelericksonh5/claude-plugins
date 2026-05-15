@@ -74,78 +74,63 @@ be dimmer than the dimmest symbol.
       the why and how. The theme has a wider vocabulary than the
       symbol roster — pull from that for environmental motifs.
 
-### Step 4 — Generate at fullscreen delivery size (1536×3324)
+### Step 4 — Generate at 9:16 / 4K (single call, native aspect, no resize)
 
-**All backgrounds delivered by this skill are 1536×3324** — H5G's iPhone
-portrait fullscreen design size, the size Jon's downstream asset script
-expects as the 3x source (he generates 2x and 1x automatically). This
-applies to every variant (base, freespins, bonus, pickme, wheel) without
-exception. Symbol art (`/slot-step-03`) and UI art (`/slot-step-06`)
-are NOT affected by this rule — they keep their own native sizes.
+**The deliverable IS the 9:16 / 4K source.** Jon Meschino's downstream pipeline
+handles the scale and crop to H5G's exact 1536×3324 iPhone fullscreen target.
+He explicitly said in spec discussion: *"as far as AI goes, you can generate
+1080x1080 images or 1080x1920 videos or whatever. jin will take those and
+size them appropriately for the game layout"* and *"so for ai generation you
+can just care about aspect and not pixel size."*
 
-**Two-call pipeline.** NB2 has no native 19.5:9 aspect (1536/3324 ≈ 0.462),
-so we generate at the closest native aspect (9:16) and recompose to exact
-pixels with `nb2_smart_resize`. Both calls use the same NB2 model end-to-end
-on Gemini-only setups.
+The previous v1.7.0–v1.7.10 two-call pipeline (generate 9:16 → smart-resize
+to 1536×3324) was a misinterpretation of his spec. The resize step always
+either cropped horizontal content or recomposed the scene because Gemini
+NB2 has no native aspect close to 19.5:9 portrait (target ratio 0.462,
+closest native 9:16 = 0.5625, 22% wider). The result was unusable
+deliverables AND deleted sources in the worst cases.
 
-**Call 1 — generate the artwork at 9:16 (this is your "source"):**
+**As of v1.7.11: one call. 9:16. 4K. Deliver as-is.** Artists adjust
+within their layout in Jon's pipeline.
 
 Call `mcp__nb2node__nb2_generate`:
 
 | API arg | Value |
 |---|---|
-| `prompt` | composed prompt |
+| `prompt` | composed prompt (per `PROMPT_TEMPLATES.md` — note the bezel-artifact fixes there) |
 | `aspect_ratio` | `"9:16"` |
-| `image_size` | `"2K"` |
+| `image_size` | `"4K"` (Gemini returns ~2160×3840 or ~2304×4096 at this tier — both work for Jon's pipeline) |
 | `output_dir` | `path.join(project_root, "Backgrounds")` |
-| `asset_name` | `"BG_<variant>_src"` — the 9:16 source generation. **This file is preserved permanently.** It's the human-reviewable composition the user approves; the 1536×3324 derivative in call 2 is just a delivery-format wrapper around the same content. |
+| `asset_name` | `"BG_<variant>"` (the MCP appends `_NNN.png` and auto-increments by scanning `Backgrounds/`) |
 | `references` | absolute paths — resolve `style_anchor.key_art_path` and `assets.sheet.approved` against `project_root` first (`path.join(project_root, stored_relative_path)`), then pass the resolved absolutes. Filter null/undefined entries. |
 
-**Call 2 — extend to 1536×3324 (the delivery format):**
-
-Call `mcp__nb2node__nb2_smart_resize` on the path returned by call 1. The MCP server's geminiSmartResize uses an **outpaint-semantic prompt by default** (added in v1.7.10) — it tells Gemini to *preserve the input content exactly and extend the canvas at edges*, NOT to recompose. This is what makes a coherent 1536×3324 deliverable instead of three-banded hallucinations.
-
-| API arg | Value |
-|---|---|
-| `source` | absolute path to `BG_<variant>_src_NNN.png` from call 1 |
-| `target_sizes` | `["1536x3324"]` |
-| `output_dir` | `path.join(project_root, "Backgrounds")` |
-| `asset_name` | `"BG_<variant>"` (the MCP appends `_resize_1536_3324.png` → file lands as `BG_<variant>_resize_1536_3324_NNN.png` next to the source) |
-| `prompt` | (optional but recommended) one short sentence reinforcing what to preserve in the center — e.g. `"Preserve the sunken Greek ruins, the central reel zone, and the dark bottom third exactly. Only extend the sky above and the seafloor below."` |
-
-**Call 4c — record outputs (NOT cleanup, NOT delete):**
-
-After call 2 succeeds, BOTH files stay on disk:
+**File on disk after a successful call:**
 
 ```
-Backgrounds/BG_<variant>_src_NNN.png                     ← the 9:16 source (your approved composition)
-Backgrounds/BG_<variant>_resize_1536_3324_NNN.png        ← the 1536×3324 delivery format
-Backgrounds/BG_<variant>_src_NNN.meta.json
-Backgrounds/BG_<variant>_resize_1536_3324_NNN.meta.json
+Backgrounds/BG_<variant>_NNN.png           ← the deliverable (~2160×3840 or larger, 9:16 native)
+Backgrounds/BG_<variant>_NNN.meta.json
 ```
 
-**Never delete the `_src` file.** It's the user's reviewable original. Earlier versions of this skill (pre-v1.7.10) auto-deleted sources after a successful resize — that was destructive when the resize produced bad output. The two-file layout is now the standard.
+That's it. No `_src` suffix, no `_resize_...` suffix, no cleanup step, no
+intermediate to delete. The 9:16 / 4K PNG IS the canonical asset path
+recorded in `project.json`.
 
-If the user explicitly approves a delivery and wants to clean up the source manually, that's their call. The skill does not auto-archive or auto-delete.
+**Optional `--target W×H` for non-Jon-pipeline consumers:** if a project
+explicitly needs a specific pixel target produced inside the plugin (e.g.
+a future consumer that doesn't have a downstream resize pipeline), the
+user can pass `--target 1536x3324` to opt into a `nb2_smart_resize` step
+after generation. **This is not the default.** Smart-resize has known
+quality issues when the target aspect diverges materially from Gemini's
+native aspects (cropping or recomposition artifacts) — only use it when
+the downstream pipeline can't handle the 9:16 / 4K deliverable.
 
-Step 6 records both paths in `project.json.assets.backgrounds.<variant>`:
-- `iterations[N].path` — the `_src` path (the human-reviewable source)
-- `iterations[N].delivery_path` — the `_resize_1536_3324` path (the engineering deliverable)
-
-`/slot-compare`, `/slot-step-08`, and `/slot-step-06` should read `delivery_path` for the fullscreen-size asset, `path` for the original-aspect reference.
-
-**Routing**: with `GEMINI_API_KEY` set, `nb2_smart_resize` routes through
-NB2 (`gemini-3.1-flash-image-preview`) with an oversample-then-crop recipe —
-same model the generation step uses. With only `FAL_KEY` set, it routes
-through fal's `nano-banana-pro` smart-resize endpoint (single API call,
-no local crop). Either path works fully for 1536×3324.
-
-**Override for non-H5G projects:** if the active project's
-`brief.delivery_spec.fullscreen` declares different `{width, height}`
-values, use those instead of 1536×3324. This field doesn't exist in the
-brief schema yet — see the PSD/layout ingest note in the "Future work"
-section at the bottom of this file. Until that's wired up, 1536×3324 is
-the unconditional default.
+**For OpenAI `gpt-image-2` users (if a background gets generated via gpt2
+for any reason)**: gpt-image-2's stable ceiling is 2K. To reach a 4K-class
+deliverable, generate at 2K with `gpt2_generate` then run `nb2_upscale` to
+linear ×2. The `nb2_upscale` tool preserves source pixels (Path-A recipe)
+and is the only faithful upscale in the plugin. Don't try to generate at
+4K with gpt-image-2 — OpenAI flags those targets experimental and the
+plugin doesn't expose them.
 
 ### Step 5 — Inline QA check (Gate 2)
 
@@ -170,18 +155,19 @@ Read the output:
 - Append an iteration record to
   `project.json.assets.backgrounds.<variant>.iterations` per
   `shared/project_memory.md` → "Writing an iteration record
-  (checklist for skills)". Background specifics (v1.7.10+ two-file layout):
-  `path` = `"Backgrounds/BG_<variant>_src_NNN.png"` (the 9:16 source);
-  `delivery_path` = `"Backgrounds/BG_<variant>_resize_1536_3324_NNN.png"` (the fullscreen delivery — if call 2 ran);
+  (checklist for skills)". Background specifics (v1.7.11+ single-file layout):
+  `path` = `"Backgrounds/BG_<variant>_NNN.png"` (the 9:16 / 4K deliverable);
   `references` = `[<key art path>, <approved sheet path if any>]`;
   `parent_path` = `null` (backgrounds are always fresh `nb2_generate`);
   `attempt_index` increments for retries within this variant.
 - If user approves, set `project.json.assets.backgrounds.<variant>.approved`
-  to the SOURCE path (`BG_<variant>_src_NNN.png`) — that's the canonical
-  reviewable artifact. The delivery file is tracked via `delivery_path`
-  on the same iteration record. Downstream skills should read
-  `approved` for composition reference and the matching iteration's
-  `delivery_path` for the fullscreen delivery format.
+  to that same relative path (matches one of `iterations[].path`).
+- Note: the `delivery_path` field from v1.7.10 is **dropped** as of v1.7.11
+  because the source IS the deliverable now. Downstream skills should
+  read `approved` directly — no separate delivery file to look up. If a
+  project ever opts into the optional `--target W×H` resize step, the
+  resized output goes under `resized[]` per the canonical asset record
+  shape, not as a separate `delivery_path`.
 - Set `current_step: "backgrounds_in_progress"` (or check if all needed
   variants are approved → `"ui_in_progress"` is the next natural state once
   the user moves on)

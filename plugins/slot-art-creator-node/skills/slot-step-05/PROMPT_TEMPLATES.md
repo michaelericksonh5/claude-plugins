@@ -4,17 +4,20 @@
 
 ```
 A mobile slot game background, <theme_summary> environment, <style_lock>,
-three-layer composition with foreground crop framing, midground story scene,
-and distant sky for atmospheric perspective,
+three-layer depth composition — foreground crop framing in the lower
+corners and edges, midground story scene at mid-height, distant sky/horizon
+at top for atmospheric perspective,
 upper-left key light at 10 o'clock,
 <palette_leads.primary> palette with <palette_leads.accents> accents,
-bottom third of the canvas darkest for UI controls — luminance drops
-noticeably from the upper two thirds to the bottom third,
-center column dimmed by roughly fifteen percent compared to surroundings
-to serve as the reel zone,
-corners about thirty percent darker than center for a soft vignette,
+overall darker tonality through the lower third of the canvas to support
+overlaid UI controls — natural shadow falloff, not a hard band,
+a soft elliptical shadow gradient through the vertical middle of the scene
+where the reel grid will overlay — diffuse atmospheric darkening, NOT a
+literal column, panel, banner, or vertical strip drawn into the scene,
+corners gently darker than center for a soft vignette,
 mostly mid-dark values with small bright accents in the upper midground,
 no UI mockup, no reels, no paylines, no spin buttons, no HUD, no text,
+no vertical bars, no panels, no rectangular reel frames painted into the scene,
 not photorealistic, professional slot game art, mobile slot background.
 ```
 
@@ -26,11 +29,14 @@ A mobile slot game free spins background based on the base game's
 same composition and key elements as the base game but graded with a warm overlay,
 hue rotated slightly toward warm, saturation increased by roughly fifteen percent,
 stronger vignette than the base game with corners darker,
-bottom third still dark for UI, reel zone still dimmed,
-three-layer parallax-ready composition intact,
+overall darker tonality through the lower third for UI overlay,
+a soft elliptical atmospheric darkening through the vertical middle where
+the reels will overlay — diffuse shadow, NOT a literal column or panel
+painted into the scene,
+three-layer depth composition (foreground / midground / distant background) intact,
 <palette_leads.primary> palette intensified with extra warm accents,
 upper-left key light at 10 o'clock,
-no UI mockup, no reels, no paylines, no text,
+no UI mockup, no reels, no paylines, no text, no vertical bars or panels,
 professional slot game art, mobile slot background.
 ```
 
@@ -91,10 +97,10 @@ bottom 20% (not 30%) reserved for controls.]
 
 ## The four hard rules (non-negotiable for base-game backgrounds)
 
-1. **Bottom 30% stays dark** — luminance drops noticeably in the bottom third for UI controls.
-2. **Reel zone is dimmed** — center column ~10–20% darker than surroundings.
-3. **Three-layer composition** — foreground → midground → distant sky.
-4. **Vignette** — corners 20–40% darker than center.
+1. **Bottom third stays darker** — natural shadow falloff through the lower portion for UI overlay. NOT a hard horizontal band painted into the scene.
+2. **Soft central darkening for the reel zone** — diffuse elliptical shadow where the reels overlay. **Never** describe this as a "column", "panel", "strip", or "bar" — Gemini will render it as a literal architectural element, leaving a visible vertical bezel artifact in the painted scene. Use atmospheric/lighting words instead: "soft shadow gradient", "atmospheric darkening", "diffuse central shading".
+3. **Three-layer depth** — foreground / midground / distant background. Depth via overlap and atmospheric perspective, NOT vertical or horizontal panels.
+4. **Vignette** — corners gently darker than center.
 
 ## What to push back on
 
@@ -109,8 +115,8 @@ bottom 20% (not 30%) reserved for controls.]
 
 | Variant | Saturation | Vignette | Reel zone | Notes |
 |---|---|---|---|---|
-| `base` | L* 10–30, cool-leaning | 20–40% darker corners | Dimmed ~15% | Default |
-| `free-spins` | +10–20% warmer | Stronger | Still dimmed | Hue rotate 20–40° warm |
+| `base` | L* 10–30, cool-leaning | 20–40% darker corners | Soft central shadow | Default |
+| `free-spins` | +10–20% warmer | Stronger | Soft central shadow | Hue rotate 20–40° warm |
 | `bonus` | Maximum | Strongest | Relaxed | Full center allowed |
 | `pickme` | High | Strong | Not needed | Calm central zone for picks |
 | `wheel` | High | Strong | Not needed | Calm circular zone for wheel |
