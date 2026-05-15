@@ -1,6 +1,6 @@
 {
   "name": "slot-art-creator-node-mcp",
-  "version": "1.7.13",
+  "version": "1.7.14",
   "description": "Node.js MCP server for slot-art-creator — exposes eight tools across two model families plus a QA helper. NB2 family (Gemini/fal.ai): nb2_generate, nb2_edit, nb2_upscale, nb2_smart_resize. GPT Image 2 family (OpenAI): gpt2_generate, gpt2_edit. Cross-family helpers: nb2_stage_image (safe-roots staging), nb2_measure (OKLCH + fill + BG-uniformity metrics for /slot-step-08 numeric audit). Generation tools accept opt-in measure:true to auto-run nb2_measure on each output. gpt-image-2 is exposed at 1K and 2K only (4K is experimental per OpenAI and not shipped); for genuine 4K, generate at 2K then run nb2_upscale. No faithful upscale mode in gpt-image-2 — use nb2_upscale for that.",
   "type": "module",
   "main": "index.js",

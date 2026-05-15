@@ -133,10 +133,14 @@ and is the only faithful upscale in the plugin. Don't try to generate at
 plugin doesn't expose them.
 
 **Mandatory: display in chat.** Immediately after `nb2_generate` returns,
-call the `Read` tool on EVERY output path it returned. Claude Code renders
-PNG/JPEG inline so the user sees the background in chat without opening
-File Explorer. Required by `shared/nb2_prompting.md` § "After every
-generation call" — non-negotiable. Do this BEFORE the QA check below.
+call the `Read` tool on EVERY output path it returned. Precede each Read
+with a short markdown header naming the variant (e.g. `### BG_freespins.png`)
+so each render is its own visual beat — batched Reads without framing
+text get collapsed in some chat clients and the images don't display.
+Claude Code renders PNG/JPEG inline so the user sees the background in
+chat without opening File Explorer. Required by `shared/nb2_prompting.md`
+§ "After every generation call" — non-negotiable. Do this BEFORE the
+QA check below.
 
 ### Step 5 — Inline QA check (Gate 2)
 

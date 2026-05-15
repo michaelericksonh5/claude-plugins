@@ -146,10 +146,13 @@ For a single-call run, call `mcp__nb2node__nb2_upscale`:
 
 **Mandatory: display in chat.** Immediately after `nb2_upscale` returns,
 call the `Read` tool on the output path (the `_upscl_x<N>.png` file).
-Claude Code renders PNG/JPEG inline so the user sees the upscaled asset
-in chat without opening File Explorer. Required by
-`shared/nb2_prompting.md` § "After every generation call" —
-non-negotiable. Do this BEFORE the review rubric below.
+Precede the Read with a short markdown header naming the upscaled asset
+(e.g. `### HP1_002_upscl_x2.png`) so the render is its own visual beat
+— batched Reads without framing text get collapsed in some chat clients
+and the images don't display. Claude Code renders PNG/JPEG inline so the
+user sees the upscaled asset in chat without opening File Explorer.
+Required by `shared/nb2_prompting.md` § "After every generation call"
+— non-negotiable. Do this BEFORE the review rubric below.
 
 ### Step 5 — Inline review (Gate 2) — 8-axis rubric
 

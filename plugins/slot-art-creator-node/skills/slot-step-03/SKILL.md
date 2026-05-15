@@ -187,11 +187,14 @@ The reference images lock the style without re-specifying it in text.
 Always pass at least the key art as a reference.
 
 **Mandatory: display in chat.** Immediately after `nb2_generate` returns,
-call the `Read` tool on EVERY output path it returned. Claude Code renders
-PNG/JPEG inline so the user sees the asset in chat without opening File
-Explorer. This is required by `shared/nb2_prompting.md` § "After every
-generation call" and is non-negotiable. Do this BEFORE the QA check below
-so the user sees what you're evaluating.
+call the `Read` tool on EVERY output path it returned. Precede each Read
+with a short markdown header naming the symbol (e.g. `### HP1_002.png`)
+so each render is its own visual beat — batched Reads without framing
+text get collapsed in some chat clients and the images don't display.
+Claude Code renders PNG/JPEG inline so the user sees the asset in chat
+without opening File Explorer. Required by `shared/nb2_prompting.md`
+§ "After every generation call" — non-negotiable. Do this BEFORE the
+QA check below so the user sees what you're evaluating.
 
 ### Step 5 — Inline QA check (Gate 2)
 

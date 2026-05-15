@@ -500,17 +500,36 @@ PNG/JPEG files inline in the chat — the user sees the result without
 leaving the conversation. Do this for **every** path in the result,
 not just the first one.
 
+**Critical rendering pattern — each Read needs its own framing text.**
+Calling Reads back-to-back without text between them causes some chat
+clients to collapse the tool results into a group — the user sees only
+file paths and headers, not the rendered images. Always precede each
+Read with a short markdown header (asset name as a level-3 heading) so
+each render becomes its own visual beat in the chat:
+
 ```
-# After any generate/edit/upscale/resize call:
-Read("H:/path/to/Backgrounds/BG_base.png")
-Read("H:/path/to/Backgrounds/BG_freespins.png")
-# ...repeat for every output path
+### BG_base.png
+[Read tool call on absolute path]
+
+### BG_freespins.png
+[Read tool call on absolute path]
+
+### BG_bonus.png
+[Read tool call on absolute path]
+```
+
+**Do NOT do this** (clients collapse it, images don't render):
+
+```
+[Read][Read][Read][Read][Read]
 ```
 
 Skills that batch-generate (e.g. `/slot-step-04` contact sheets,
 multi-target `nb2_smart_resize`, contact sheets in `/slot-step-08`) must
-Read every output, in order. The user reviews the work in chat — they
-shouldn't have to open File Explorer or a folder to see what was made.
+Read every output, in order, each preceded by its identifying header.
+The user reviews the work in chat — they shouldn't have to open File
+Explorer to see what was made, and they shouldn't have to click to
+expand collapsed tool results either.
 
 This applies even when the user can already infer the output from the
 prompt or the file count. The Read step is the visual handoff between

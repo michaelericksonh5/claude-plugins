@@ -136,10 +136,14 @@ upscale-multiplier suffixes (`_upscl_x2`) can't be confused with the
 
 **Mandatory: display in chat.** Immediately after `nb2_smart_resize`
 returns, call the `Read` tool on EVERY output path it returned (one
-file per target size). Claude Code renders PNG/JPEG inline so the user
-sees each variant in chat without opening File Explorer. Required by
-`shared/nb2_prompting.md` § "After every generation call" —
-non-negotiable. Do this BEFORE the review below.
+file per target size). Precede each Read with a short markdown header
+naming the variant (e.g. `### Key_Art_003_resize_2048_2048.png`) so
+each render is its own visual beat — batched Reads without framing
+text get collapsed in some chat clients and the images don't display.
+Claude Code renders PNG/JPEG inline so the user sees each variant in
+chat without opening File Explorer. Required by `shared/nb2_prompting.md`
+§ "After every generation call" — non-negotiable. Do this BEFORE the
+review below.
 
 ### Step 5 — Inline review
 

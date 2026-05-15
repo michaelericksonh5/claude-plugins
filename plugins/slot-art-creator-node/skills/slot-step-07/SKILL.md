@@ -115,10 +115,14 @@ while `nb2_edit` treats the array as style references only.
 | `asset_name` | same convention as NB2 |
 
 **Mandatory: display in chat.** Immediately after `nb2_edit` returns,
-call the `Read` tool on the output path. Claude Code renders PNG/JPEG
-inline so the user sees the reskinned UI in chat without opening File
-Explorer. Required by `shared/nb2_prompting.md` § "After every generation
-call" — non-negotiable. Do this BEFORE the QA check below.
+call the `Read` tool on the output path. Precede the Read with a short
+markdown header naming the reskinned surface (e.g. `### UI_reskin_001.png`)
+so the render is its own visual beat — batched Reads without framing
+text get collapsed in some chat clients and the images don't display.
+Claude Code renders PNG/JPEG inline so the user sees the reskinned UI
+in chat without opening File Explorer. Required by `shared/nb2_prompting.md`
+§ "After every generation call" — non-negotiable. Do this BEFORE the
+QA check below.
 
 ### Step 5 — Inline QA check — 8-axis layout-preservation rubric
 
