@@ -1345,8 +1345,17 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       `the target shape; do not crop awkwardly. Keep the hero subject as the ` +
       `focal point. Match the rendering style of the source exactly.`;
 
-    const t0 = Date.now();
-    const response = await client.models.generateContent({
+    // Build the request. Per the @google/genai GenerateContentConfig docs
+    // (verified via Context7), the top-level `responseMimeType` field on
+    // GenerateContentConfig controls the MIME type of the response. For
+    // image-output models this should pin the output to image/png. We tried
+    // putting the hint inside imageConfig.outputMimeType in v1.7.3 — that
+    // field is in the SDK type but the Gemini Developer API rejects it at
+    // runtime. The top-level field is the documented control surface and
+    // should be honored. We still keep the per-target fal fallback below
+    // for defense in depth: if Gemini ignores the hint or rejects it, the
+    // call falls back to fal.ai's smart-resize endpoint which always returns PNG.
+    const baseRequest = {
       model: "gemini-3.1-flash-image-preview",
       contents: [{
         role: "user",
@@ -1357,21 +1366,33 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       }],
       config: {
         responseModalities: ["IMAGE", "TEXT"],
+        responseMimeType: "image/png",  // force PNG output (top-level, not in imageConfig)
         imageConfig: {
           aspectRatio,
           imageSize: tier,
-          // Note: @google/genai's ImageConfig type DOES define an
-          // outputMimeType field, but the Gemini Developer API rejects
-          // it at runtime for gemini-3.1-flash-image-preview ("not
-          // supported in Gemini API"). We do not set it here. Instead
-          // we read the actual returned mimeType below and fall back
-          // to fal.ai per-target when the model returns non-PNG. For
-          // tall portrait aspects like 1536×3324 the model consistently
-          // returns JPEG, so the fal fallback fires every time and
-          // produces the final pixel-perfect PNG.
         },
       },
-    });
+    };
+
+    const t0 = Date.now();
+    let response;
+    try {
+      response = await client.models.generateContent(baseRequest);
+    } catch (err) {
+      // Some Gemini API versions reject responseMimeType for image-output
+      // models with a 400 ("not supported in Gemini API"). When that happens,
+      // retry the call without the hint and rely on the non-PNG response
+      // fallback below. We only retry on this specific error shape — any
+      // other API error (rate limit, auth, safety filter) propagates.
+      const msg = String(err?.message || err);
+      if (/responseMimeType.*not supported|not supported in Gemini API/i.test(msg)) {
+        const fallbackRequest = JSON.parse(JSON.stringify(baseRequest));
+        delete fallbackRequest.config.responseMimeType;
+        response = await client.models.generateContent(fallbackRequest);
+      } else {
+        throw err;
+      }
+    }
     const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 
     // Extract image bytes from the response and read its actual mimeType.

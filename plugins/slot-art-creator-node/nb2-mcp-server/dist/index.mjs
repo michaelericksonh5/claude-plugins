@@ -72383,8 +72383,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
     const aspectRatio = pickGeminiAspectRatio(targetW, targetH);
     const tier = pickGeminiResolutionTier(targetW, targetH);
     const recomposePrompt = (prompt ? prompt + " " : "") + `Recompose this image at ${aspectRatio} aspect ratio while preserving the subject, palette, style, and overall mood. Adjust framing as needed to fit the target shape; do not crop awkwardly. Keep the hero subject as the focal point. Match the rendering style of the source exactly.`;
-    const t0 = Date.now();
-    const response = await client.models.generateContent({
+    const baseRequest = {
       model: "gemini-3.1-flash-image-preview",
       contents: [{
         role: "user",
@@ -72395,21 +72394,28 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       }],
       config: {
         responseModalities: ["IMAGE", "TEXT"],
+        responseMimeType: "image/png",
+        // force PNG output (top-level, not in imageConfig)
         imageConfig: {
           aspectRatio,
           imageSize: tier
-          // Note: @google/genai's ImageConfig type DOES define an
-          // outputMimeType field, but the Gemini Developer API rejects
-          // it at runtime for gemini-3.1-flash-image-preview ("not
-          // supported in Gemini API"). We do not set it here. Instead
-          // we read the actual returned mimeType below and fall back
-          // to fal.ai per-target when the model returns non-PNG. For
-          // tall portrait aspects like 1536×3324 the model consistently
-          // returns JPEG, so the fal fallback fires every time and
-          // produces the final pixel-perfect PNG.
         }
       }
-    });
+    };
+    const t0 = Date.now();
+    let response;
+    try {
+      response = await client.models.generateContent(baseRequest);
+    } catch (err) {
+      const msg = String(err?.message || err);
+      if (/responseMimeType.*not supported|not supported in Gemini API/i.test(msg)) {
+        const fallbackRequest = JSON.parse(JSON.stringify(baseRequest));
+        delete fallbackRequest.config.responseMimeType;
+        response = await client.models.generateContent(fallbackRequest);
+      } else {
+        throw err;
+      }
+    }
     const elapsed = ((Date.now() - t0) / 1e3).toFixed(1);
     let imageBuf = null;
     let imageMime = null;

@@ -26,7 +26,7 @@
     {
       "name": "slot-art-creator-node",
       "description": "Generate, QA, and resize mobile slot machine art — symbols, UI, backgrounds, key art — with Nano Banana 2. Numbered slash-command workflow (slot-00 through slot-10), persistent project memory, key-art-anchored style consistency. Gemini (NB2) is the primary backend for every tool, including smart resize; fal.ai (NB Pro) acts as a fallback when only FAL_KEY is set. Backgrounds auto-deliver at 1536×3324 (H5G iPhone fullscreen). Optional GPT-image-2 for paytables, logos, and photorealistic 4K composites. Node.js, no Python required.",
-      "version": "1.7.4",
+      "version": "1.7.5",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
