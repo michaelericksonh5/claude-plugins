@@ -488,19 +488,33 @@ The `slot-step-01` skill writes it to `game_brief.json` and the master `project.
 
 ## After every generation call
 
-These three steps apply after **every** `nb2_generate`, `nb2_edit`, or
-`nb2_upscale` tool call, regardless of which skill triggered it.
+These three steps apply after **every** `nb2_generate`, `nb2_edit`,
+`nb2_upscale`, `nb2_smart_resize`, `gpt2_generate`, or `gpt2_edit`
+tool call, regardless of which skill triggered it.
 
-### 1. Show thumbnails inline
+### 1. Show thumbnails inline (MANDATORY — every output path, every time)
 
-Use the `Read` tool on each file path returned by the MCP server.
-Claude Code renders image files inline — the user sees the result without
-leaving the chat. Read every path, not just the first one.
+**This is non-negotiable.** For every file path returned by an MCP
+generation tool, call `Read` on the absolute path. Claude Code renders
+PNG/JPEG files inline in the chat — the user sees the result without
+leaving the conversation. Do this for **every** path in the result,
+not just the first one.
 
 ```
-# example — do this for each path in the result
-Read("C:/Users/name/Pictures/claude_nb2/image_1.png")
+# After any generate/edit/upscale/resize call:
+Read("H:/path/to/Backgrounds/BG_base.png")
+Read("H:/path/to/Backgrounds/BG_freespins.png")
+# ...repeat for every output path
 ```
+
+Skills that batch-generate (e.g. `/slot-step-04` contact sheets,
+multi-target `nb2_smart_resize`, contact sheets in `/slot-step-08`) must
+Read every output, in order. The user reviews the work in chat — they
+shouldn't have to open File Explorer or a folder to see what was made.
+
+This applies even when the user can already infer the output from the
+prompt or the file count. The Read step is the visual handoff between
+"generated" and "shown to user".
 
 ### 2. State the save location clearly
 

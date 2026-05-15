@@ -1,6 +1,6 @@
 {
   "name": "slot-art-creator-node",
-  "version": "1.7.11",
+  "version": "1.7.12",
   "description": "Generate, QA, and resize mobile slot machine art — symbols, UI, backgrounds, key art — with Nano Banana 2. Numbered slash-command workflow (slot-00 through slot-10), persistent project memory across sessions, key-art-anchored style consistency. Generation tools prefer Google Gemini (NB2); nb2_smart_resize prefers the purpose-built fal.ai endpoint (NB Pro) and falls back to Gemini (NB2 + local center-crop) when only Gemini is available. Either key alone works; both gives each tool its optimal backend. Node.js, no Python required.",
   "author": {
     "name": "High 5 Games",
