@@ -72397,14 +72397,16 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
         responseModalities: ["IMAGE", "TEXT"],
         imageConfig: {
           aspectRatio,
-          imageSize: tier,
-          // Force PNG so pngjs.centerCrop downstream doesn't choke. Without
-          // this hint, gemini-3.1-flash-image-preview picks its own output
-          // format and chooses JPEG for tall portrait aspect ratios (e.g.
-          // recompose-to-1536x3324 always returns JPEG without this set).
-          // Mirrors fal-ai/smart-resize's `output_format: "png"` parameter.
-          // Confirmed against @google/genai ImageConfig interface.
-          outputMimeType: "image/png"
+          imageSize: tier
+          // Note: @google/genai's ImageConfig type DOES define an
+          // outputMimeType field, but the Gemini Developer API rejects
+          // it at runtime for gemini-3.1-flash-image-preview ("not
+          // supported in Gemini API"). We do not set it here. Instead
+          // we read the actual returned mimeType below and fall back
+          // to fal.ai per-target when the model returns non-PNG. For
+          // tall portrait aspects like 1536×3324 the model consistently
+          // returns JPEG, so the fal fallback fires every time and
+          // produces the final pixel-perfect PNG.
         }
       }
     });
