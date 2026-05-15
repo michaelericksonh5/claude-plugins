@@ -114,6 +114,12 @@ while `nb2_edit` treats the array as style references only.
 | `output_dir` | same per-surface routing as the NB2 path — the source's category folder |
 | `asset_name` | same convention as NB2 |
 
+**Mandatory: display in chat.** Immediately after `nb2_edit` returns,
+call the `Read` tool on the output path. Claude Code renders PNG/JPEG
+inline so the user sees the reskinned UI in chat without opening File
+Explorer. Required by `shared/nb2_prompting.md` § "After every generation
+call" — non-negotiable. Do this BEFORE the QA check below.
+
 ### Step 5 — Inline QA check — 8-axis layout-preservation rubric
 
 Read the output. Compare against source:

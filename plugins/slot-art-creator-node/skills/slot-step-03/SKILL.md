@@ -186,9 +186,16 @@ per-template formula fills the rest of the prompt body after it.
 The reference images lock the style without re-specifying it in text.
 Always pass at least the key art as a reference.
 
+**Mandatory: display in chat.** Immediately after `nb2_generate` returns,
+call the `Read` tool on EVERY output path it returned. Claude Code renders
+PNG/JPEG inline so the user sees the asset in chat without opening File
+Explorer. This is required by `shared/nb2_prompting.md` § "After every
+generation call" and is non-negotiable. Do this BEFORE the QA check below
+so the user sees what you're evaluating.
+
 ### Step 5 — Inline QA check (Gate 2)
 
-Read the output image immediately:
+Review the output image (now visible inline from the Read call above):
 
 **BLOCK** (fix and auto-regenerate, max 2 retries):
 - Wrong background color for tier

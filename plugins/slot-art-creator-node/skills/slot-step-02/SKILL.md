@@ -72,6 +72,12 @@ tool reads. Do not paraphrase or abbreviate it.
 Compute `nextFilename` per `shared/asset_naming.md` — glob the
 `Key_Art/` subfolder for `Key_Art_*.png`, find max number, increment.
 
+**Mandatory: display in chat.** Immediately after `nb2_generate` returns,
+call the `Read` tool on EVERY output path it returned. Claude Code renders
+PNG/JPEG inline so the user sees the key art in chat without opening File
+Explorer. Required by `shared/nb2_prompting.md` § "After every generation
+call" — non-negotiable. Do this BEFORE the QA check below.
+
 ### Step 4 — Inline QA check (Gate 2)
 
 Read the generated image immediately. Check:

@@ -144,6 +144,13 @@ For a single-call run, call `mcp__nb2node__nb2_upscale`:
 | `output_dir` | **the source's category folder** — `path.dirname(absolute_source_path)`. Upscaled outputs live next to their source so `Symbol_Art/HP1_002.png` and `Symbol_Art/HP1_002_upscl_x2.png` sit side by side. |
 | `asset_name` | `"<source_basename>_upscl_x<N>"` where `<source_basename>` is the source filename without extension and `<N>` is the linear multiplier. Example: source `Symbol_Art/HP1_002.png` upscaled 2K→4K → pass `"HP1_002_upscl_x2"`. The MCP server appends `.png`. |
 
+**Mandatory: display in chat.** Immediately after `nb2_upscale` returns,
+call the `Read` tool on the output path (the `_upscl_x<N>.png` file).
+Claude Code renders PNG/JPEG inline so the user sees the upscaled asset
+in chat without opening File Explorer. Required by
+`shared/nb2_prompting.md` § "After every generation call" —
+non-negotiable. Do this BEFORE the review rubric below.
+
 ### Step 5 — Inline review (Gate 2) — 8-axis rubric
 
 For **N=1**: read source and output, compare against the rubric below.

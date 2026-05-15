@@ -132,6 +132,12 @@ and is the only faithful upscale in the plugin. Don't try to generate at
 4K with gpt-image-2 — OpenAI flags those targets experimental and the
 plugin doesn't expose them.
 
+**Mandatory: display in chat.** Immediately after `nb2_generate` returns,
+call the `Read` tool on EVERY output path it returned. Claude Code renders
+PNG/JPEG inline so the user sees the background in chat without opening
+File Explorer. Required by `shared/nb2_prompting.md` § "After every
+generation call" — non-negotiable. Do this BEFORE the QA check below.
+
 ### Step 5 — Inline QA check (Gate 2)
 
 Read the output:

@@ -166,6 +166,12 @@ Call `mcp__nb2node__nb2_generate` (NB2 path) or `mcp__nb2node__gpt2_generate` (g
 | `asset_name` | same convention as NB2 |
 | `extra_references` (gpt2_edit only) | absolute paths to approved symbol PNGs when composing them into a layout |
 
+**Mandatory: display in chat.** Immediately after the generation call
+returns, invoke the `Read` tool on EVERY output path it returned. Claude
+Code renders PNG/JPEG inline so the user sees the surface in chat without
+opening File Explorer. Required by `shared/nb2_prompting.md` § "After every
+generation call" — non-negotiable. Do this BEFORE the QA check below.
+
 ### Step 5 — Inline QA check (Gate 2)
 
 **BLOCK** (auto-iterate):

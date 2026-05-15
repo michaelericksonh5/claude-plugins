@@ -127,6 +127,12 @@ Call `mcp__nb2node__nb2_generate`:
 | `asset_name` | `"Sheet"` (the MCP server appends `_NNN.png` and auto-increments by scanning `Symbol_Sheets/`) |
 | `references` | absolute paths — resolve each path in `project.json` against `project_root` first. **Mode A (ideation)**: only the key art is reliably available, so pass `[style_anchor.key_art_path]` plus any GDD reference images you read in earlier. **Mode B (assemble)**: pass `[style_anchor.key_art_path, HP1_approved, MP1_approved, LP1_approved, WD1_approved]` (skip any whose `.approved` is null — never pass a literal "null"). Filter null/undefined paths before the call; `uploadLocalFile` inside the MCP tool will throw ENOENT if you don't. |
 
+**Mandatory: display in chat.** Immediately after `nb2_generate` returns,
+call the `Read` tool on EVERY output path it returned. Claude Code renders
+PNG/JPEG inline so the user sees the contact sheet in chat without opening
+File Explorer. Required by `shared/nb2_prompting.md` § "After every
+generation call" — non-negotiable. Do this BEFORE the QA check below.
+
 ### Step 5 — Inline QA check (Gate 2)
 
 Read the output. Check:

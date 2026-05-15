@@ -134,6 +134,13 @@ off the filename without opening the file, and so the `x` in
 upscale-multiplier suffixes (`_upscl_x2`) can't be confused with the
 `x` in old resize-dimensions suffixes.
 
+**Mandatory: display in chat.** Immediately after `nb2_smart_resize`
+returns, call the `Read` tool on EVERY output path it returned (one
+file per target size). Claude Code renders PNG/JPEG inline so the user
+sees each variant in chat without opening File Explorer. Required by
+`shared/nb2_prompting.md` § "After every generation call" —
+non-negotiable. Do this BEFORE the review below.
+
 ### Step 5 — Inline review
 
 Read each output. Confirm:
