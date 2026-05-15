@@ -1288,7 +1288,11 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
           aspect_ratio: aspectRatio || null,
           reference_images: references || [],
           source_image: null,
-          actual_mime: respMime,
+          // File-on-disk mime (always image/png since we transcode JPEG→PNG
+          // before save). gemini_response_mime records what Gemini actually
+          // returned — useful for auditing whether the transcode fired.
+          actual_mime: "image/png",
+          gemini_response_mime: respMime,
           duration_seconds: Number(elapsed),
         });
       }
@@ -1484,6 +1488,9 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       );
     }
 
+    // Capture the original mime before any transcode so the sidecar can
+    // record what Gemini actually returned for auditing.
+    const geminiResponseMime = imageMime;
     // Transcode JPEG to PNG so pngjs.centerCrop can work on it. For the
     // expected case (JPEG from gemini-3.1-flash-image-preview) the
     // transcode is local + pure JS, ~50ms. For an unusual non-PNG
@@ -1531,7 +1538,9 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       tool: "nb2_smart_resize",
       provider: "Gemini",
       model: "gemini-3.1-flash-image-preview",
-      underlying_model: "gemini-3.1-flash-image-preview", // JPEG returns transcoded to PNG locally before center-crop
+      underlying_model: "gemini-3.1-flash-image-preview",
+      actual_mime: "image/png",            // file-on-disk mime (always PNG after transcode)
+      gemini_response_mime: geminiResponseMime, // what Gemini returned — useful for auditing
       prompt: recomposePrompt,
       image_size: size,
       target_size: size,

@@ -74549,7 +74549,11 @@ async function geminiGenerate({ prompt, outputDir, assetName, imageSize, aspectR
           aspect_ratio: aspectRatio || null,
           reference_images: references || [],
           source_image: null,
-          actual_mime: respMime,
+          // File-on-disk mime (always image/png since we transcode JPEG→PNG
+          // before save). gemini_response_mime records what Gemini actually
+          // returned — useful for auditing whether the transcode fired.
+          actual_mime: "image/png",
+          gemini_response_mime: respMime,
           duration_seconds: Number(elapsed)
         });
       }
@@ -74671,6 +74675,7 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
         `Gemini returned no image for target ${size}. \u2192 Often transient; retry once. If it persists, this specific aspect ratio may be triggering the safety filter or the input is too small for Gemini to recompose. With FAL_KEY set, the fal-ai/smart-resize endpoint (Nano Banana Pro) handles this in a single call and is much more reliable for unusual aspects.`
       );
     }
+    const geminiResponseMime = imageMime;
     if (imageMime === "image/jpeg" || imageMime === "image/jpg") {
       imageBuf = jpegToPng(imageBuf);
       imageMime = "image/png";
@@ -74708,7 +74713,10 @@ async function geminiSmartResize({ source, outputDir, assetName, targetSizes, pr
       provider: "Gemini",
       model: "gemini-3.1-flash-image-preview",
       underlying_model: "gemini-3.1-flash-image-preview",
-      // JPEG returns transcoded to PNG locally before center-crop
+      actual_mime: "image/png",
+      // file-on-disk mime (always PNG after transcode)
+      gemini_response_mime: geminiResponseMime,
+      // what Gemini returned — useful for auditing
       prompt: recomposePrompt,
       image_size: size,
       target_size: size,
