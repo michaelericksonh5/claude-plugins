@@ -1,11 +1,11 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "h5g-plugins",
-  "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, and other game-production utilities.",
-  "version": "1.1.1",
   "owner": {
     "name": "Michael Erickson (High 5 Games)",
     "email": "michael.erickson@high5games.com"
+  },
+  "metadata": {
+    "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, token-saving guidance, and other game-production utilities."
   },
   "plugins": [
     {
@@ -37,6 +37,21 @@
       "license": "MIT",
       "category": "creative",
       "tags": ["slot-machine", "image-generation", "nano-banana", "gemini", "fal-ai", "game-art"]
+    },
+    {
+      "name": "token-saver",
+      "description": "Reduce avoidable Claude token usage and cost with model-routing guidance, context hygiene, Claude Code settings examples, output-filtering hooks, and status-line visibility.",
+      "version": "0.1.0",
+      "author": {
+        "name": "High 5 Games",
+        "email": "michael.erickson@high5games.com"
+      },
+      "source": "./plugins/token-saver",
+      "homepage": "https://github.com/michaelericksonh5/token_saver",
+      "repository": "https://github.com/michaelericksonh5/token_saver",
+      "license": "MIT",
+      "category": "developer-tools",
+      "tags": ["token-usage", "cost-control", "model-routing", "context-hygiene", "claude-code", "statusline"]
     },
     {
       "name": "ai-video-generator",

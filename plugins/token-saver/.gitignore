@@ -1,0 +1,14 @@
+# Local environment
+.env
+.env.*
+
+# Build artifacts
+/dist/
+*.zip
+*.plugin
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
