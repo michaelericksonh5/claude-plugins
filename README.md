@@ -82,13 +82,13 @@ claude-plugins/
     ├── token-saver/            # bundled copy of the token-saver plugin
     └── ai-video-generator/     # bundled copy of the ai-video plugin
 
-External GitHub source:
+GitHub-sourced plugin:
 └── spine-slot-animation/        # fetched from michaelericksonh5/Claude_Spine_Generator
 ```
 
 The `skill-auditor`, `slot-art-creator-node`, `token-saver`, and `ai-video-generator` plugins are bundled directly
 in this repo under `plugins/` (using `"source": "./plugins/…"` in the catalog).
-The `spine-slot-animation` plugin is referenced from its dedicated GitHub repo with the `github` source type.
+The `spine-slot-animation` plugin is hosted in its own GitHub repo and referenced with the `github` source type.
 
 ## Adding a new plugin to this marketplace
 
