@@ -70,25 +70,21 @@ claude plugin install ai-video-generator@h5g-plugins
 > on Anthropic's side is in progress. Workaround: re-install from the
 > marketplace listing — the marketplace stays added.
 
-## Repository structure
+## Marketplace catalog
 
 ```
 claude-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json    # catalog: lists each plugin and where to fetch it
-└── plugins/
-    ├── skill-auditor/          # bundled copy of the skill-auditor plugin
-    ├── slot-art-creator-node/  # bundled copy of the slot-art plugin
-    ├── token-saver/            # bundled copy of the token-saver plugin
-    └── ai-video-generator/     # bundled copy of the ai-video plugin
-
-GitHub-sourced plugin:
-└── spine-slot-animation/        # fetched from michaelericksonh5/Claude_Spine_Generator
+└── marketplace plugins/
+    ├── skill-auditor
+    ├── slot-art-creator-node
+    ├── spine-slot-animation
+    ├── token-saver
+    └── ai-video-generator
 ```
 
-The `skill-auditor`, `slot-art-creator-node`, `token-saver`, and `ai-video-generator` plugins are bundled directly
-in this repo under `plugins/` (using `"source": "./plugins/…"` in the catalog).
-The `spine-slot-animation` plugin is hosted in its own GitHub repo and referenced with the `github` source type.
+All five plugins are from GitHub repos owned by `michaelericksonh5` and are exposed through this marketplace.
 
 ## Adding a new plugin to this marketplace
 
