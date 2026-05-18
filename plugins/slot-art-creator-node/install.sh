@@ -154,7 +154,6 @@ PLUGIN_ITEMS=(
 )
 EXCLUDED_DIRS=(
     "node_modules"
-    "dist"
     "generated"
     "logs"
     ".git"

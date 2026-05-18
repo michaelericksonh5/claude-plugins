@@ -206,7 +206,7 @@ if exist "!STAGE_ROOT!" rmdir /s /q "!STAGE_ROOT!"
 mkdir "!STAGE!" >nul 2>&1
 for %%I in (.claude-plugin skills agents hooks nb2-mcp-server shared) do (
     if exist "!SRC!\%%I\" (
-        robocopy "!SRC!\%%I" "!STAGE!\%%I" /E /XD node_modules dist generated logs .git .cache cache caches __pycache__ /XF .env .env.* *.log npm-debug.log* yarn-debug.log* yarn-error.log* pnpm-debug.log* *.pem *credentials* id_rsa* id_ed25519* >nul
+        robocopy "!SRC!\%%I" "!STAGE!\%%I" /E /XD node_modules generated logs .git .cache cache caches __pycache__ /XF .env .env.* *.log npm-debug.log* yarn-debug.log* yarn-error.log* pnpm-debug.log* *.pem *credentials* id_rsa* id_ed25519* >nul
         if !ERRORLEVEL! GEQ 8 (
             echo  ERROR: failed to stage %%I for marketplace copy.
             if exist "!STAGE_ROOT!" rmdir /s /q "!STAGE_ROOT!"

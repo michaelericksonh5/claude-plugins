@@ -29,6 +29,7 @@ desktop.ini
 *~
 
 # Build / temp artifacts
+/dist/
 *.tmp
 *.bak
 *.orig

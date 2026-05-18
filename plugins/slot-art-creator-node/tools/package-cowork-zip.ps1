@@ -33,7 +33,6 @@ $Items = @(
 
 $ExcludedDirs = @(
     "node_modules",
-    "dist",
     "generated",
     "logs",
     ".git",
