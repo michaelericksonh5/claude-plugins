@@ -39,6 +39,21 @@
       "tags": ["slot-machine", "image-generation", "nano-banana", "gemini", "fal-ai", "game-art"]
     },
     {
+      "name": "spine-slot-animation",
+      "description": "Generate validated Spine 4.2 proof packages for slot-game symbols, UI/system elements, and avatar state rigs from natural-language notes, separated PNG layers, or PSD-export manifests. Includes deterministic atlas packing, loop/settle validation, browser preview proof, and guarded advanced features.",
+      "version": "0.1.0",
+      "author": {
+        "name": "High 5 Games",
+        "email": "michael.erickson@high5games.com"
+      },
+      "source": { "source": "github", "repo": "michaelericksonh5/Claude_Spine_Generator" },
+      "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
+      "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
+      "license": "Proprietary",
+      "category": "creative",
+      "tags": ["spine", "slot-machine", "animation", "game-art", "validation", "claude-skills"]
+    },
+    {
       "name": "token-saver",
       "description": "Reduce avoidable Claude token usage and cost with model-routing guidance, context hygiene, Claude Code settings examples, output-filtering hooks, and status-line visibility.",
       "version": "0.1.1",
