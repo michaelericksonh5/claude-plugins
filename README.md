@@ -10,6 +10,7 @@ collaborative mode inside the Claude desktop app).
 |---|---|
 | [`skill-auditor`](https://github.com/michaelericksonh5/skill-auditor) | Audits a Claude skill against an 8-dimension quality rubric and returns a **READY / NEEDS WORK / DRAFT** verdict with specific, actionable findings. Checks frontmatter validity, description trigger quality, instruction clarity, reference integrity, completeness (no TODO/FIXME/TBD), output specification, evals coverage, and security. |
 | [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with **two model families**: Nano Banana 2 (Gemini + fal.ai, 4 tools — the bulk of the workflow) and OpenAI's gpt-image-2 (2 tools — optional, for paytables, logos, banners with required copy, photorealistic 4K, and compositional multi-image edits). 13 slash commands (workflow + onboarding), persistent project memory, independent keys per family. |
+| [`token-saver`](https://github.com/michaelericksonh5/token_saver) | Reduce avoidable Claude token usage and cost with model-routing guidance, context hygiene, Claude Code settings examples, output-filtering hooks, and status-line visibility. Helps teams default to cost-effective Claude usage while preserving Opus for work that actually needs it. |
 | [`ai-video-generator`](https://github.com/michaelericksonh5/ai-video-mcp-server) | Generate AI videos using Veo 3.1, Happy Horse, and Seedance 2.0. Text-to-video, image-to-video, first+last frame, reference images, and video extension. Works with fal.ai and Google Gemini API keys. |
 
 ## Add this marketplace
@@ -22,8 +23,10 @@ From inside Claude Code, add the marketplace once, then install whichever plugin
 /plugin marketplace add michaelericksonh5/claude-plugins
 /plugin install skill-auditor@h5g-plugins
 /plugin install slot-art-creator-node@h5g-plugins
+/plugin install token-saver@h5g-plugins
 /plugin install ai-video-generator@h5g-plugins
 /slot-setup
+/token-saver
 ```
 
 The first command adds the marketplace. `/slot-setup` is a guided first-run skill
@@ -38,6 +41,7 @@ Or from a shell:
 ```
 claude plugin marketplace add michaelericksonh5/claude-plugins
 claude plugin install slot-art-creator-node@h5g-plugins
+claude plugin install token-saver@h5g-plugins
 ```
 
 ### Claude Cowork (Claude desktop app)
@@ -48,10 +52,10 @@ claude plugin install slot-art-creator-node@h5g-plugins
 4. Click **Browse plugins**
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
 6. Enter the URL: `https://github.com/michaelericksonh5/claude-plugins`
-7. After it syncs, all three plugins appear in the marketplace listing — click **Install** on whichever you want
+7. After it syncs, all four plugins appear in the marketplace listing — click **Install** on whichever you want
 8. Open the plugin's settings and paste your API keys into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [slot-art README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) or [ai-video README](https://github.com/michaelericksonh5/ai-video-mcp-server#set-up-your-api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
-10. In any Cowork chat, run `/slot-help` for the workflow overview, or `/slot-setup` for a guided check that your keys are configured correctly. Then jump to `/slot-step-00` (GDD-driven) or `/slot-step-01` (fresh concept).
+10. In any Cowork chat, run `/slot-help` for the slot-art workflow overview, `/slot-setup` for a guided check that your keys are configured correctly, or `/token-saver` for model/context hygiene guidance.
 
 > [!NOTE]
 > Cowork's **Personal** marketplace tier has a documented persistence bug
@@ -68,15 +72,14 @@ claude-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json    # catalog: lists each plugin and where to fetch it
 └── plugins/
+    ├── ai-video-generator/      # bundled copy of the ai-video plugin
     ├── skill-auditor/          # bundled copy of the skill-auditor plugin
-    └── slot-art-creator-node/  # bundled copy of the slot-art plugin
+    ├── slot-art-creator-node/  # bundled copy of the slot-art plugin
+    └── token-saver/            # bundled copy of the token-saver plugin
 ```
 
-The `skill-auditor` and `slot-art-creator-node` plugins are bundled directly
+The `skill-auditor`, `slot-art-creator-node`, `ai-video-generator`, and `token-saver` plugins are bundled directly
 in this repo under `plugins/` (using `"source": "./plugins/…"` in the catalog).
-The `ai-video-generator` plugin lives in its own repo and is referenced via the
-`github` source type (using `{"source": "github", "repo": "owner/repo"}`), which
-tells Claude Code to fetch it directly from GitHub without an SSH key.
 
 ## Adding a new plugin to this marketplace
 
