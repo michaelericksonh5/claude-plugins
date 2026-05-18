@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "h5g-plugins",
   "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, and other game-production utilities.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "owner": {
     "name": "Michael Erickson (High 5 Games)",
     "email": "michael.erickson@high5games.com"
