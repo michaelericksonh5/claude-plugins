@@ -42,9 +42,11 @@ Or from a shell:
 
 ```
 claude plugin marketplace add michaelericksonh5/claude-plugins
+claude plugin install skill-auditor@h5g-plugins
 claude plugin install slot-art-creator-node@h5g-plugins
 claude plugin install spine-slot-animation@h5g-plugins
 claude plugin install token-saver@h5g-plugins
+claude plugin install ai-video-generator@h5g-plugins
 ```
 
 ### Claude Cowork (Claude desktop app)
@@ -75,13 +77,16 @@ claude-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json    # catalog: lists each plugin and where to fetch it
 └── plugins/
-    ├── ai-video-generator/      # bundled copy of the ai-video plugin
     ├── skill-auditor/          # bundled copy of the skill-auditor plugin
     ├── slot-art-creator-node/  # bundled copy of the slot-art plugin
-    └── token-saver/            # bundled copy of the token-saver plugin
+    ├── token-saver/            # bundled copy of the token-saver plugin
+    └── ai-video-generator/     # bundled copy of the ai-video plugin
+
+External GitHub source:
+└── spine-slot-animation/        # fetched from michaelericksonh5/Claude_Spine_Generator
 ```
 
-The `skill-auditor`, `slot-art-creator-node`, `ai-video-generator`, and `token-saver` plugins are bundled directly
+The `skill-auditor`, `slot-art-creator-node`, `token-saver`, and `ai-video-generator` plugins are bundled directly
 in this repo under `plugins/` (using `"source": "./plugins/…"` in the catalog).
 The `spine-slot-animation` plugin is referenced from its dedicated GitHub repo with the `github` source type.
 
