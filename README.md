@@ -74,17 +74,17 @@ claude plugin install ai-video-generator@h5g-plugins
 
 ```
 claude-plugins/
-├── .claude-plugin/
-│   └── marketplace.json    # catalog: lists each plugin and where to fetch it
-└── marketplace plugins/
-    ├── skill-auditor
-    ├── slot-art-creator-node
-    ├── spine-slot-animation
-    ├── token-saver
-    └── ai-video-generator
+└── .claude-plugin/
+    └── marketplace.json    # catalog: lists each plugin's GitHub repo source
 ```
 
-All five plugins are from GitHub repos owned by `michaelericksonh5` and are exposed through this marketplace.
+All five plugins are sourced from GitHub repos owned by `michaelericksonh5` and exposed through this marketplace:
+
+- `skill-auditor` from `michaelericksonh5/skill-auditor`
+- `slot-art-creator-node` from `michaelericksonh5/slot-art-creator-node`
+- `spine-slot-animation` from `michaelericksonh5/Claude_Spine_Generator`
+- `token-saver` from `michaelericksonh5/token_saver`
+- `ai-video-generator` from `michaelericksonh5/ai-video-mcp-server`
 
 ## Adding a new plugin to this marketplace
 
@@ -96,7 +96,7 @@ All five plugins are from GitHub repos owned by `michaelericksonh5` and are expo
    `npm install` on the cached plugin, so the bundle must be import-ready.
    Point `plugin.json`'s MCP `args` at the bundle path.
 3. Add an entry to the `plugins[]` array in `.claude-plugin/marketplace.json`.
-   Use the `github` source type for external repos:
+   Use the `github` source type for plugin repos:
    ```json
    {
      "name": "my-new-plugin",
@@ -105,11 +105,7 @@ All five plugins are from GitHub repos owned by `michaelericksonh5` and are expo
      "version": "1.0.0"
    }
    ```
-   Or bundle it locally in `plugins/my-new-plugin/` and use:
-   ```json
-   { "name": "my-new-plugin", "source": "./plugins/my-new-plugin" }
-   ```
-4. Validate locally: `claude plugin validate .`
+4. Validate locally: `claude plugin validate .claude-plugin/marketplace.json`
 5. Commit and push. Users with the marketplace already added pick up new
    plugins on the next `/plugin marketplace update`.
 
