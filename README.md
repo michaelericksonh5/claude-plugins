@@ -102,11 +102,11 @@ The older `token-saver` repo remains available at `michaelericksonh5/token_saver
    `npm install` on the cached plugin, so the bundle must be import-ready.
    Point `plugin.json`'s MCP `args` at the bundle path.
 3. Add an entry to the `plugins[]` array in `.claude-plugin/marketplace.json`.
-   Use the `github` source type for plugin repos:
+   Use HTTPS `url` sources for public repos so users do not need SSH host-key setup:
    ```json
    {
      "name": "my-new-plugin",
-     "source": { "source": "github", "repo": "michaelericksonh5/my-new-plugin" },
+     "source": { "source": "url", "url": "https://github.com/michaelericksonh5/my-new-plugin.git" },
      "description": "...",
      "version": "1.0.0"
    }

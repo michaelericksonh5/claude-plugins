@@ -16,7 +16,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/skill-auditor" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/skill-auditor.git" },
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
       "license": "MIT",
@@ -31,7 +31,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/slot-art-creator-node" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git" },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",
@@ -46,7 +46,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/Claude_Spine_Generator" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator.git" },
       "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "license": "Proprietary",
@@ -61,7 +61,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/rtk-token-saver" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/rtk-token-saver.git" },
       "homepage": "https://github.com/michaelericksonh5/rtk-token-saver",
       "repository": "https://github.com/michaelericksonh5/rtk-token-saver",
       "license": "MIT",
@@ -76,7 +76,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/webgamedev_structure" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/webgamedev_structure.git" },
       "homepage": "https://github.com/michaelericksonh5/webgamedev_structure",
       "repository": "https://github.com/michaelericksonh5/webgamedev_structure",
       "license": "MIT",
@@ -91,7 +91,7 @@
         "name": "Michael Erickson",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/ai-video-mcp-server" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/ai-video-mcp-server.git" },
       "homepage": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "repository": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "license": "MIT",
