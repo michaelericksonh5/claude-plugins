@@ -56,7 +56,7 @@
     {
       "name": "token-saver",
       "description": "Reduce avoidable Claude token usage and cost with model-routing guidance, context hygiene, Claude Code settings examples, output-filtering hooks, and status-line visibility.",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
