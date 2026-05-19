@@ -16,7 +16,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": "./plugins/skill-auditor",
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/skill-auditor.git" },
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
       "license": "MIT",
@@ -31,7 +31,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": "./plugins/slot-art-creator-node",
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git" },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",
@@ -46,7 +46,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/Claude_Spine_Generator" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator.git" },
       "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "license": "Proprietary",
@@ -54,19 +54,34 @@
       "tags": ["spine", "slot-machine", "animation", "game-art", "validation", "claude-skills"]
     },
     {
-      "name": "token-saver",
-      "description": "Reduce avoidable Claude token usage and cost with model-routing guidance, context hygiene, Claude Code settings examples, output-filtering hooks, and status-line visibility.",
-      "version": "0.1.1",
+      "name": "rtk-token-saver",
+      "description": "H5G wrapper for RTK: teaches and verifies RTK-based shell output reduction while preserving Claude model-routing and context-hygiene guidance. RTK remains the upstream engine and setup is explicit opt-in.",
+      "version": "0.1.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": "./plugins/token-saver",
-      "homepage": "https://github.com/michaelericksonh5/token_saver",
-      "repository": "https://github.com/michaelericksonh5/token_saver",
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/rtk-token-saver.git" },
+      "homepage": "https://github.com/michaelericksonh5/rtk-token-saver",
+      "repository": "https://github.com/michaelericksonh5/rtk-token-saver",
       "license": "MIT",
       "category": "developer-tools",
-      "tags": ["token-usage", "cost-control", "model-routing", "context-hygiene", "claude-code", "statusline"]
+      "tags": ["rtk", "token-usage", "cost-control", "shell-output", "model-routing", "context-hygiene", "claude-code"]
+    },
+    {
+      "name": "webgamedev-structure",
+      "description": "GameForge folder structure and no-delete Perforce workflow guidance for //webgamedev assets, including GLOBAL/LOCAL placement, source-vs-runtime rules, asset-type paths, and preview-first P4 helpers.",
+      "version": "0.2.0",
+      "author": {
+        "name": "High 5 Games",
+        "email": "michael.erickson@high5games.com"
+      },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/webgamedev_structure.git" },
+      "homepage": "https://github.com/michaelericksonh5/webgamedev_structure",
+      "repository": "https://github.com/michaelericksonh5/webgamedev_structure",
+      "license": "MIT",
+      "category": "developer-tools",
+      "tags": ["gameforge", "perforce", "p4", "webgamedev", "game-art", "artist-workflow", "folder-structure"]
     },
     {
       "name": "ai-video-generator",
@@ -76,7 +91,7 @@
         "name": "Michael Erickson",
         "email": "michael.erickson@high5games.com"
       },
-      "source": "./plugins/ai-video-generator",
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/ai-video-mcp-server.git" },
       "homepage": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "repository": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "license": "MIT",
