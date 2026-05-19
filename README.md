@@ -60,7 +60,7 @@ claude plugin install ai-video-generator@h5g-plugins
 7. After it syncs, all five plugins appear in the marketplace listing — click **Install** on whichever you want
 8. Open the plugin's settings and paste your API keys into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [slot-art README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) or [ai-video README](https://github.com/michaelericksonh5/ai-video-mcp-server#set-up-your-api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
-10. In any Cowork chat, run `/slot-help` for the slot-art workflow overview, `/slot-setup` for a guided check that your keys are configured correctly, or `/rtk-token-saver` for RTK/model/context hygiene guidance.
+10. In any Cowork chat, run `/slot-help` for the slot-art workflow overview, `/slot-setup` for a guided check that your keys are configured correctly, or `/rtk-token-saver` for RTK/model/context hygiene guidance. RTK shell-output filtering itself is a Claude Code/local-machine workflow; Cowork gets guidance, not local hook enforcement.
 
 > [!NOTE]
 > Cowork's **Personal** marketplace tier has a documented persistence bug
