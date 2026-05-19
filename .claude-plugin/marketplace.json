@@ -70,8 +70,8 @@
     },
     {
       "name": "webgamedev-structure",
-      "description": "GameForge folder structure and artist-safe Perforce workflow guidance for //webgamedev assets, including GLOBAL/LOCAL placement, source-vs-runtime rules, asset-type paths, and preview-first P4 helpers.",
-      "version": "0.1.0",
+      "description": "GameForge folder structure and no-delete Perforce workflow guidance for //webgamedev assets, including GLOBAL/LOCAL placement, source-vs-runtime rules, asset-type paths, and preview-first P4 helpers.",
+      "version": "0.2.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
