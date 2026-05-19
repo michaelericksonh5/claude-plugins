@@ -54,19 +54,19 @@
       "tags": ["spine", "slot-machine", "animation", "game-art", "validation", "claude-skills"]
     },
     {
-      "name": "token-saver",
-      "description": "Reduce avoidable Claude token usage and cost with model-routing guidance, context hygiene, Claude Code settings examples, output-filtering hooks, and status-line visibility.",
-      "version": "0.2.0",
+      "name": "rtk-token-saver",
+      "description": "H5G wrapper for RTK: teaches and verifies RTK-based shell output reduction while preserving Claude model-routing and context-hygiene guidance. RTK remains the upstream engine and setup is explicit opt-in.",
+      "version": "0.1.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "github", "repo": "michaelericksonh5/token_saver" },
-      "homepage": "https://github.com/michaelericksonh5/token_saver",
-      "repository": "https://github.com/michaelericksonh5/token_saver",
+      "source": { "source": "github", "repo": "michaelericksonh5/rtk-token-saver" },
+      "homepage": "https://github.com/michaelericksonh5/rtk-token-saver",
+      "repository": "https://github.com/michaelericksonh5/rtk-token-saver",
       "license": "MIT",
       "category": "developer-tools",
-      "tags": ["token-usage", "cost-control", "model-routing", "context-hygiene", "claude-code", "statusline"]
+      "tags": ["rtk", "token-usage", "cost-control", "shell-output", "model-routing", "context-hygiene", "claude-code"]
     },
     {
       "name": "ai-video-generator",
