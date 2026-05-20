@@ -40,8 +40,8 @@
     },
     {
       "name": "spine-slot-animation",
-      "description": "Generate validated Spine 4.2 proof packages for slot-game symbols, UI/system elements, and avatar state rigs from natural-language notes, separated PNG layers, or PSD-export manifests. Includes deterministic atlas packing, loop/settle validation, browser preview proof, and guarded advanced features.",
-      "version": "0.1.2",
+      "description": "Generate validated Spine 4.3 proof packages for slot-game symbols, UI/system elements, and avatar state rigs from natural-language notes, separated PNG layers, or PSD-export manifests. Includes deterministic atlas packing, loop/settle validation, browser preview proof, and guarded advanced features.",
+      "version": "0.1.3",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
