@@ -31,7 +31,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git", "sha": "1eef4f4995c220b7a1d4fdc58ec0c62b64e5f4c8" },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",
