@@ -86,7 +86,7 @@
     {
       "name": "h5g-slot-math",
       "description": "Auto-invoked probability-first slot math skills for H5G: math/RTP/RMG modeling, dependent-probability audits, simulation verification, and Claude rule installation.",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"

@@ -1,7 +1,7 @@
 {
   "name": "h5g-slot-math",
   "displayName": "H5G Slot Math",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Auto-invoked probability-first slot math skills for H5G: math/RTP/RMG modeling, dependent-probability audits, simulation verification, and rule installation.",
   "author": {
     "name": "High 5 Games",
@@ -26,6 +26,5 @@
   ],
   "agents": [
     "./agents/slot-math-auditor.md"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
