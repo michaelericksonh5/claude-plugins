@@ -91,7 +91,7 @@ All seven active plugins are sourced from GitHub repos owned by `michaelerickson
 - `spine-slot-animation` from `michaelericksonh5/Claude_Spine_Generator`
 - `rtk-token-saver` from `michaelericksonh5/rtk-token-saver`
 - `webgamedev-structure` from `michaelericksonh5/webgamedev_structure`
-- `h5g-slot-math` from `michaelericksonh5/h5g-slot-math`
+- `h5g-slot-math` from `./plugins/h5g-slot-math` bundled in this marketplace repo, with a standalone mirror at `michaelericksonh5/h5g-slot-math`
 - `ai-video-generator` from `michaelericksonh5/ai-video-mcp-server`
 
 The older `token-saver` repo remains available at `michaelericksonh5/token_saver` for rollback or future reuse, but it is no longer listed in this marketplace.
