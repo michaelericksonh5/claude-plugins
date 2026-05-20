@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "h5g-plugins",
   "owner": {
     "name": "Michael Erickson (High 5 Games)",
@@ -26,12 +26,12 @@
     {
       "name": "slot-art-creator-node",
       "description": "Generate, QA, and resize mobile slot machine art — symbols, UI, backgrounds, key art — with Nano Banana 2. Numbered slash-command workflow (/slot-step-00 through /slot-step-10), persistent project memory, key-art-anchored style consistency. Gemini (NB2) is the primary backend for generation, edit, upscale, and smart-resize; fal.ai (NB Pro) is the fallback when only FAL_KEY is set. Optional GPT-image-2 covers paytables, logos, and photorealistic assets; for 4K-class gpt2 output, generate at 2K then run nb2_upscale. Node.js 20+, no Python required.",
-      "version": "1.7.21",
+      "version": "1.7.20",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git", "sha": "fb46a7759d13d0626413f16ad74a8136dbb27ded" },
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git", "sha": "1eef4f4995c220b7a1d4fdc58ec0c62b64e5f4c8" },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",
