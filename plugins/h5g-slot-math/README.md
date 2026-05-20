@@ -62,7 +62,7 @@ Most users should install this through Claude Desktop rather than starting the C
 - Plugins are available in Cowork and Code, not Chat.
 - Code supports plugins for local and SSH sessions; remote sessions do not use plugins.
 - Desktop users can install from Customize -> Plugins, from an organization marketplace, or from an uploaded plugin package.
-- A local upload package is available at `C:\Users\merickson\Documents\Claude_Plugins\h5g-slot-math-0.2.2.zip`.
+- A local upload package is available at `C:\Users\merickson\Documents\Claude_Plugins\h5g-slot-math-0.2.3.zip`.
 - See `DESKTOP.md` for the current workflow and marketplace notes.
 
 ## Natural-Language Invocation

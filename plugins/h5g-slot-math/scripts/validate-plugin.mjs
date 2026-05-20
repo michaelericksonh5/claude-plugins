@@ -41,7 +41,24 @@ if (!/^[a-z0-9-]+$/.test(manifest.name || "")) {
   fail(".claude-plugin/plugin.json: name must be kebab-case");
 }
 
-for (const skillPath of manifest.skills || []) {
+if ((manifest.skills || []).some((skillPath) => String(skillPath).startsWith("./skills/"))) {
+  fail(".claude-plugin/plugin.json: do not list standard ./skills/* entries; Claude auto-discovers the skills directory and duplicate entries cause duplicate skills at runtime");
+}
+
+if (manifest.hooks) {
+  const hookPath = String(manifest.hooks).startsWith("./") ? manifest.hooks.slice(2) : manifest.hooks;
+  if (hookPath === "hooks/hooks.json") {
+    fail(".claude-plugin/plugin.json: do not list hooks/hooks.json; Claude auto-loads the standard hooks file and duplicate entries fail at runtime");
+  }
+}
+
+const skillPaths = exists("skills")
+  ? fs.readdirSync(path.join(root, "skills"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => `./skills/${entry.name}`)
+  : [];
+
+for (const skillPath of skillPaths) {
   if (!skillPath.startsWith("./")) {
     fail(`skill path must start with ./: ${skillPath}`);
     continue;
