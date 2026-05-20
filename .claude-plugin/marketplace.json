@@ -54,9 +54,9 @@
       "tags": ["spine", "slot-machine", "animation", "game-art", "validation", "claude-skills"]
     },
     {
-      "name": "spine-slot-animation-progressive",
-      "description": "Progressive Claude skill fork for validated Spine 4.3 slot-animation proof packages with a compact router skill plus manual compile, diagnose, validate, handoff, and rig-review workflows.",
-      "version": "0.1.0",
+      "name": "spine-2-0-skills",
+      "description": "Spine 2.0 Skills: validated Spine 4.3 slot-animation proof packages with a compact router skill plus manual compile, diagnose, validate, handoff, and rig-review workflows.",
+      "version": "2.0.0",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
