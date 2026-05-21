@@ -34,6 +34,15 @@ const marketplace = JSON.parse(originalText);
 
 const changes = [];
 
+if (marketplace.metadata?.description && !marketplace.description) {
+  marketplace.description = marketplace.metadata.description;
+  changes.push("marketplace: moved metadata.description to description");
+}
+if ("metadata" in marketplace) {
+  delete marketplace.metadata;
+  changes.push("marketplace: removed metadata");
+}
+
 for (const plugin of marketplace.plugins ?? []) {
   const manifest = await readPluginManifest(plugin);
 
@@ -57,6 +66,13 @@ for (const plugin of marketplace.plugins ?? []) {
     changes.push(`${plugin.name}: removed source.sha`);
     delete plugin.source.sha;
   }
+
+  if ("version" in plugin) {
+    changes.push(`${plugin.name}: removed marketplace version`);
+    delete plugin.version;
+  }
+
+  normalizeGitHubSource(plugin, changes);
 }
 
 const nextText = `${formatJson(marketplace)}\n`;
@@ -152,6 +168,23 @@ function isGitHubBackedSource(source) {
     || (source.source === "github" && typeof source.repo === "string")
     || (source.source === "git-subdir" && typeof source.url === "string" && typeof source.path === "string")
   );
+}
+
+function normalizeGitHubSource(plugin, changes) {
+  if (!plugin.source || typeof plugin.source !== "object" || plugin.source.source !== "url") {
+    return;
+  }
+
+  const repo = parseGitHubRepo(plugin.source.url);
+  if (!repo) {
+    return;
+  }
+
+  plugin.source = {
+    source: "github",
+    repo: `${repo.owner}/${repo.name}`,
+  };
+  changes.push(`${plugin.name}: normalized GitHub URL source`);
 }
 
 function getGitHubRepo(source) {
