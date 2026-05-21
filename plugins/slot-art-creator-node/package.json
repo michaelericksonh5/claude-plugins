@@ -1,7 +1,0 @@
-{
-  "name": "slot-art-creator-node",
-  "version": "1.7.21",
-  "private": true,
-  "type": "module",
-  "description": "Claude Desktop and Code plugin tooling for the High 5 Games slot art workflow"
-}
