@@ -1,0 +1,121 @@
+{
+  "schema": "spine_slot_animation_autonomous_rigging_evidence_index_v1",
+  "generated_at": "source-reviewed-2026-05-19",
+  "status": "report_only_research",
+  "source_policy": {
+    "allowed_roots": [
+      "assets/h5g_corpus_distilled_evidence.json",
+      "references/h5g_corpus_distilled_knowledge.md",
+      "assets/autonomous_rigging_evidence_index.json"
+    ],
+    "prohibited_writes": [
+      "G:/artSource",
+      "G:\\artSource",
+      "Perforce"
+    ],
+    "external_code_policy": "Genielabs is conceptual prior art only; do not copy or embed PolyForm Noncommercial code."
+  },
+  "coverage": {
+    "status": "not_autonomous_production_rigger",
+    "current_plugin_support": [
+      "PNG-layer proof package generation",
+      "review-required automatic mesh plan and first-pass weight binding",
+      "mesh/weight parity fixture comparator for Chris-approved exports",
+      "avatar state-frame proof package and manifest",
+      "avatar runtime contract validator for state/event ownership",
+      "Spine CLI JSON-to-.spine import when explicitly approved",
+      "non-exporting production export gate"
+    ],
+    "blocked_claims": [
+      "production mesh topology generation",
+      "production weight painting",
+      "Spine Auto weight parity",
+      "deform timeline authoring",
+      "target game runtime acceptance",
+      "production .skel export automation",
+      "fully autonomous production rigger"
+    ]
+  },
+  "h5g_research_sources": {
+    "compiler_evidence_index": {
+      "path": "assets/compiler_evidence_index.json",
+      "summary": "Portable index of generated H5G corpus, recipe, UI, contextual layer, bakeoff, and advanced gate evidence."
+    },
+    "avatar_recipe_spec": {
+      "path": "research/generated/family_recipe_specs/specs/avatar.md",
+      "summary": "Avatar is proof-ready only; corpus rows show 17 games, 309 animations, 46 distinct animations, and 148 deform timeline observations."
+    },
+    "avatar_bakeoff": {
+      "path": "research/generated/full_deep_animation_bakeoff/closure_full_20260506_225908/families/avatar.md",
+      "summary": "One generated avatar candidate compared to 20 references; largest missing deltas include slot_attachment=5162, slot_color=2322, scale=453, translate=268, rotate=149, drawOrder=10."
+    },
+    "mesh_findings": {
+      "path": "research/spine_mesh_weights_deform.md",
+      "summary": "Official Spine guidance supports mesh/weight/deform caution: topology and weights require review, deform keys should stay sparse."
+    },
+    "capability_status": {
+      "path": "references/capability_status.md",
+      "summary": "Portable plugin truth table: strong proof/review pipeline, not a fully autonomous production rigger."
+    },
+    "distilled_corpus_pack": {
+      "path": "assets/h5g_corpus_distilled_evidence.json",
+      "summary": "Bundled portable H5G corpus/bakeoff knowledge pack used by default for rig proposal evidence IDs and support status; full H5G research workspace is not required."
+    }
+  },
+  "genielabs_prior_art_review": {
+    "allowed_ideas": [
+      "Use part-matching and geometric alignment as review evidence, not as a production source of truth.",
+      "Store editable adjustment JSON beside generated previews.",
+      "Provide self-contained web previews and interactive review loops."
+    ],
+    "blocked_uses": [
+      "Do not copy source code, presets, or fixtures under PolyForm Noncommercial terms.",
+      "Do not treat generic humanoid presets as H5G slot-character evidence.",
+      "Do not use single-image decomposition as safe production intake without hidden-part and hallucination review."
+    ]
+  },
+  "fixture_requirements": {
+    "mesh_parity": [
+      "One Chris-approved region-vs-mesh fixture with source layer, mesh hull, edges, and budget.",
+      "Same fixture exported from Spine Editor with Auto weights and nonessential mesh data preserved.",
+      "Plugin report-only proposal and first-pass weights compared to Spine export by vertex count, bone influence count, and max weight delta.",
+      "Run scripts/compare_mesh_weight_parity.py and store the report beside the fixture evidence."
+    ],
+    "avatar_parity": [
+      "At least one real H5G avatar source with state list, transition rules, expression layers, event ownership, and target runtime proof.",
+      "Diff thresholds for required animation names, slot attachment timelines, slot color timelines, transform ranges, and any deform references.",
+      "Run scripts/validate_avatar_runtime_contract.py before claiming runtime state or event support."
+    ],
+    "production_export": [
+      "Exact approved Spine Editor, Spine CLI, and runtime versions.",
+      "Approved license posture and approver metadata.",
+      "Browser-runtime probe for current package plus target game runtime acceptance before production claim.",
+      "Manual export approval only unless a future policy explicitly permits CLI export automation."
+    ]
+  },
+  "acceptance_criteria_before_autonomous_rigger_claim": [
+    "Rig proposal schema validated by local evals and used only in report-only mode.",
+    "Mesh and weight parity fixtures pass documented diff thresholds against Chris-approved Spine exports.",
+    "Avatar-specific runtime state, event, and expression contracts are verified by the game runtime owner.",
+    "Production export policy allows the selected output format and still records no source-art or Perforce writes.",
+    "A verifier can trace every supported claim to evidence in this index, validation reports, runtime probes, and art approval."
+  ],
+  "implemented_gates": {
+    "rig_proposal": {
+      "schema": "assets/rig_proposal_schema.json",
+      "tool": "scripts/generate_rig_proposal.py"
+    },
+    "mesh_weight_parity": {
+      "schema": "assets/mesh_weight_parity_fixture_schema.json",
+      "tool": "scripts/compare_mesh_weight_parity.py"
+    },
+    "avatar_runtime_contract": {
+      "schema": "assets/avatar_runtime_contract_schema.json",
+      "tool": "scripts/validate_avatar_runtime_contract.py"
+    },
+    "production_export": {
+      "schema": "assets/production_export_profile_schema.json",
+      "tool": "scripts/production_export_gate.py"
+    }
+  }
+}

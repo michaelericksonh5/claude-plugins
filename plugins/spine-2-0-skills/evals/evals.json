@@ -1,0 +1,33 @@
+{
+  "skill_name": "spine-2-0-skills:spine-slot-animation",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "natural-language-controls-revision",
+      "prompt": "I have a compiled HP1 character symbol on my reel and the art lead just gave me notes \u2014 \"make it more bouncy on the land but less flashy overall, and slow the idle down a hair.\" The current rig has glow, sparkle, frame_glow, and a lit slot. Give me the controls JSON I should run through the proof compiler.",
+      "expected_output": "A single JSON object matching the bounded recipe controls schema. Should include increased bounce_strength and land_duration_scale (more bouncy on land), decreased glow_intensity/sparkle_intensity/premium_intensity (less flashy), and slightly increased idle_duration_scale (slower idle). No prose, no markdown fences, no Spine JSON. recipe_type either omitted or hp_symbol. Values stay in the 0.0-2.0 / 0.25-3.0 ranges. No unknown fields invented.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "eval_name": "classify-and-walk-through-compile",
+      "prompt": "I have a folder of separated PNG layers in research/generated/intake/santapop_HP3/. The layer names are: HP3_BG.png, HP3_frame.png, HP3_frame_glow.png, HP3_head.png, HP3_head_eyes_blink.png, HP3_santa_laugh.png, HP3_hand_L.png, HP3_hand_R.png, HP3_santa_hat_top.png. Walk me through what family this is and how to compile it to a validated Spine 4.3.04 package. What commands do I run and what do I check?",
+      "expected_output": "Correctly classifies as hp_symbol (character HP: expression overlays and hand layers). Routes new work through the portable 4.3 package builder by default, not the legacy proof compiler. Walks through: 1) classify or interpret layers, 2) run scripts/build_spine_package.py with --layer-dir, --family hp_symbol, rank/doc size, --build-preview, and --spine-editor-zip, 3) inspect validation_report.json and preview output, 4) use the current 4.x contract/import-version gate before claiming readiness. Calls out overlay polarity (eyes_blink and laugh hidden at rest), editor import version matching, and boundaries: no source-art writes, no Perforce writes, no production mesh/IK/deform/export claims, and no freehand Spine JSON.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "diagnose-4_3-blank-canvas",
+      "prompt": "My compiled Spine package loads in the player but the canvas is just blank \u2014 no error in the console. The validation_report.json says everything passed. I'm targeting Spine 4.3.04. What's wrong and how do I fix it?",
+      "expected_output": "Identifies the #1 cause: skins emitted as 3.8 object form instead of the current 4.x array form. Explains why the symptom is silent (the player expects iterable array-form skins; an object can leave every slot with null attachment and a blank canvas). Tells the user to run the current 4.x compatibility/import-version gate to enumerate contract violations, noting that validation_report.json alone may not catch every legacy field-shape issue. The fix is at the compiler emission level: regenerate through the current 4.3 package builder or fix the compiler to emit array-form skins. Does not propose hand-editing the JSON. May also mention secondary candidates (rotate value vs angle, rgba vs color) but skins-as-object is the strongest match for silent-blank-canvas.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "phase-10-production-export-gate",
+      "prompt": "I have a validated Spine 4.3.04 package and want to production export it. What deterministic gate should I run, what evidence must the profile contain, and is the CLI export allowed?",
+      "expected_output": "Routes to scripts/production_export_gate.py or build_spine_package.py with --production-export-profile --check-production-export-gate, and explains that accepted runtime evidence comes from scripts/runtime_acceptance_probe.mjs. Requires exact approved Spine Editor/CLI/runtime versions, validation_report status ok, license posture approval, approver metadata, explicit JSON-vs-binary output decision, matching advanced-feature counts, approved browser-runtime provenance plus package hashes for required skins/physics/sequences/clipping/events/blends, and perforce_writes/source_art_writes false. States that production_export_gate_report.json remains non-exporting: export_invoked=false, cli_invocation_allowed=false under the bundled policy, no .skel conversion, no license activation, no Perforce automation, and no source-art writes. Report-only/static/manual/self-attested evidence remains unverified and blocked. A clean result is ready_for_manual_export only.",
+      "files": []
+    }
+  ]
+}

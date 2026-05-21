@@ -1,0 +1,335 @@
+{
+  "schema": "claude_spine_phase_11_eval_coverage_registry_v1",
+  "phase": "Phase 11 Evals",
+  "entries": [
+    {
+      "eval_id": "eval-17-sequence-auto-emission",
+      "aliases": [],
+      "feature": "Sequence attachment auto-emission",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--enable-sequences"],
+      "positive_case": "numbered VFX frames emit one sequence attachment and sequence timeline",
+      "guard_case": "numbered frames remain plain regions without the opt-in flag",
+      "positive_tests": ["test_eval_17_sequence_auto_emission"],
+      "guard_tests": ["test_eval_17_sequence_guard_without_flag"]
+    },
+    {
+      "eval_id": "eval-18-mesh-plan-emission",
+      "aliases": [],
+      "feature": "Reviewed unweighted mesh plan emission",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--mesh-plan"],
+      "positive_case": "reviewed mesh plan emits an unweighted Spine mesh attachment",
+      "guard_case": "bad topology, schema violations, escaped paths, and over-budget meshes block emission",
+      "positive_tests": ["test_eval_18_mesh_plan_emits_reviewed_unweighted_mesh"],
+      "guard_tests": [
+        "test_eval_18_mesh_plan_rejects_bad_triangle_index",
+        "test_eval_18_mesh_plan_rejects_closed_schema_violations",
+        "test_eval_18_mesh_plan_rejects_bool_triangle_value",
+        "test_eval_18_mesh_plan_rejects_bad_uv_range",
+        "test_eval_18_mesh_plan_rejects_degenerate_triangle",
+        "test_eval_18_mesh_plan_rejects_bad_edge_index",
+        "test_eval_18_mesh_plan_rejects_source_path_escape",
+        "test_eval_18_mesh_plan_rejects_hull_degeneracy",
+        "test_eval_18_mesh_plan_rejects_self_intersecting_hull",
+        "test_eval_18_mesh_plan_rejects_over_budget_vertices"
+      ]
+    },
+    {
+      "eval_id": "eval-19-auto-bind-weighted-mesh",
+      "aliases": [],
+      "feature": "First-pass auto-bound weighted mesh",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--mesh-plan", "--auto-bind-weights"],
+      "positive_case": "reviewed mesh plan with explicit bones emits weighted mesh vertices",
+      "guard_case": "missing plans, missing bones, transform budgets, and policy edits block binding",
+      "positive_tests": ["test_eval_19_auto_bind_weighted_mesh"],
+      "guard_tests": [
+        "test_eval_19_auto_bind_rejects_missing_mesh_plan",
+        "test_eval_19_auto_bind_rejects_missing_bone_name",
+        "test_eval_19_auto_bind_rejects_transform_budget",
+        "test_eval_19_auto_bind_rejects_aggregate_transform_budget",
+        "test_eval_19_auto_bind_rejects_bad_policy"
+      ]
+    },
+    {
+      "eval_id": "eval-20-multi-skin-variants",
+      "aliases": [],
+      "feature": "Reviewed multi-skin region variants",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--skin-plan"],
+      "positive_case": "skin plan emits default plus named variant skins with preview listing",
+      "guard_case": "no plan keeps default-only output and invalid plans are blocked",
+      "positive_tests": ["test_eval_20_multi_skin_variants_emit_default_plus_two_variants"],
+      "guard_tests": [
+        "test_eval_20_no_skin_plan_keeps_single_default_skin",
+        "test_eval_20_skin_plan_guard_cases"
+      ]
+    },
+    {
+      "eval_id": "eval-21-bezier-modern-profile",
+      "aliases": [],
+      "feature": "Spine 4.3 numeric Bezier profile",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#not-implemented-today",
+      "required_feature_gates": ["export_profile=spine_43_bezier", "bezier_preset"],
+      "positive_case": "Bezier profile emits numeric curve arrays without changing timing or endpoints",
+      "guard_case": "legacy profiles, unsupported presets, invalid curves, and unstable rewrites are blocked",
+      "positive_tests": ["test_eval_21_bezier_profile_emits_numeric_arrays_and_preserves_timing"],
+      "guard_tests": [
+        "test_eval_21_v10_linear_is_rejected_by_current_builder",
+        "test_eval_21_unsupported_profile_and_preset_are_rejected",
+        "test_eval_21_curve_validator_rejects_invalid_curves",
+        "test_eval_21_curve_application_stability_guard"
+      ]
+    },
+    {
+      "eval_id": "eval-22-ui-frame-ambient-loop",
+      "aliases": [],
+      "feature": "Evidence-backed UI/frame ambient proof templates",
+      "promoted": true,
+      "promoted_status": "promoted",
+      "docs_path": "references/capability_status.md#supported-by-the-default-package-builder",
+      "required_feature_gates": ["assets/compiler_evidence_index.json", "assets/ui_system_template_policy.json"],
+      "positive_case": "symbol frame/glow and supported UI families compile only from evidence-backed policy",
+      "guard_case": "missing or stale evidence blocks supported UI policy promotion",
+      "positive_tests": [
+        "test_eval_22_symbol_frame_glow_uses_available_slots_only",
+        "test_eval_22_non_symbol_ui_family_reports_supported_policy",
+        "test_eval_22_all_supported_ui_families_are_evidence_backed"
+      ],
+      "guard_tests": [
+        "test_eval_22_missing_evidence_index_blocks_supported_policy",
+        "test_eval_22_stale_evidence_index_blocks_supported_policy"
+      ]
+    },
+    {
+      "eval_id": "eval-23-background-parallax-ambient",
+      "aliases": [],
+      "feature": "Background parallax ambient review-only gate",
+      "promoted": true,
+      "promoted_status": "review-only gate",
+      "docs_path": "references/capability_status.md#not-implemented-today",
+      "required_feature_gates": ["assets/compiler_evidence_index.json", "review-only bucket policy"],
+      "positive_case": "review-only gate passes by reporting portable evidence and requiring review",
+      "guard_case": "unsupported or unknown ambient buckets stay blocked instead of compiling guessed templates",
+      "positive_tests": ["test_eval_23_background_parallax_stays_review_only"],
+      "guard_tests": ["test_eval_23_unknown_alias_stays_review_only_with_unknown_bucket_evidence"]
+    },
+    {
+      "eval_id": "eval-24-character-wardrobe-physics",
+      "aliases": [],
+      "feature": "Policy-gated wardrobe physics constraints",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--enable-physics", "assets/physics_policy.json", "preview required"],
+      "positive_case": "policy-permitted physics role emits a preview-required physics constraint",
+      "guard_case": "review-only roles, raw keyword guesses, invalid plans, and over-budget constraints are blocked",
+      "positive_tests": ["test_eval_24_policy_permitted_physics_emits_with_preview_hook"],
+      "guard_tests": [
+        "test_eval_24_review_only_candidate_does_not_emit",
+        "test_eval_24_raw_keyword_candidate_is_review_only",
+        "test_eval_24_invalid_physics_plan_fields_fail_without_crashing",
+        "test_eval_24_over_max_constraints_rejected"
+      ]
+    },
+    {
+      "eval_id": "eval-25-expression-atlas-variants",
+      "aliases": [],
+      "feature": "Opt-in expression atlas variants",
+      "promoted": true,
+      "promoted_status": "opt-in promoted",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--composite-expressions"],
+      "positive_case": "source head and overlays emit composited expression attachments with structural QA",
+      "guard_case": "missing flag, absent states, no expression layers, and bad overlay canvases do not fabricate output",
+      "positive_tests": ["test_expression_composites_splice_into_package"],
+      "guard_tests": [
+        "test_expression_overlays_are_not_composited_without_flag",
+        "test_expression_composites_no_expression_layers_do_not_fabricate_variants",
+        "test_expression_composites_do_not_fabricate_absent_states",
+        "test_expression_composites_reject_mismatched_overlay_canvas"
+      ]
+    },
+    {
+      "eval_id": "eval-26-avatar-state-manifest",
+      "aliases": [],
+      "feature": "Avatar state manifest and event-plan contract",
+      "promoted": true,
+      "promoted_status": "promoted proof package",
+      "docs_path": "references/capability_status.md#supported-by-the-default-package-builder",
+      "required_feature_gates": ["avatar_state_manifest.json", "runtime_consumer_verified=false"],
+      "positive_case": "avatar layers emit a state graph manifest without claiming runtime event consumption",
+      "guard_case": "event plans, state names, missing defaults, orphan references, and duplicate IDs are blocked",
+      "positive_tests": ["test_eval_26_avatar_state_manifest_declares_graph_without_event_timelines"],
+      "guard_tests": [
+        "test_eval_26_avatar_event_plan_must_match_manifest_names_and_times",
+        "test_eval_26_avatar_rejects_malformed_state_layer_names",
+        "test_eval_26_avatar_rejects_missing_default_state",
+        "test_eval_26_avatar_rejects_orphan_transition_references",
+        "test_eval_26_avatar_rejects_duplicate_state_ids"
+      ]
+    },
+    {
+      "eval_id": "eval-28-production-export-gate",
+      "aliases": ["eval-26-production-export-gate"],
+      "feature": "Production export approval gate",
+      "promoted": true,
+      "promoted_status": "browser-runtime evidence gate",
+      "docs_path": "references/capability_status.md#supported-by-the-default-package-builder",
+      "required_feature_gates": ["--production-export-profile", "--check-production-export-gate", "scripts/runtime_acceptance_probe.mjs", "manual export only"],
+      "positive_case": "browser-runtime probe evidence passes as ready_for_manual_export without invoking CLI export",
+      "guard_case": "missing profile, incomplete approvals, unsafe writes, report-only/static/manual runtime evidence, bad runtime evidence, and policy tampering block export",
+      "positive_tests": ["test_eval_28_approved_provenance_profile_is_ready_for_manual_export_only"],
+      "guard_tests": [
+        "test_eval_28_missing_profile_blocks_production_export_gate",
+        "test_eval_28_incomplete_profile_blocks_missing_approvals",
+        "test_eval_28_unsafe_perforce_or_source_art_write_request_blocks_gate",
+        "test_eval_28_report_only_runtime_fixture_blocks_gate",
+        "test_eval_28_static_runtime_evidence_without_approved_provenance_blocks_gate",
+        "test_eval_28_required_runtime_feature_missing_blocks_gate",
+        "test_eval_28_policy_tampering_cannot_enable_cli_export"
+      ]
+    },
+    {
+      "eval_id": "eval-29-loop-closure-validation",
+      "aliases": [],
+      "feature": "Loop and settle endpoint validation",
+      "promoted": true,
+      "promoted_status": "required validation gate",
+      "docs_path": "references/validation.md#per-package-validation-report",
+      "required_feature_gates": ["animation_loop_validation", "animation_loop_intents", "loop_validation_status"],
+      "positive_case": "supported families report loop/settle intents for emitted animations",
+      "guard_case": "bad idle loop endpoints and bad settle endpoints fail validation",
+      "positive_tests": [
+        "test_eval_29_loop_validation_reports_hp_symbol_intents",
+        "test_eval_29_loop_validation_reports_avatar_intents",
+        "test_eval_29_loop_validation_reports_winframe_intents"
+      ],
+      "guard_tests": [
+        "test_eval_29_loop_validation_rejects_bad_idle_endpoint",
+        "test_eval_29_loop_validation_rejects_bad_settle_endpoint"
+      ]
+    },
+    {
+      "eval_id": "eval-30-automatic-weighted-mesh",
+      "aliases": [],
+      "feature": "Automatic weighted mesh draft proposals",
+      "promoted": true,
+      "promoted_status": "opt-in review-required",
+      "docs_path": "references/capability_status.md#opt-in-or-helper-only-support",
+      "required_feature_gates": ["--report-mesh-candidates", "--auto-mesh-plan", "--auto-bind-weights", "review required"],
+      "positive_case": "conservative candidates generate an automatic draft mesh plan, first-pass weights, and structural mesh QA",
+      "guard_case": "reviewed mesh plans override drafts and static layers remain regions",
+      "positive_tests": ["test_eval_30_auto_mesh_plan_generates_weighted_review_package"],
+      "guard_tests": [
+        "test_eval_30_reviewed_mesh_plan_overrides_auto_draft_plan",
+        "test_eval_30_conservative_auto_mesh_keeps_static_layers_regions"
+      ]
+    },
+    {
+      "eval_id": "eval-31-spine-cli-reference",
+      "aliases": [],
+      "feature": "Spine CLI knowledge and policy reference",
+      "promoted": true,
+      "promoted_status": "documented bounded automation",
+      "docs_path": "references/spine_cli.md",
+      "required_feature_gates": ["official CLI command family coverage", "production export remains gated"],
+      "positive_case": "reference covers official command families, flags, platforms, invocation semantics, and exit behavior",
+      "guard_case": "support boundaries preserve import/info-only automation and gated production export language",
+      "positive_tests": ["test_eval_31_spine_cli_reference_covers_official_command_families"],
+      "guard_tests": ["test_eval_31_spine_cli_reference_preserves_policy_boundaries"]
+    },
+    {
+      "eval_id": "eval-32-autonomous-rigging-proposals",
+      "aliases": [],
+      "feature": "Report-only autonomous rigging proposals",
+      "promoted": true,
+      "promoted_status": "research/report-only gate",
+      "docs_path": "references/autonomous_rigging_research.md",
+      "required_feature_gates": ["assets/rig_proposal_schema.json", "assets/h5g_corpus_distilled_evidence.json", "assets/autonomous_rigging_evidence_index.json", "report-only", "not fully autonomous production rigger"],
+      "positive_case": "interpreted layers generate auditable region/mesh proposal decisions and missing policy gates",
+      "guard_case": "proposal artifacts preserve production claim, Genielabs license, source-art, and production export boundaries",
+      "positive_tests": ["test_eval_32_rig_proposal_generator_reports_region_and_mesh_decisions"],
+      "guard_tests": ["test_eval_32_autonomous_rigging_artifacts_preserve_claim_boundaries"]
+    },
+    {
+      "eval_id": "eval-33-bundled-corpus-evidence-pack",
+      "aliases": [],
+      "feature": "Bundled distilled H5G corpus and bakeoff evidence pack",
+      "promoted": true,
+      "promoted_status": "self-contained distilled evidence",
+      "docs_path": "references/h5g_corpus_distilled_knowledge.md",
+      "required_feature_gates": ["assets/h5g_corpus_distilled_evidence.json", "default rig proposal evidence index", "no absolute research runtime dependency"],
+      "positive_case": "distilled pack covers required families and evidence sections for portable rigging guidance",
+      "guard_case": "absolute local H5G research paths are not required by the bundled pack or rig proposal default",
+      "positive_tests": ["test_eval_33_bundled_corpus_pack_covers_required_sections"],
+      "guard_tests": ["test_eval_33_bundled_corpus_pack_has_no_absolute_research_dependency"]
+    },
+    {
+      "eval_id": "eval-34-h5g-corpus-bakeoff-resolver",
+      "aliases": [],
+      "feature": "H5G corpus bakeoff resolver and snapshot fallback",
+      "promoted": true,
+      "promoted_status": "read-only network reference with bundled fallback",
+      "docs_path": "references/h5g_corpus_bakeoff_usage.md",
+      "required_feature_gates": ["assets/h5g_corpus_evidence_snapshot.json", "G:/artSource/_spineResources/H5G_Corpus_Bakeoff read-only", "bundled snapshot fallback"],
+      "positive_case": "resolver reports network bakeoff resources when present and exposes bundled snapshot metadata",
+      "guard_case": "G-drive resources are read-only references and bundled snapshot evidence stays advisory, not full bakeoff proof",
+      "positive_tests": ["test_eval_34_bakeoff_resolver_detects_network_resource_and_snapshot"],
+      "guard_tests": ["test_eval_34_bakeoff_snapshot_and_docs_preserve_read_only_boundaries"]
+    },
+    {
+      "eval_id": "eval-35-visual-remediation-loop",
+      "aliases": [],
+      "feature": "Claude visual preview remediation loop",
+      "promoted": true,
+      "promoted_status": "AI visual QA remediation gate",
+      "docs_path": "references/visual_remediation.md",
+      "required_feature_gates": ["scripts/visual_remediation_loop.py", "visual_remediation_packet.json", "visual_remediation_report.json", "bounded controls only for safe visual fixes"],
+      "positive_case": "preview packet guides Claude/artist review and safe visual findings become bounded controls for recompile",
+      "guard_case": "mesh tearing, z-order, missing attachment, deform, linked mesh, and rig/source-art issues block instead of becoming fake controls",
+      "positive_tests": [
+        "test_eval_35_visual_remediation_packet_guides_review_loop",
+        "test_eval_35_visual_remediation_maps_safe_controls_and_blocks_rig_issues"
+      ],
+      "guard_tests": ["test_eval_35_visual_remediation_maps_safe_controls_and_blocks_rig_issues"]
+    },
+    {
+      "eval_id": "eval-36-mesh-weight-parity-fixtures",
+      "aliases": [],
+      "feature": "Chris-approved mesh and weight parity fixture comparator",
+      "promoted": true,
+      "promoted_status": "fixture parity gate",
+      "docs_path": "references/autonomous_rigging_research.md#mesh-and-weight-fixtures",
+      "required_feature_gates": ["assets/mesh_weight_parity_fixture_schema.json", "scripts/compare_mesh_weight_parity.py"],
+      "positive_case": "matching approved/candidate weighted mesh fixture passes topology and weight-sum checks",
+      "guard_case": "bad weight sums, topology mismatch, missing meshes, and extra meshes block parity claims",
+      "positive_tests": ["test_eval_36_mesh_weight_parity_comparator_accepts_matching_fixture"],
+      "guard_tests": ["test_eval_36_mesh_weight_parity_comparator_blocks_bad_weights"]
+    },
+    {
+      "eval_id": "eval-37-avatar-runtime-contract",
+      "aliases": [],
+      "feature": "Avatar runtime state and event ownership contract",
+      "promoted": true,
+      "promoted_status": "runtime ownership gate",
+      "docs_path": "references/autonomous_rigging_research.md#avatar-fixtures",
+      "required_feature_gates": ["assets/avatar_runtime_contract_schema.json", "scripts/validate_avatar_runtime_contract.py"],
+      "positive_case": "verified avatar runtime contract records states, transitions, events, and runtime owner",
+      "guard_case": "unverified runtime acceptance blocks avatar runtime claims",
+      "positive_tests": ["test_eval_37_avatar_runtime_contract_accepts_verified_contract"],
+      "guard_tests": ["test_eval_37_avatar_runtime_contract_blocks_unverified_runtime"]
+    }
+  ]
+}

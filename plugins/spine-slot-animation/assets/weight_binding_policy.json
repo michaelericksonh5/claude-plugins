@@ -1,0 +1,11 @@
+{
+  "schema": "spine_slot_animation_weight_binding_policy_v1",
+  "max_bones_per_vertex": 2,
+  "weight_epsilon": 0.001,
+  "influence_threshold": 0.05,
+  "smoothing_iterations": 2,
+  "max_estimated_vertex_transforms": 96,
+  "allowed_bones_by_slot": {},
+  "review_required": true,
+  "bind_position_mode": "approximate_local_offset"
+}

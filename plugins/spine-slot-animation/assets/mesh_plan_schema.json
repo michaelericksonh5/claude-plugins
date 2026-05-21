@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://h5g.local/schemas/spine_slot_animation_mesh_plan_v1.json",
+  "title": "Reviewed Spine 4.2 Unweighted Mesh Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "max_vertex_budget", "attachments"],
+  "properties": {
+    "schema": {
+      "const": "spine_slot_animation_mesh_plan_v1"
+    },
+    "max_vertex_budget": {
+      "type": "integer",
+      "minimum": 3,
+      "description": "Default maximum vertex count for each mesh attachment."
+    },
+    "weight_binding_policy": {
+      "$ref": "#/$defs/weight_binding_policy",
+      "description": "Optional Phase 3 policy overrides used only with --auto-bind-weights."
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reviewed",
+          "source_layer",
+          "target_slot",
+          "hull_vertices",
+          "interior_vertices",
+          "triangles",
+          "uvs",
+          "hull_count",
+          "max_vertex_budget"
+        ],
+        "properties": {
+          "reviewed": {
+            "const": true,
+            "description": "Must be true; Phase 2 emits only reviewed mesh plans."
+          },
+          "source_layer": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Source PNG layer name or stem that already exists in the rig layout."
+          },
+          "target_slot": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Existing slot that will receive the mesh attachment."
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Optional atlas path; when present it must match the existing attachment path."
+          },
+          "hull_vertices": {
+            "$ref": "#/$defs/points",
+            "description": "Outer hull vertices in mesh-local x/y coordinates. These vertices come first in vertices."
+          },
+          "interior_vertices": {
+            "$ref": "#/$defs/points",
+            "description": "Reviewed interior vertices in mesh-local x/y coordinates."
+          },
+          "triangles": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minItems": 3,
+            "description": "Flat vertex indices in groups of three; runtime does not triangulate."
+          },
+          "uvs": {
+            "$ref": "#/$defs/points",
+            "description": "Normalized texture-region UV x/y pairs, one per mesh vertex."
+          },
+          "hull_count": {
+            "type": "integer",
+            "minimum": 3,
+            "description": "Number of leading vertices that define the non-self-intersecting hull."
+          },
+          "max_vertex_budget": {
+            "type": "integer",
+            "minimum": 3,
+            "description": "Per-attachment H5G vertex budget."
+          },
+          "edges": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    { "type": "integer", "minimum": 0 },
+                    { "type": "integer", "minimum": 0 }
+                  ],
+                  "items": false,
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            ],
+            "description": "Optional manual edges as flat index pairs or pair arrays."
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}$"
+          },
+          "vertices": {
+            "type": "array",
+            "description": "Not required; if supplied with weighted encoding, Phase 2 validation rejects it."
+          },
+          "allowed_bones": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "description": "Explicit existing skeleton bone names allowed to influence this mesh when --auto-bind-weights is used."
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "points": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          { "type": "number" },
+          { "type": "number" }
+        ],
+        "items": false,
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "weight_binding_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "max_bones_per_vertex",
+        "weight_epsilon",
+        "influence_threshold",
+        "smoothing_iterations",
+        "max_estimated_vertex_transforms",
+        "review_required",
+        "bind_position_mode"
+      ],
+      "properties": {
+        "schema": {
+          "const": "spine_slot_animation_weight_binding_policy_v1"
+        },
+        "max_bones_per_vertex": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "weight_epsilon": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.01
+        },
+        "influence_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "smoothing_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_estimated_vertex_transforms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "allowed_bones_by_slot": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        },
+        "review_required": {
+          "const": true
+        },
+        "bind_position_mode": {
+          "const": "approximate_local_offset"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "spine_slot_animation_production_export_policy_v1",
+  "approved_spine_editor_version": "4.3.04",
+  "approved_spine_cli_version": "4.3.04",
+  "approved_runtime_name": "@esotericsoftware/spine-player",
+  "approved_runtime_version": "4.3.1",
+  "allowed_output_formats": ["json", "binary"],
+  "cli_invocation_allowed": false,
+  "manual_export_only": true,
+  "require_license_posture_approval": true,
+  "require_runtime_acceptance_evidence": true,
+  "perforce_writes_allowed": false,
+  "source_art_writes_allowed": false,
+  "advanced_feature_report_fields": {
+    "skins": "skin_variants_emitted",
+    "physics": "physics_constraints_emitted",
+    "sequences": "sequence_attachments_emitted",
+    "clipping": "clipping_attachments_emitted",
+    "events": "events_defined",
+    "blends": null
+  },
+  "runtime_acceptance_features": [
+    "skins",
+    "physics",
+    "sequences",
+    "clipping",
+    "events",
+    "blends"
+  ],
+  "approved_runtime_evidence_provenance": {
+    "method": "runtime_probe",
+    "tool": "h5g-runtime-acceptance-probe",
+    "tool_version": "runtime-acceptance-probe-v1",
+    "execution_mode": "browser_runtime"
+  }
+}

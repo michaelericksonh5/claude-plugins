@@ -25,14 +25,14 @@ From inside Claude Code, add the marketplace once, then install whichever plugin
 
 ```
 /plugin marketplace add michaelericksonh5/claude-plugins
-/plugin install skill-auditor@h5g-plugins
-/plugin install slot-art-creator-node@h5g-plugins
-/plugin install spine-slot-animation@h5g-plugins
-/plugin install spine-2-0-skills@h5g-plugins
-/plugin install rtk-token-saver@h5g-plugins
-/plugin install webgamedev-structure@h5g-plugins
-/plugin install h5g-slot-math@h5g-plugins
-/plugin install ai-video-generator@h5g-plugins
+/plugin install skill-auditor@michaelericksonh5-claude-plugins
+/plugin install slot-art-creator-node@michaelericksonh5-claude-plugins
+/plugin install spine-slot-animation@michaelericksonh5-claude-plugins
+/plugin install spine-2-0-skills@michaelericksonh5-claude-plugins
+/plugin install rtk-token-saver@michaelericksonh5-claude-plugins
+/plugin install webgamedev-structure@michaelericksonh5-claude-plugins
+/plugin install h5g-slot-math@michaelericksonh5-claude-plugins
+/plugin install ai-video-generator@michaelericksonh5-claude-plugins
 /slot-setup
 /rtk-token-saver
 ```
@@ -46,20 +46,20 @@ the workflow overview.
 
 Third-party marketplace auto-update is off by default. To receive plugin
 updates automatically after installing this marketplace, open `/plugin`, go to
-**Marketplaces**, select `h5g-plugins`, and enable auto-update.
+**Marketplaces**, select `michaelericksonh5-claude-plugins`, and enable auto-update.
 
 Or from a shell:
 
 ```
 claude plugin marketplace add michaelericksonh5/claude-plugins
-claude plugin install skill-auditor@h5g-plugins
-claude plugin install slot-art-creator-node@h5g-plugins
-claude plugin install spine-slot-animation@h5g-plugins
-claude plugin install spine-2-0-skills@h5g-plugins
-claude plugin install rtk-token-saver@h5g-plugins
-claude plugin install webgamedev-structure@h5g-plugins
-claude plugin install h5g-slot-math@h5g-plugins
-claude plugin install ai-video-generator@h5g-plugins
+claude plugin install skill-auditor@michaelericksonh5-claude-plugins
+claude plugin install slot-art-creator-node@michaelericksonh5-claude-plugins
+claude plugin install spine-slot-animation@michaelericksonh5-claude-plugins
+claude plugin install spine-2-0-skills@michaelericksonh5-claude-plugins
+claude plugin install rtk-token-saver@michaelericksonh5-claude-plugins
+claude plugin install webgamedev-structure@michaelericksonh5-claude-plugins
+claude plugin install h5g-slot-math@michaelericksonh5-claude-plugins
+claude plugin install ai-video-generator@michaelericksonh5-claude-plugins
 ```
 
 ### Claude Cowork (Claude desktop app)
@@ -69,7 +69,7 @@ claude plugin install ai-video-generator@h5g-plugins
 3. Click **Customize** in the left sidebar
 4. Click **Browse plugins**
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
-6. Enter the URL: `https://github.com/michaelericksonh5/claude-plugins`
+6. Enter the GitHub shorthand: `michaelericksonh5/claude-plugins`
 7. After it syncs, all eight plugins appear in the marketplace listing — click **Install** on whichever you want
 8. Open the plugin's settings and paste your API keys into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [slot-art README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) or [ai-video README](https://github.com/michaelericksonh5/ai-video-mcp-server#set-up-your-api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
@@ -87,11 +87,13 @@ claude plugin install ai-video-generator@h5g-plugins
 
 ```
 claude-plugins/
-└── .claude-plugin/
-    └── marketplace.json    # catalog: lists each plugin's GitHub repo source
+├── .claude-plugin/
+│   └── marketplace.json    # catalog: lists each bundled plugin package
+└── plugins/
+    └── <plugin-name>/      # installable plugin package with plugin.json
 ```
 
-All eight active plugins are sourced from GitHub repos owned by `michaelericksonh5` and exposed through this marketplace:
+All eight active plugins are bundled in this marketplace for reliable Cowork/Desktop installs. Their upstream source repos are:
 
 - `skill-auditor` from `michaelericksonh5/skill-auditor`
 - `slot-art-creator-node` from `michaelericksonh5/slot-art-creator-node`
@@ -99,7 +101,7 @@ All eight active plugins are sourced from GitHub repos owned by `michaelerickson
 - `spine-2-0-skills` from `michaelericksonh5/Claude_Spine_Generator_Progressive`
 - `rtk-token-saver` from `michaelericksonh5/rtk-token-saver`
 - `webgamedev-structure` from `michaelericksonh5/webgamedev_structure`
-- `h5g-slot-math` from `./plugins/h5g-slot-math` bundled in this marketplace repo, with a standalone mirror at `michaelericksonh5/h5g-slot-math`
+- `h5g-slot-math` from `michaelericksonh5/h5g-slot-math`
 - `ai-video-generator` from `michaelericksonh5/ai-video-mcp-server`
 
 The older `token-saver` repo remains available at `michaelericksonh5/token_saver` for rollback or future reuse, but it is no longer listed in this marketplace.
@@ -113,14 +115,13 @@ The older `token-saver` repo remains available at `michaelericksonh5/token_saver
    and check the bundle into the repo — Claude Code and Cowork don't run
    `npm install` on the cached plugin, so the bundle must be import-ready.
    Point `plugin.json`'s MCP `args` at the bundle path.
-3. Add an entry to the `plugins[]` array in `.claude-plugin/marketplace.json`.
-   Use HTTPS `url` sources for public repos so users do not need SSH host-key setup:
+3. Vendor the plugin package into `plugins/<plugin-name>/` and add an entry to
+   the `plugins[]` array in `.claude-plugin/marketplace.json`:
    ```json
    {
      "name": "my-new-plugin",
-     "source": { "source": "url", "url": "https://github.com/michaelericksonh5/my-new-plugin.git" },
-     "description": "...",
-     "version": "1.0.0"
+     "source": "./plugins/my-new-plugin",
+     "description": "..."
    }
    ```
 4. Sync marketplace metadata from plugin manifests:
@@ -141,13 +142,6 @@ node scripts/sync-marketplace.mjs --check
 claude plugin validate .claude-plugin/marketplace.json
 ```
 
-When preparing marketplace changes before the plugin repos are pushed, point the
-sync check at local sibling checkouts:
-
-```
-node scripts/sync-marketplace.mjs --local-root C:/Users/merickson/Documents/Claude_Plugins --check
-```
-
-Keep URL sources branch-tracking unless there is a specific release-blocking
-reason to pin a commit. A `source.sha` pin prevents installed users from moving
-to newer plugin commits until the marketplace SHA changes.
+The marketplace vendors plugin packages under `plugins/` instead of pointing at
+external Git repos. This avoids the Claude Desktop/Windows Git plugin-cache
+rename failure while staying within the official Git-hosted marketplace model.

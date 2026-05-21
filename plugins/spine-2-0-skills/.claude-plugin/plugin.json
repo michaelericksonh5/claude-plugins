@@ -1,0 +1,12 @@
+{
+  "name": "spine-2-0-skills",
+  "version": "2.0.1",
+  "description": "Spine 2.0 Skills: validated Spine 4.3 slot-animation proof packages with a compact router skill plus manual compile, diagnose, validate, handoff, and rig-review workflows.",
+  "author": {
+    "name": "High 5 Games",
+    "email": "michael.erickson@high5games.com"
+  },
+  "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive",
+  "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive",
+  "license": "Proprietary"
+}

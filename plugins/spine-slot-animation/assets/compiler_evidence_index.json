@@ -1,0 +1,2381 @@
+{
+  "advanced_gate_summary": {
+    "current_status_artifacts": [
+      "advanced_spine_contracts.py validates source-layer intake, rig layout, mesh/weights/deform, constraints/IK/transform/path, clipping, events/runtime triggers, and production export readiness.",
+      "config/h5g_source_layer_contract.json defines accepted source inputs, layer names, Spine PSD tags, pivots, origins, z-order bands, and review gates.",
+      "config/h5g_advanced_spine_policy.json defines mesh budgets, max bone influences, deform safety rules, constraint limits, clipping rules, event namespaces, and runtime listener gates.",
+      "config/h5g_production_export_profile.json defines the H5G/V10 review profile, atlas settings, editor/runtime version gates, CLI/license gates, and production write policy.",
+      "generated/advanced_spine_contracts/advanced_spine_contract_validation.{json,md} is the generated proof report for the current workspace state."
+    ],
+    "gate_areas": [
+      {
+        "area": "Source-Layer Intake",
+        "blocked_or_review_gated": [
+          "generated source-layer candidates still require H5G/Christian approval before becoming fixtures;",
+          "exact handling for unsupported Photoshop features must be confirmed per fixture;",
+          "AI decomposition remains review-only and cannot be accepted without hidden-part/hallucination review."
+        ],
+        "ready_or_concrete": [
+          "accepted source types are explicit: PSD/PSB, Spine Import PSD, and reviewed transparent PNG layers;",
+          "flat single renders and unapproved AI decomposition are disallowed;",
+          "layer name regexes, allowed Spine PSD tags, required origin, pivots, z-order policy, and reviewer gates are machine-readable.",
+          "source_layer_inventory.py now generates a bounded, read-only candidate inventory and review-required source_layer_manifest.json under generated/source_layer_inventory/.",
+          "source_layer_manifest.py now resolves the live manifest into compiler-facing candidates and gates PSD/PSB rows as extraction/review-required.",
+          "app/local_proof_ui.py now exposes a separate source-layer selector that runs layered_rig_compiler.py only for existing PNG folders."
+        ]
+      },
+      {
+        "area": "Rig Parts And Layout",
+        "blocked_or_review_gated": [
+          "production slot, skin, attachment path, and H5G runtime naming conventions need final approval;",
+          "PSD tag import must be tested against real Christian PSDs before production promotion.",
+          "current manifest-connected layered-rig output is proof-only and still inherits each manifest row's candidate_review_required approval status."
+        ],
+        "ready_or_concrete": [
+          "layered_rig_compiler.py validates part files, pivots, z-order, parent bones, atlas/attachment coverage, V10 linear timelines, and now advanced feature absence."
+        ]
+      },
+      {
+        "area": "Mesh, Weights, And Deform",
+        "blocked_or_review_gated": [
+          "no production mesh topology generation exists;",
+          "no automatic weights, linked mesh inheritance, or deform timeline authoring is production-approved;",
+          "one controlled reviewed mesh fixture should be built before generalizing."
+        ],
+        "ready_or_concrete": [
+          "max mesh vertices, total mesh vertices, max bone influences per vertex, pruning threshold, deform review requirements, and topology-regeneration bans are explicit;",
+          "tests reject unsafe deform enablement and budget violations."
+        ]
+      },
+      {
+        "area": "Constraints / IK / Transform / Path",
+        "blocked_or_review_gated": [
+          "no production constraint authoring is enabled;",
+          "one character-like or symbol-like controlled IK fixture is needed before compiler support."
+        ],
+        "ready_or_concrete": [
+          "allowed constraint types, max IK chain length, mix range, order review, and skin membership review are explicit;",
+          "tests reject unsafe IK chain length, bad mix values, and missing target bones."
+        ]
+      },
+      {
+        "area": "Clipping",
+        "blocked_or_review_gated": [
+          "production clipping authoring remains disabled until runtime CPU budgets and slot-range use cases are approved."
+        ],
+        "ready_or_concrete": [
+          "max clipping polygon vertices, max slot span, no self-intersection, no overlapping clip ranges, and CPU budget review are explicit;",
+          "tests reject self-intersecting and oversized clipping cases."
+        ]
+      },
+      {
+        "area": "Events / Runtime Triggers",
+        "blocked_or_review_gated": [
+          "H5G runtime listener owner, payload semantics, audio/VFX/gameplay dispatch behavior, and acceptance tests are not assigned."
+        ],
+        "ready_or_concrete": [
+          "event namespaces are fixed to h5g.symbol, h5g.ui, h5g.audio, and h5g.vfx;",
+          "tests reject events outside those namespaces."
+        ]
+      },
+      {
+        "area": "Production Export",
+        "blocked_or_review_gated": [
+          "exact runtime version and editor export version are not selected;",
+          "Spine CLI/editor license approval is not confirmed;",
+          "runtime acceptance tests have not passed;",
+          "Perforce and G:/artSource writes remain disabled."
+        ],
+        "ready_or_concrete": [
+          "target runtime/editor major-minor compatibility, atlas settings, data export policy, CLI dry-run posture, license gate, runtime test gate, and production write policy are machine-readable."
+        ]
+      }
+    ],
+    "next_production_steps": [
+      "Review and approve selected rows from generated/source_layer_inventory/source_layer_manifest.json, starting with PNG-folder proof outputs such as generated/source_layer_fixture_runs/manifest_4000_buffalo_images/.",
+      "Assign the runtime owner for event listener namespaces and payload handling.",
+      "Confirm exact H5G Spine runtime/editor export versions and license posture.",
+      "Build one reviewed mesh/weights/deform fixture and one reviewed constraint fixture.",
+      "Enable clipping only after a measured runtime CPU budget and slot-range design.",
+      "Keep production export disabled until runtime acceptance tests pass and the manual Perforce workflow is approved."
+    ]
+  },
+  "bakeoff_gap_summary": {
+    "biggest_compiler_gaps": [
+      "slot_attachment",
+      "scale",
+      "rotate",
+      "translate",
+      "slot_color",
+      "slot_twoColor",
+      "deform"
+    ],
+    "family_findings": [
+      "hp_symbol: 304 results, 65 real comparisons; largest gaps are slot_attachment, scale, rotate, translate, slot_color, and deform.",
+      "bonus_symbol: 1962 results, 630 real comparisons; largest gaps are slot_attachment, scale, rotate, translate, and slot_color.",
+      "lp_symbol: 5 real comparisons; largest gaps are slot_attachment, scale, rotate, translate, and slot_color.",
+      "value_symbol: 2 real comparisons; largest gaps include slot_color, slot_attachment, translate, rotate, scale, and slot_twoColor.",
+      "scatter_symbol: reference-only; human evidence exists, but no generated candidate was selected.",
+      "UI/system buckets including interface_ambients, interface_popups, overlay/panel/popup, reel/row/grid, and vfx_only remain reference-only or unavailable."
+    ],
+    "focused_validation_runs": [
+      "Run: attachment_timeline_source_hp_smoke_20260506",
+      "Run: closure_gap_smoke_asset_match_20260506",
+      "closure_compiler_upgrade_smoke_20260507: proof defaults plus source-layer candidates; 18 candidates, 17 comparisons, 0 failures.",
+      "closure_compiler_upgrade_smoke_exact_20260507: exact/local gate report separating aggregate advisory counts.",
+      "closure_attachment_alias_smoke_20260507: proof attachment-alias smoke; 3 candidates, 2 comparisons, 0 failures.",
+      "closure_motion_profile_seed_20260507: writes research/generated/compiler_motion_profiles/latest_exact_motion_profile.json from exact local reference motion ranges.",
+      "closure_sequence_motion_smoke_20260507: source/proof smoke with exact motion profile available to compilers; 18 candidates, 17 comparisons, 0 failures.",
+      "closure_hp_sequence_real_smoke_20260507: real HP source-layer smoke proving numbered PNG frame runs compile as timed attachment swaps; 8 candidates, 8 comparisons, 0 failures."
+    ],
+    "layered_performance_delta": [
+      {
+        "After": 674,
+        "Before": 283,
+        "Closure gate family": "transform_motion (translate + rotate + scale)",
+        "Delta": "+391"
+      },
+      {
+        "After": 819,
+        "Before": 651,
+        "Closure gate family": "slot_color_alpha (slot_color + slot_twoColor)",
+        "Delta": "+168"
+      },
+      {
+        "After": 450,
+        "Before": 366,
+        "Closure gate family": "attachment_swap (slot_attachment)",
+        "Delta": "+84"
+      },
+      {
+        "After": 158,
+        "Before": 144,
+        "Closure gate family": "drawOrder",
+        "Delta": "+14"
+      },
+      {
+        "After": 177,
+        "Before": 160,
+        "Closure gate family": "Animations (across 17 symbols)",
+        "Delta": "+17 (new win per symbol)"
+      }
+    ],
+    "next_critical_path": [
+      "Run a focused full deep bakeoff against the rebuilt Santa Pop layered_loops batch to materialize the new exact-local missing counts and refresh latest_exact_motion_profile.json.",
+      "Expand true source/VFX frame-sequence grouping beyond detected numbered PNG runs.",
+      "Promote UI/system reference-only buckets into generated candidates where deterministic templates exist.",
+      "Keep mesh/deform, clipping, IK, and production export behind explicit review gates."
+    ],
+    "result": {
+      "candidate_results": 2534,
+      "compared_candidates": 766,
+      "failed_candidates": 0,
+      "local_human-authored_json_references": 266,
+      "references": 303,
+      "skipped_candidates": 1768
+    },
+    "run": "full_deep_all_20260505_1513"
+  },
+  "contextual_layer_evidence_summary": {
+    "animation_use_counts": {
+      "blink": 2,
+      "bounce_followthrough": 19,
+      "frame_pulse": 4,
+      "idle_breathe": 84,
+      "shimmer": 30,
+      "sparkle": 6,
+      "text_sheen": 32,
+      "value_pop": 11,
+      "wave": 4
+    },
+    "low_confidence_layers": [
+      "breathe/Layer 1 -> generic_part (0.37): generic name with large centered bounds; bakeoff placement quality: missing_sidecar; generated rig currently parents to _rig",
+      "HP1/Layer 12 -> generic_part (0.4): generic name with large centered bounds; sidecar only provides symbol-level 160x160 attachment; bakeoff placement quality: photoshop_bounds_fallback_or_simplified_sidecar; generated rig currently parents to _rig",
+      "HP3/HP3_original -> background (0.27): large low-z layer covers most of the document; bakeoff placement quality: mixed_sidecar_and_photoshop_bounds_fallback; generated rig currently parents to _rig",
+      "LP1/LP1_original -> generic_part (0.12): exact sidecar slot/attachment match; bakeoff placement quality: source_sidecar_used_strong; generated rig currently parents to _rig",
+      "SF1/SF1_box -> generic_part (0.12): exact sidecar slot/attachment match; bakeoff placement quality: source_sidecar_used_strong; generated rig currently parents to _rig"
+    ],
+    "per_symbol_recommendations": [
+      {
+        "Additive/Effect Layers": "BO1_key_sheen_1, BO1_key_sheen_2, BO1_key_sheen_3, BO1_key_sheen_1, BO1_key_sheen_2, BO1_key_sheen_3",
+        "Key Parents": "BO1_key->root, BO1_key_sheen_1->text, BO1_key_sheen_2->text, BO1_key_sheen_3->text",
+        "Layers": 4,
+        "Recipe": "bo_special_symbol",
+        "Review Flags": 0,
+        "Symbol": "BO1"
+      },
+      {
+        "Additive/Effect Layers": "none",
+        "Key Parents": "none",
+        "Layers": 1,
+        "Recipe": "breathe_fixture",
+        "Review Flags": 1,
+        "Symbol": "breathe"
+      },
+      {
+        "Additive/Effect Layers": "HP1_frame_glow",
+        "Key Parents": "Background->root, HP1_BG->root, HP1_santa->body, HP1_head->body, HP1_head_eyes_blink->head",
+        "Layers": 14,
+        "Recipe": "hp_symbol",
+        "Review Flags": 12,
+        "Symbol": "HP1"
+      },
+      {
+        "Additive/Effect Layers": "HP2_frame_sheen_1, HP2_frame_sheen_2, HP2_frame_sheen_3, HP2_frame_glow, HP2_frame_sheen_1, HP2_frame_sheen_2, HP2_frame_sheen_3",
+        "Key Parents": "HP2_BG->root, HP2_BG_Nlights_3->root, HP2_BG_N_lights_2->root, HP2_BG_N_lights_1->root, HP2_raindeer_leather_2->body",
+        "Layers": 15,
+        "Recipe": "hp_symbol",
+        "Review Flags": 1,
+        "Symbol": "HP2"
+      },
+      {
+        "Additive/Effect Layers": "none",
+        "Key Parents": "HP3_BG->root",
+        "Layers": 2,
+        "Recipe": "hp_symbol",
+        "Review Flags": 1,
+        "Symbol": "HP3"
+      },
+      {
+        "Additive/Effect Layers": "HP4_cane_sheen_1, HP4_cane_sheen_2, HP4_cane_sheen_3, HP4_cane_sheen_4, HP4_cane_sheen_1, HP4_cane_sheen_2, HP4_cane_sheen_3, HP4_cane_sheen_4",
+        "Key Parents": "HP4_cane_sheen_1->text, HP4_cane_sheen_2->text, HP4_cane_sheen_3->text, HP4_cane_sheen_4->text",
+        "Layers": 4,
+        "Recipe": "hp_symbol",
+        "Review Flags": 0,
+        "Symbol": "HP4"
+      },
+      {
+        "Additive/Effect Layers": "JP_star_glow, JP1_star_outline, JP1_star, JP_star_sheen, JP_star_sheen_1, JP_star_sheen_2, JP_star_sheen_3, JP_star_glow",
+        "Key Parents": "Background->root, JP_star_glow->root, JP1_star_outline->root, JP1_star->root, JP_star_sheen->text",
+        "Layers": 10,
+        "Recipe": "jackpot_symbol",
+        "Review Flags": 0,
+        "Symbol": "JP1"
+      },
+      {
+        "Additive/Effect Layers": "JP2_star, JP2_star, JP2_major",
+        "Key Parents": "JP2_star->root, JP2_major->text",
+        "Layers": 2,
+        "Recipe": "jackpot_symbol",
+        "Review Flags": 0,
+        "Symbol": "JP2"
+      },
+      {
+        "Additive/Effect Layers": "JP3_star, JP3_star, JP3_minor",
+        "Key Parents": "JP3_star->root, JP3_minor->text",
+        "Layers": 2,
+        "Recipe": "jackpot_symbol",
+        "Review Flags": 0,
+        "Symbol": "JP3"
+      },
+      {
+        "Additive/Effect Layers": "JP4_star, JP4_star, JP4_mini",
+        "Key Parents": "JP4_star->root, JP4_mini->text",
+        "Layers": 2,
+        "Recipe": "jackpot_symbol",
+        "Review Flags": 0,
+        "Symbol": "JP4"
+      },
+      {
+        "Additive/Effect Layers": "none",
+        "Key Parents": "none",
+        "Layers": 1,
+        "Recipe": "lp_symbol",
+        "Review Flags": 1,
+        "Symbol": "LP1"
+      },
+      {
+        "Additive/Effect Layers": "LP2_sheen_1, LP2_sheen_2, LP2_sheen_3, LP2_K, LP2_sheen_1, LP2_sheen_2, LP2_sheen_3",
+        "Key Parents": "LP2_K->text, LP2_sheen_1->text, LP2_sheen_2->text, LP2_sheen_3->text",
+        "Layers": 4,
+        "Recipe": "lp_symbol",
+        "Review Flags": 0,
+        "Symbol": "LP2"
+      },
+      {
+        "Additive/Effect Layers": "LP3_J_sheen_1, LP3_J_sheen_2, LP3_J_sheen_3, LP3_J, LP3_J_sheen_1, LP3_J_sheen_2, LP3_J_sheen_3",
+        "Key Parents": "LP3_J->text, LP3_J_sheen_1->text, LP3_J_sheen_2->text, LP3_J_sheen_3->text",
+        "Layers": 4,
+        "Recipe": "lp_symbol",
+        "Review Flags": 0,
+        "Symbol": "LP3"
+      },
+      {
+        "Additive/Effect Layers": "LP4_Q_back",
+        "Key Parents": "LP4_Q_back->text",
+        "Layers": 1,
+        "Recipe": "lp_symbol",
+        "Review Flags": 0,
+        "Symbol": "LP4"
+      },
+      {
+        "Additive/Effect Layers": "none",
+        "Key Parents": "SF1_BG_glow->root, SF1_BG->root",
+        "Layers": 3,
+        "Recipe": "special_feature_symbol",
+        "Review Flags": 1,
+        "Symbol": "SF1"
+      },
+      {
+        "Additive/Effect Layers": "WD1_WILD_sheen_1, WD1_WILD_sheen_2, WD1_WILD_sheen_3, WD1_WILD, WD1_WILD_sheen_1, WD1_WILD_sheen_2, WD1_WILD_sheen_3",
+        "Key Parents": "WD1_BG_glow->root, WD1_BG->root, WD1_leaves_1->root, WD1_leaves_2->root, WD1_WILD->text",
+        "Layers": 8,
+        "Recipe": "wild_symbol",
+        "Review Flags": 0,
+        "Symbol": "WD1"
+      },
+      {
+        "Additive/Effect Layers": "WY1_ball_sheen_1, WY1_ball_sheen_2, WY1_ball_sheen_3, WY1_ball_sheen_4, circular_burst, WY1_ball_glow, WY1_ball, WY1_ball_sheen_1",
+        "Key Parents": "circular_burst->text, WY1_ball_glow->text, WY1_ball->text, WY1_ball_sheen_1->text, WY1_ball_sheen_2->text",
+        "Layers": 7,
+        "Recipe": "value_symbol",
+        "Review Flags": 0,
+        "Symbol": "WY1"
+      }
+    ],
+    "recommended_next_compiler_changes": [
+      "Accept contextual parent_map and pivot_map overrides during manifest intake before layered_rig_compiler builds bones.",
+      "Create semantic bones for body/head/left_arm/right_arm/frame/text instead of parenting all parts to _rig.",
+      "Map inferred effect layers to additive slots and shimmer/text_sheen/frame_pulse timelines.",
+      "Use inferred animation_uses to choose recipe-specific HP/LP/JP/BO/WD/WY/SF actions instead of generic proof pulses.",
+      "Surface low-confidence and symbol-level-only sidecar matches in the UI for animator review before compile."
+    ],
+    "rig_role_counts": {
+      "additive_effect": 33,
+      "character_part": 15,
+      "frame_part": 4,
+      "overlay": 4,
+      "root_static": 13,
+      "text_effect": 12,
+      "ui_part": 3
+    },
+    "semantic_role_counts": {
+      "arm": 1,
+      "background": 13,
+      "character_body": 5,
+      "eyes": 2,
+      "frame": 2,
+      "frame_glow": 2,
+      "generic_part": 4,
+      "head": 3,
+      "key": 1,
+      "leaf": 2,
+      "left_hand": 1,
+      "mouth_laugh": 1,
+      "right_hand": 2,
+      "sheen": 27,
+      "sparkle": 6,
+      "text": 4,
+      "value_ball": 7,
+      "wild_text": 1
+    },
+    "summary": {
+      "layers_interpreted": 84,
+      "low-confidence_layers": 5,
+      "sidecar_match_tiers": "{'exact': 66, 'none': 4, 'symbol_level_only': 14}",
+      "symbols_interpreted": 17
+    }
+  },
+  "coverage_summary": {
+    "coverage_rows": [
+      {
+        "compiler": "implemented",
+        "corpus_counts": "53/17/69/2531/469",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "hp_symbol",
+        "gaps_next_action": "Promote from proof scaffold to production template after runtime/folder contract is approved.",
+        "label": "HP Symbol",
+        "next_template": "production_symbol_template",
+        "one_click": 98,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "HP1idle",
+          "HP1land",
+          "HP2idle",
+          "HP2land",
+          "HP3idle",
+          "HP3land",
+          "HP4idle",
+          "HP4land"
+        ],
+        "role_map": 236,
+        "source_bodies": 12,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": "53/17/57/3578/786",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "lp_symbol",
+        "gaps_next_action": "Add broader one-click thumbnail/source-body coverage and production-quality symbol layering.",
+        "label": "LP Symbol / General Symbols",
+        "next_template": "one_click_source_coverage",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "LP1idle",
+          "LP1land",
+          "LP2idle",
+          "LP2land",
+          "LP3idle",
+          "LP3land",
+          "LP4idle",
+          "LP4land"
+        ],
+        "role_map": 258,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: role-map medium-pay candidates with first-pass proof recipe",
+        "family": "mp_symbol",
+        "gaps_next_action": "Add one-click thumbnail/source-body coverage and validate production MP intensity against game art.",
+        "label": "MP Symbol",
+        "next_template": "one_click_source_coverage",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "MP1",
+          "MP1idle",
+          "MP1land"
+        ],
+        "role_map": 4,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": "63/22/158/2497/571",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "bo_special_symbol",
+        "gaps_next_action": "Split legacy BO-special coverage from modern bonus/special-feature roles where production needs differ.",
+        "label": "BO / Special Symbol",
+        "next_template": "role_split",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BO1idle",
+          "BO1land",
+          "BO1smart",
+          "SF1idle",
+          "WD1idle",
+          "WD1land",
+          "BO1win",
+          "SF1land"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: first-pass proof recipe from full-corpus wild role evidence",
+        "family": "wild_symbol",
+        "gaps_next_action": "Promote role-map evidence into a dedicated corpus recipe document and add one-click thumbnails.",
+        "label": "Wild Symbol",
+        "next_template": "dedicated_corpus_recipe",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WD1",
+          "WD1idle",
+          "WD1land"
+        ],
+        "role_map": 77,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: first-pass proof recipe from full-corpus special-feature role evidence",
+        "family": "special_feature_symbol",
+        "gaps_next_action": "Promote role-map evidence into a dedicated corpus recipe document and add one-click thumbnails.",
+        "label": "Special Feature Symbol",
+        "next_template": "dedicated_corpus_recipe",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "SF1",
+          "SF1idle",
+          "SF1land",
+          "SF1smart"
+        ],
+        "role_map": 133,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: first-pass proof recipe from full-corpus bonus role evidence",
+        "family": "bonus_symbol",
+        "gaps_next_action": "Keep BO bonus trigger behavior separate from BL row-blocker UI/gameplay assets.",
+        "label": "Bonus Symbol",
+        "next_template": "bl_disambiguation",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BO1",
+          "BO1idle",
+          "BO1land",
+          "BO1smart"
+        ],
+        "role_map": 49,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: first-pass proof recipe from full-corpus jackpot role evidence",
+        "family": "jackpot_symbol",
+        "gaps_next_action": "Broaden source-body coverage beyond current thumbnail-backed one-click rows.",
+        "label": "Jackpot Symbol",
+        "next_template": "source_body_coverage",
+        "one_click": 47,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "JP1",
+          "JP1idle",
+          "JP1land",
+          "JP1smart"
+        ],
+        "role_map": 136,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: first-pass proof recipe from full-corpus WYS/WY value role evidence",
+        "family": "value_symbol",
+        "gaps_next_action": "Confirm WYS/WY naming and text/value layer requirements with production assets.",
+        "label": "Value Symbol / WYS",
+        "next_template": "text_layer_contract",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WYS1",
+          "WYS1idle",
+          "WYS1land"
+        ],
+        "role_map": 112,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: first-pass proof recipe from limited scatter role evidence",
+        "family": "scatter_symbol",
+        "gaps_next_action": "Add scatter to the static recipe library and build more corpus/source-body evidence.",
+        "label": "Scatter Symbol",
+        "next_template": "more_corpus_evidence",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "SC1",
+          "SC1idle",
+          "SC1land",
+          "SC1smart"
+        ],
+        "role_map": 3,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": null,
+        "evidence": "documented: live 4440 semantic notes plus corpus explode rows",
+        "family": "winframe_explode",
+        "gaps_next_action": "Define production frame/VFX layering, masking, and compositing rules before promoting beyond proof support.",
+        "label": "WinFrame / Explode",
+        "next_template": "production_frame_vfx_template",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WinFrame",
+          "WinFrameidle",
+          "WinFrameExplode"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": "53/19/85/698/165",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "meter",
+        "gaps_next_action": "Define production meter state, fill-mask, tier layout, and reset/loop contracts before promoting beyond proof support.",
+        "label": "Meter",
+        "next_template": "stateful_template",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "State1Collect",
+          "State2Collect",
+          "State3Collect",
+          "State4Collect",
+          "State5Collect",
+          "landscape_tier1",
+          "landscape_tier2",
+          "landscape_tier3"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": "62/22/169/955/181",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "transition",
+        "gaps_next_action": "Define production screen layout, masks, camera motion, and feature-state integration before promoting beyond proof support.",
+        "label": "Transition",
+        "next_template": "screen_template",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "intro",
+          "outro",
+          "FB_Transition",
+          "SB_Transition",
+          "totalwin",
+          "freeGamesComplete",
+          "WYS_intro",
+          "landscape_intro_tier1"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": "45/19/76/256/91",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "celebration",
+        "gaps_next_action": "Define production celebration layout, masking, tier-value overlays, and stop/loop contracts before promoting beyond proof support.",
+        "label": "Celebration",
+        "next_template": "layout_template",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "grandJackpot",
+          "tier_1",
+          "tier_2",
+          "tier_3",
+          "celebration_fx_1",
+          "celebration_fx_2",
+          "celebration_fx_3",
+          "burst"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus_counts": "17/10/17/309/46",
+        "evidence": "strong: preliminary_spec; promoted full-corpus recipe evidence",
+        "family": "avatar",
+        "gaps_next_action": "Define production rig, state list, expression layers, IK/mesh constraints, and loop/one-shot contracts before promoting beyond proof support.",
+        "label": "Avatar",
+        "next_template": "rig_template",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "State0Idle",
+          "State0to1",
+          "State1Awarded",
+          "State1Close",
+          "State1Idle",
+          "State1to2",
+          "State2Awarded",
+          "State2Close"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      {
+        "compiler": "unsupported",
+        "corpus_counts": null,
+        "evidence": "role-map: 8 role-map candidates; no promoted full-corpus recipe row",
+        "family": "blocker_or_bonus_symbol",
+        "gaps_next_action": "Define a row-blocker UI/gameplay template before allowing automatic compiler use.",
+        "label": "Row Blocker / BL UI Gameplay Element",
+        "next_template": "row_blocker_ui_template",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BL",
+          "bonus_or_blocker",
+          "row blocker",
+          "blocker UI"
+        ],
+        "role_map": 8,
+        "source_bodies": 0,
+        "tier": "needs-review"
+      },
+      {
+        "compiler": "unsupported",
+        "corpus_counts": null,
+        "evidence": "role-map: 37 role-map candidates; no promoted full-corpus recipe row",
+        "family": "non_symbol_or_unknown",
+        "gaps_next_action": "Classify unresolved assets by visual/gameplay purpose or leave outside symbol compiler scope.",
+        "label": "Non-symbol or Unknown / Unresolved Assets",
+        "next_template": "classification",
+        "one_click": 0,
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "unknown",
+          "non-symbol"
+        ],
+        "role_map": 37,
+        "source_bodies": 0,
+        "tier": "needs-review"
+      }
+    ],
+    "evidence_sources": [
+      "Promotions: research/generated/full_corpus_runs/20260430_222740/full_4000_recipe_promotions.json",
+      "Role map: research/generated/symbol_role_maps/symbol_role_map.json",
+      "Source bodies: research/generated/source_symbol_bodies/20260504_source_body_priority_smoke_v4/source_body_manifest.json",
+      "UI smoke: research/generated/ui_smoke_tests/latest_one_click_smoke_test.json",
+      "Family recipe specs: research/generated/family_recipe_specs/family_recipe_specs.json"
+    ],
+    "notes": [
+      "Corpus counts come only from promoted full-corpus recipe categories where available.",
+      "Compiler support is separated from one-click GUI readiness; manual proof recipes can exist without one-click corpus rows.",
+      "Proof-ready does not mean production-ready; it means deterministic proof compilation and smoke validation exist.",
+      "No Perforce, artSource, or credential paths are read beyond the listed generated evidence files."
+    ],
+    "summary": {
+      "doc-only": 0,
+      "families_tracked": 17,
+      "formal_recipe_specs_generated": 17,
+      "needs_review": 2,
+      "one-click_enabled_rows": 145,
+      "proof-ready_families": 15,
+      "role-map_rows": "1053 total, 45 review-gated",
+      "source-body_crops": 12,
+      "strong_evidence_but_no_compiler_template": 0
+    },
+    "tier_counts": {
+      "needs-review": 2,
+      "proof-ready": 15
+    }
+  },
+  "family_specs_summary": {
+    "compiler_counts": {
+      "implemented": 1,
+      "implemented_proof": 14,
+      "unsupported": 2
+    },
+    "evidence_sources": {
+      "compendium": "research/generated/symbol_compendium_runs/20260501_121542/symbol_animation_compendium.json (present)",
+      "coverage": "research/generated/coverage/animation_family_coverage.json (present)",
+      "full_corpus": "research/generated/full_corpus_runs/20260430_222740/full_4000_spine_corpus.json (present)",
+      "full_corpus_rows": "research/generated/full_corpus_runs/20260430_222740/full_4000_spine_corpus.rows.json (present)",
+      "inventory": "research/generated/symbol_inventory/dynamic_symbol_inventory.json (present)",
+      "promotions": "research/generated/full_corpus_runs/20260430_222740/full_4000_recipe_promotions.json (present)",
+      "role_map": "research/generated/symbol_role_maps/symbol_role_map.json (present)",
+      "source_bodies": "research/generated/source_symbol_bodies/20260504_source_body_priority_smoke_v4/source_body_manifest.json (present)",
+      "ui_smoke": "research/generated/ui_smoke_tests/latest_one_click_smoke_test.json (present)"
+    },
+    "families": [
+      {
+        "compiler": "implemented",
+        "corpus": 2531,
+        "family": "hp_symbol",
+        "label": "HP Symbol",
+        "missing_evidence": [],
+        "next_priority": "production_symbol_template",
+        "one_click": 98,
+        "readiness": "proof-ready",
+        "role_map": 236,
+        "source_bodies": 12
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": 3578,
+        "family": "lp_symbol",
+        "label": "LP Symbol / General Symbols",
+        "missing_evidence": [
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "one_click_source_coverage",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 258,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "mp_symbol",
+        "label": "MP Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "one_click_source_coverage",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 4,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": 2497,
+        "family": "bo_special_symbol",
+        "label": "BO / Special Symbol",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "role_split",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 0,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "wild_symbol",
+        "label": "Wild Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "dedicated_corpus_recipe",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 77,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "special_feature_symbol",
+        "label": "Special Feature Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "dedicated_corpus_recipe",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 133,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "bonus_symbol",
+        "label": "Bonus Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "bl_disambiguation",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 49,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "jackpot_symbol",
+        "label": "Jackpot Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest."
+        ],
+        "next_priority": "source_body_coverage",
+        "one_click": 47,
+        "readiness": "proof-ready",
+        "role_map": 136,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "value_symbol",
+        "label": "Value Symbol / WYS",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "text_layer_contract",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 112,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "scatter_symbol",
+        "label": "Scatter Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "more_corpus_evidence",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 3,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "family": "winframe_explode",
+        "label": "WinFrame / Explode",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "production_frame_vfx_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 0,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": 698,
+        "family": "meter",
+        "label": "Meter",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "stateful_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 0,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": 955,
+        "family": "transition",
+        "label": "Transition",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "screen_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 0,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": 256,
+        "family": "celebration",
+        "label": "Celebration",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "layout_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 0,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "implemented_proof",
+        "corpus": 309,
+        "family": "avatar",
+        "label": "Avatar",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "rig_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "role_map": 0,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "unsupported",
+        "corpus": null,
+        "family": "blocker_or_bonus_symbol",
+        "label": "Row Blocker / BL UI Gameplay Element",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family.",
+          "No deterministic compiler template is implemented."
+        ],
+        "next_priority": "row_blocker_ui_template",
+        "one_click": 0,
+        "readiness": "needs-review",
+        "role_map": 8,
+        "source_bodies": 0
+      },
+      {
+        "compiler": "unsupported",
+        "corpus": null,
+        "family": "non_symbol_or_unknown",
+        "label": "Non-symbol or Unknown / Unresolved Assets",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family.",
+          "No deterministic compiler template is implemented."
+        ],
+        "next_priority": "classification",
+        "one_click": 0,
+        "readiness": "needs-review",
+        "role_map": 37,
+        "source_bodies": 0
+      }
+    ],
+    "readiness_counts": {
+      "needs-review": 2,
+      "proof-ready": 15
+    },
+    "summary": {
+      "families": 17,
+      "families_missing_compiler_templates": 2,
+      "families_missing_promoted_corpus_rows": 10,
+      "families_with_compiler_support": 15,
+      "per-family_json_specs": 17,
+      "per-family_markdown_specs": 17
+    }
+  },
+  "generated_at": "source-sha256:9a6d9b854768a881",
+  "motion_profile_availability": {
+    "available": true,
+    "generated_at": "2026-05-08T12:07:38",
+    "ranges_by_role": {
+      "generic": {
+        "alpha": 1.0,
+        "angle": 0.0,
+        "scale": 0.469,
+        "x": 182.24,
+        "y": 0.0
+      },
+      "vfx": {
+        "alpha": 1.0,
+        "angle": 0.0,
+        "scale": 1.892,
+        "x": 142.99,
+        "y": 77.53
+      }
+    },
+    "roles": [
+      "generic",
+      "vfx"
+    ],
+    "sample_counts": {
+      "generic": 36,
+      "vfx": 36
+    },
+    "schema": "h5g_exact_local_motion_profile_v1",
+    "source": "local_json_deep reference summaries"
+  },
+  "plugin_root": "C:\\Users\\merickson\\Documents\\Claude_Plugins\\Claude_Spine_Generator",
+  "query_indexes": {
+    "families_by_family": {
+      "avatar": {
+        "compiler": "implemented_proof",
+        "corpus": 309,
+        "gaps_next_action": "Define production rig, state list, expression layers, IK/mesh constraints, and loop/one-shot contracts before promoting beyond proof support.",
+        "label": "Avatar",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "rig_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "State0Idle",
+          "State0to1",
+          "State1Awarded",
+          "State1Close",
+          "State1Idle",
+          "State1to2",
+          "State2Awarded",
+          "State2Close"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "blocker_or_bonus_symbol": {
+        "compiler": "unsupported",
+        "corpus": null,
+        "gaps_next_action": "Define a row-blocker UI/gameplay template before allowing automatic compiler use.",
+        "label": "Row Blocker / BL UI Gameplay Element",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family.",
+          "No deterministic compiler template is implemented."
+        ],
+        "next_priority": "row_blocker_ui_template",
+        "one_click": 0,
+        "readiness": "needs-review",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BL",
+          "bonus_or_blocker",
+          "row blocker",
+          "blocker UI"
+        ],
+        "role_map": 8,
+        "source_bodies": 0,
+        "tier": "needs-review"
+      },
+      "bo_special_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": 2497,
+        "gaps_next_action": "Split legacy BO-special coverage from modern bonus/special-feature roles where production needs differ.",
+        "label": "BO / Special Symbol",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "role_split",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BO1idle",
+          "BO1land",
+          "BO1smart",
+          "SF1idle",
+          "WD1idle",
+          "WD1land",
+          "BO1win",
+          "SF1land"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "bonus_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Keep BO bonus trigger behavior separate from BL row-blocker UI/gameplay assets.",
+        "label": "Bonus Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "bl_disambiguation",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BO1",
+          "BO1idle",
+          "BO1land",
+          "BO1smart"
+        ],
+        "role_map": 49,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "celebration": {
+        "compiler": "implemented_proof",
+        "corpus": 256,
+        "gaps_next_action": "Define production celebration layout, masking, tier-value overlays, and stop/loop contracts before promoting beyond proof support.",
+        "label": "Celebration",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "layout_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "grandJackpot",
+          "tier_1",
+          "tier_2",
+          "tier_3",
+          "celebration_fx_1",
+          "celebration_fx_2",
+          "celebration_fx_3",
+          "burst"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "hp_symbol": {
+        "compiler": "implemented",
+        "corpus": 2531,
+        "gaps_next_action": "Promote from proof scaffold to production template after runtime/folder contract is approved.",
+        "label": "HP Symbol",
+        "missing_evidence": [],
+        "next_priority": "production_symbol_template",
+        "one_click": 98,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "HP1idle",
+          "HP1land",
+          "HP2idle",
+          "HP2land",
+          "HP3idle",
+          "HP3land",
+          "HP4idle",
+          "HP4land"
+        ],
+        "role_map": 236,
+        "source_bodies": 12,
+        "tier": "proof-ready"
+      },
+      "jackpot_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Broaden source-body coverage beyond current thumbnail-backed one-click rows.",
+        "label": "Jackpot Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest."
+        ],
+        "next_priority": "source_body_coverage",
+        "one_click": 47,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "JP1",
+          "JP1idle",
+          "JP1land",
+          "JP1smart"
+        ],
+        "role_map": 136,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "lp_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": 3578,
+        "gaps_next_action": "Add broader one-click thumbnail/source-body coverage and production-quality symbol layering.",
+        "label": "LP Symbol / General Symbols",
+        "missing_evidence": [
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "one_click_source_coverage",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "LP1idle",
+          "LP1land",
+          "LP2idle",
+          "LP2land",
+          "LP3idle",
+          "LP3land",
+          "LP4idle",
+          "LP4land"
+        ],
+        "role_map": 258,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "meter": {
+        "compiler": "implemented_proof",
+        "corpus": 698,
+        "gaps_next_action": "Define production meter state, fill-mask, tier layout, and reset/loop contracts before promoting beyond proof support.",
+        "label": "Meter",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "stateful_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "State1Collect",
+          "State2Collect",
+          "State3Collect",
+          "State4Collect",
+          "State5Collect",
+          "landscape_tier1",
+          "landscape_tier2",
+          "landscape_tier3"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "mp_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Add one-click thumbnail/source-body coverage and validate production MP intensity against game art.",
+        "label": "MP Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "one_click_source_coverage",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "MP1",
+          "MP1idle",
+          "MP1land"
+        ],
+        "role_map": 4,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "non_symbol_or_unknown": {
+        "compiler": "unsupported",
+        "corpus": null,
+        "gaps_next_action": "Classify unresolved assets by visual/gameplay purpose or leave outside symbol compiler scope.",
+        "label": "Non-symbol or Unknown / Unresolved Assets",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family.",
+          "No deterministic compiler template is implemented."
+        ],
+        "next_priority": "classification",
+        "one_click": 0,
+        "readiness": "needs-review",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "unknown",
+          "non-symbol"
+        ],
+        "role_map": 37,
+        "source_bodies": 0,
+        "tier": "needs-review"
+      },
+      "scatter_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Add scatter to the static recipe library and build more corpus/source-body evidence.",
+        "label": "Scatter Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "more_corpus_evidence",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "SC1",
+          "SC1idle",
+          "SC1land",
+          "SC1smart"
+        ],
+        "role_map": 3,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "special_feature_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Promote role-map evidence into a dedicated corpus recipe document and add one-click thumbnails.",
+        "label": "Special Feature Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "dedicated_corpus_recipe",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "SF1",
+          "SF1idle",
+          "SF1land",
+          "SF1smart"
+        ],
+        "role_map": 133,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "transition": {
+        "compiler": "implemented_proof",
+        "corpus": 955,
+        "gaps_next_action": "Define production screen layout, masks, camera motion, and feature-state integration before promoting beyond proof support.",
+        "label": "Transition",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "screen_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "intro",
+          "outro",
+          "FB_Transition",
+          "SB_Transition",
+          "totalwin",
+          "freeGamesComplete",
+          "WYS_intro",
+          "landscape_intro_tier1"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "value_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Confirm WYS/WY naming and text/value layer requirements with production assets.",
+        "label": "Value Symbol / WYS",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "text_layer_contract",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WYS1",
+          "WYS1idle",
+          "WYS1land"
+        ],
+        "role_map": 112,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "wild_symbol": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Promote role-map evidence into a dedicated corpus recipe document and add one-click thumbnails.",
+        "label": "Wild Symbol",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "dedicated_corpus_recipe",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WD1",
+          "WD1idle",
+          "WD1land"
+        ],
+        "role_map": 77,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      },
+      "winframe_explode": {
+        "compiler": "implemented_proof",
+        "corpus": null,
+        "gaps_next_action": "Define production frame/VFX layering, masking, and compositing rules before promoting beyond proof support.",
+        "label": "WinFrame / Explode",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_priority": "production_frame_vfx_template",
+        "one_click": 0,
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WinFrame",
+          "WinFrameidle",
+          "WinFrameExplode"
+        ],
+        "role_map": 0,
+        "source_bodies": 0,
+        "tier": "proof-ready"
+      }
+    },
+    "recipes_by_family": {
+      "avatar": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "rig_template",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "State0Idle",
+          "State0to1",
+          "State1Awarded",
+          "State1Close",
+          "State1Idle",
+          "State1to2",
+          "State2Awarded",
+          "State2Close"
+        ]
+      },
+      "blocker_or_bonus_symbol": {
+        "compiler": "unsupported",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family.",
+          "No deterministic compiler template is implemented."
+        ],
+        "next_template": "row_blocker_ui_template",
+        "readiness": "needs-review",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BL",
+          "bonus_or_blocker",
+          "row blocker",
+          "blocker UI"
+        ]
+      },
+      "bo_special_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "role_split",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BO1idle",
+          "BO1land",
+          "BO1smart",
+          "SF1idle",
+          "WD1idle",
+          "WD1land",
+          "BO1win",
+          "SF1land"
+        ]
+      },
+      "bonus_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "bl_disambiguation",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "BO1",
+          "BO1idle",
+          "BO1land",
+          "BO1smart"
+        ]
+      },
+      "celebration": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "layout_template",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "grandJackpot",
+          "tier_1",
+          "tier_2",
+          "tier_3",
+          "celebration_fx_1",
+          "celebration_fx_2",
+          "celebration_fx_3",
+          "burst"
+        ]
+      },
+      "hp_symbol": {
+        "compiler": "implemented",
+        "missing_evidence": [],
+        "next_template": "production_symbol_template",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "HP1idle",
+          "HP1land",
+          "HP2idle",
+          "HP2land",
+          "HP3idle",
+          "HP3land",
+          "HP4idle",
+          "HP4land"
+        ]
+      },
+      "jackpot_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest."
+        ],
+        "next_template": "source_body_coverage",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "JP1",
+          "JP1idle",
+          "JP1land",
+          "JP1smart"
+        ]
+      },
+      "lp_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "one_click_source_coverage",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "LP1idle",
+          "LP1land",
+          "LP2idle",
+          "LP2land",
+          "LP3idle",
+          "LP3land",
+          "LP4idle",
+          "LP4land"
+        ]
+      },
+      "meter": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "stateful_template",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "State1Collect",
+          "State2Collect",
+          "State3Collect",
+          "State4Collect",
+          "State5Collect",
+          "landscape_tier1",
+          "landscape_tier2",
+          "landscape_tier3"
+        ]
+      },
+      "mp_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "one_click_source_coverage",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "MP1",
+          "MP1idle",
+          "MP1land"
+        ]
+      },
+      "non_symbol_or_unknown": {
+        "compiler": "unsupported",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family.",
+          "No deterministic compiler template is implemented."
+        ],
+        "next_template": "classification",
+        "readiness": "needs-review",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "unknown",
+          "non-symbol"
+        ]
+      },
+      "scatter_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "more_corpus_evidence",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "SC1",
+          "SC1idle",
+          "SC1land",
+          "SC1smart"
+        ]
+      },
+      "special_feature_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "dedicated_corpus_recipe",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "SF1",
+          "SF1idle",
+          "SF1land",
+          "SF1smart"
+        ]
+      },
+      "transition": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "screen_template",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "intro",
+          "outro",
+          "FB_Transition",
+          "SB_Transition",
+          "totalwin",
+          "freeGamesComplete",
+          "WYS_intro",
+          "landscape_intro_tier1"
+        ]
+      },
+      "value_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "text_layer_contract",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WYS1",
+          "WYS1idle",
+          "WYS1land"
+        ]
+      },
+      "wild_symbol": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "dedicated_corpus_recipe",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WD1",
+          "WD1idle",
+          "WD1land"
+        ]
+      },
+      "winframe_explode": {
+        "compiler": "implemented_proof",
+        "missing_evidence": [
+          "No promoted full-corpus recipe category/count row for this family.",
+          "No direct role-map compiler candidate rows for this family.",
+          "No exact source-body crops in the current source-body manifest.",
+          "No one-click UI rows have source bodies or smoke thumbnails for this family."
+        ],
+        "next_template": "production_frame_vfx_template",
+        "readiness": "proof-ready",
+        "recipe_spec": "formal_spec_generated",
+        "representative_animations": [
+          "WinFrame",
+          "WinFrameidle",
+          "WinFrameExplode"
+        ]
+      }
+    },
+    "roles_by_role": {
+      "additive_effect": {
+        "rig_layer_count": 33
+      },
+      "arm": {
+        "semantic_layer_count": 1
+      },
+      "background": {
+        "semantic_layer_count": 13
+      },
+      "bonus": {
+        "symbol_count": 49
+      },
+      "bonus_or_blocker": {
+        "symbol_count": 8
+      },
+      "character_body": {
+        "semantic_layer_count": 5
+      },
+      "character_part": {
+        "rig_layer_count": 15
+      },
+      "eyes": {
+        "semantic_layer_count": 2
+      },
+      "frame": {
+        "semantic_layer_count": 2
+      },
+      "frame_glow": {
+        "semantic_layer_count": 2
+      },
+      "frame_part": {
+        "rig_layer_count": 4
+      },
+      "generic": {
+        "motion_ranges": {
+          "alpha": 1.0,
+          "angle": 0.0,
+          "scale": 0.469,
+          "x": 182.24,
+          "y": 0.0
+        }
+      },
+      "generic_part": {
+        "semantic_layer_count": 4
+      },
+      "head": {
+        "semantic_layer_count": 3
+      },
+      "high_pay": {
+        "symbol_count": 236
+      },
+      "jackpot": {
+        "symbol_count": 136
+      },
+      "key": {
+        "semantic_layer_count": 1
+      },
+      "leaf": {
+        "semantic_layer_count": 2
+      },
+      "left_hand": {
+        "semantic_layer_count": 1
+      },
+      "low_pay": {
+        "symbol_count": 258
+      },
+      "medium_pay": {
+        "symbol_count": 4
+      },
+      "mouth_laugh": {
+        "semantic_layer_count": 1
+      },
+      "non_symbol_or_unknown": {
+        "symbol_count": 457
+      },
+      "overlay": {
+        "rig_layer_count": 4
+      },
+      "right_hand": {
+        "semantic_layer_count": 2
+      },
+      "root_static": {
+        "rig_layer_count": 13
+      },
+      "scatter": {
+        "symbol_count": 3
+      },
+      "sheen": {
+        "semantic_layer_count": 27
+      },
+      "sparkle": {
+        "semantic_layer_count": 6
+      },
+      "special_feature": {
+        "symbol_count": 133
+      },
+      "text": {
+        "semantic_layer_count": 4
+      },
+      "text_effect": {
+        "rig_layer_count": 12
+      },
+      "ui_part": {
+        "rig_layer_count": 3
+      },
+      "value_ball": {
+        "semantic_layer_count": 7
+      },
+      "vfx": {
+        "motion_ranges": {
+          "alpha": 1.0,
+          "angle": 0.0,
+          "scale": 1.892,
+          "x": 142.99,
+          "y": 77.53
+        }
+      },
+      "wild": {
+        "symbol_count": 77
+      },
+      "wild_text": {
+        "semantic_layer_count": 1
+      },
+      "wysiwyg_value": {
+        "symbol_count": 112
+      }
+    },
+    "ui_buckets_by_bucket": {
+      "avatar_state_ui": {
+        "animation_count": 85,
+        "asset_count": 1,
+        "bucket_count": 86,
+        "compendium_linked_count": 4
+      },
+      "celebration": {
+        "animation_count": 522,
+        "asset_count": 44,
+        "bucket_count": 566,
+        "compendium_linked_count": 658
+      },
+      "interface_ambients": {
+        "animation_count": 1251,
+        "asset_count": 72,
+        "bucket_count": 1323,
+        "compendium_linked_count": 512
+      },
+      "interface_popups": {
+        "animation_count": 142,
+        "asset_count": 14,
+        "bucket_count": 156,
+        "compendium_linked_count": 47
+      },
+      "meter": {
+        "animation_count": 1631,
+        "asset_count": 153,
+        "bucket_count": 1784,
+        "compendium_linked_count": 2401
+      },
+      "overlay_panel_popup_modal": {
+        "animation_count": 4,
+        "asset_count": 1,
+        "bucket_count": 5,
+        "compendium_linked_count": 1
+      },
+      "reel_row_grid_blocker_row_expanding_row": {
+        "animation_count": 247,
+        "asset_count": 2,
+        "bucket_count": 249,
+        "compendium_linked_count": 24
+      },
+      "row_blocker": {
+        "asset_count": 8,
+        "bucket_count": 8,
+        "compendium_linked_count": 395
+      },
+      "symbol_family_reference": {
+        "animation_count": 8133,
+        "asset_count": 1008,
+        "bucket_count": 9141,
+        "compendium_linked_count": 8133
+      },
+      "transition": {
+        "animation_count": 581,
+        "asset_count": 136,
+        "bucket_count": 717,
+        "compendium_linked_count": 530
+      },
+      "unknown_ui_or_system": {
+        "animation_count": 111,
+        "asset_count": 1,
+        "bucket_count": 112,
+        "compendium_linked_count": 1
+      },
+      "vfx_only": {
+        "animation_count": 268,
+        "asset_count": 16,
+        "bucket_count": 284,
+        "compendium_linked_count": 39
+      },
+      "winframe_explode": {
+        "animation_count": 55,
+        "asset_count": 17,
+        "bucket_count": 72,
+        "compendium_linked_count": 285
+      }
+    }
+  },
+  "research_root": "C:\\Users\\merickson\\Desktop\\Claude Spine\\research",
+  "schema": "claude_spine_compiler_evidence_index_v1",
+  "source_hash": "9a6d9b854768a881dc65056e19480bffaae1dfdaf1baefa1c018567ef189a5f0",
+  "source_policy": {
+    "allowed_roots": [
+      "C:\\Users\\merickson\\Desktop\\Claude Spine\\research"
+    ],
+    "prohibited_roots": [
+      "G:/artSource",
+      "G:\\artSource",
+      "Perforce"
+    ],
+    "rule": "Read only existing documented/generated H5G research outputs; never inspect artSource or write Perforce."
+  },
+  "sources": {
+    "advanced_spine_capability_plan": {
+      "bytes": 6216,
+      "exists": true,
+      "kind": "file",
+      "path": "ADVANCED_SPINE_CAPABILITY_IMPLEMENTATION_PLAN.md",
+      "required": true,
+      "sha256": "a269acb4957fce9cc27b836b2db95abe6a9648b08a03dea6fb77521b25ec65ea",
+      "status": "ok"
+    },
+    "animation_family_coverage": {
+      "bytes": 9345,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/coverage/animation_family_coverage.md",
+      "required": true,
+      "sha256": "52da99cad2b3f673556d9ee832d49462e41021a7062770acd38aee735742f90a",
+      "status": "ok"
+    },
+    "contextual_layer_interpretation": {
+      "entries": 20,
+      "exists": true,
+      "kind": "directory",
+      "path": "generated/contextual_layer_interpretation",
+      "required": true,
+      "status": "ok",
+      "tree_sha256": "34279a53850912fa7bc1e1eb5d9b658553b3bb1213e7bbffda3271d8a69f5b02"
+    },
+    "contextual_layer_interpretation_json": {
+      "bytes": 246839,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/contextual_layer_interpretation/contextual_layer_interpretation.json",
+      "required": false,
+      "sha256": "76982fb5810f883f625101b1041c1a1ffe37e8843ad30e8714789fa31e212049",
+      "status": "ok"
+    },
+    "contextual_layer_interpretation_md": {
+      "bytes": 9113,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/contextual_layer_interpretation/contextual_layer_interpretation.md",
+      "required": false,
+      "sha256": "d1d572f1f34503d08290e540f3476454a7868945a818808794b18f1b9d4abd4e",
+      "status": "ok"
+    },
+    "family_recipe_specs": {
+      "bytes": 6931,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/family_recipe_specs/family_recipe_specs.md",
+      "required": true,
+      "sha256": "3d26e60a95216a519d94242fe32d6a64e05499297996d87c4f33aee7cd49e4fb",
+      "status": "ok"
+    },
+    "family_recipe_specs_json": {
+      "bytes": 279048,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/family_recipe_specs/family_recipe_specs.json",
+      "required": false,
+      "sha256": "7b07d359a40b0445634547409eb186d1da6b26b8abcc6b38f7718de7e05c0aa4",
+      "status": "ok"
+    },
+    "full_deep_bakeoff_findings": {
+      "bytes": 7353,
+      "exists": true,
+      "kind": "file",
+      "path": "FULL_DEEP_ANIMATION_BAKEOFF_FINDINGS.md",
+      "required": true,
+      "sha256": "8e8235f40b9e55637d8bfdce30e57d00344f3901bc24351e770da10b1c46093d",
+      "status": "ok"
+    },
+    "latest_exact_motion_profile": {
+      "bytes": 483,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/compiler_motion_profiles/latest_exact_motion_profile.json",
+      "required": true,
+      "sha256": "a6725c09e8e570d9f930c919178aa49501f36ac605b8e552fadaef4ea99e8595",
+      "status": "ok"
+    },
+    "latest_symbol_compendium_md": {
+      "bytes": 3772,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/symbol_compendium_runs/20260501_121542/symbol_animation_compendium.md",
+      "required": false,
+      "sha256": "ea0849237ccbf2fdc079a007ee0e7c90593cda8390494cdde49d77f7311006a1",
+      "status": "ok"
+    },
+    "symbol_compendium_runs": {
+      "entries": 17,
+      "exists": true,
+      "kind": "directory",
+      "path": "generated/symbol_compendium_runs",
+      "required": true,
+      "status": "ok",
+      "tree_sha256": "990eb69cf3547664b3b8897f85d8248d0c63bef4a6f221b268fe954e38b96200"
+    },
+    "ui_animation_classification_json": {
+      "bytes": 14140575,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/ui_animation_coverage/ui_animation_classification.json",
+      "required": false,
+      "sha256": "35507ff18fe26838ab620372f8e748be55a595e94501df79eb9af23c9ec0eced",
+      "status": "ok"
+    },
+    "ui_animation_classification_md": {
+      "bytes": 8176,
+      "exists": true,
+      "kind": "file",
+      "path": "generated/ui_animation_coverage/ui_animation_classification.md",
+      "required": false,
+      "sha256": "876f56dc371e5c58811c3a3678c24e9c4460bcf7177460c76ee4d45d1338e875",
+      "status": "ok"
+    },
+    "ui_animation_coverage": {
+      "entries": 4,
+      "exists": true,
+      "kind": "directory",
+      "path": "generated/ui_animation_coverage",
+      "required": true,
+      "status": "ok",
+      "tree_sha256": "8587fadec2051866538371e561133c482ead777b3e571714a114259da35ae03a"
+    }
+  },
+  "symbol_compendium_summary": {
+    "alerts": {
+      "assets_with_animations_but_unknown_subject_type": 275,
+      "games_requiring_human_review": 5,
+      "games_with_no_usable_symbol_grouping": 6,
+      "games_with_spine_source_but_no_runtime_export_linkage": 0
+    },
+    "asset_categories": {
+      "avatar": 17,
+      "celebration": 70,
+      "hp_symbol": 236,
+      "interface": 124,
+      "lp_symbol": 258,
+      "meter": 46,
+      "mp_symbol": 4,
+      "special_symbol": 181,
+      "spin_reel": 1,
+      "transition": 148,
+      "unknown": 4,
+      "vfx": 10,
+      "wild_scatter_bonus": 374
+    },
+    "behavior_buckets": {
+      "celebration": 26,
+      "collect_meter": 178,
+      "explode_burst": 9702,
+      "idle": 463,
+      "land": 628,
+      "other": 649,
+      "smart_feature_active": 1031,
+      "spin_reel": 152,
+      "transition": 150,
+      "win": 51
+    },
+    "generated": "2026-05-01T12:15:43",
+    "human_review_games": [
+      "4080 4080_neptunes_champions_production - needs_human_review",
+      "4081 4081_alchemistress_production - needs_human_review",
+      "4140 4140_feather_of_the_nile_jackpot_production - needs_manual_review",
+      "4231 4231_da_vinci_power_bet_clone_01_production - needs_manual_review",
+      "4240 4240_buffalo_mountain_production - needs_human_review"
+    ],
+    "largest_games_by_asset_count": [
+      "4290 4290_bankrush_beta_production: 36 assets, 211 animations",
+      "4292 4292_sonic_77_sevens_clone_02_production: 36 assets, 219 animations",
+      "4291 4291_bankrush_beta_clone_01_production: 35 assets, 203 animations",
+      "4260 4260_dodge_production: 34 assets, 209 animations",
+      "4261 4261_dodge_clone_01_production: 34 assets, 215 animations",
+      "4262 4262_dodge_clone_02_production: 34 assets, 226 animations",
+      "4263 4263_dodge_clone_03_production: 34 assets, 225 animations",
+      "4264 4264_dodge_clone_04_production: 34 assets, 215 animations",
+      "4265 4265_dodge_clone_05_production: 33 assets, 219 animations",
+      "4052 4052_da_vinci_deluxeways_clone_02_rmg_production: 32 assets, 883 animations"
+    ],
+    "subject_types": {
+      "abstract_vfx": 496,
+      "animal": 13,
+      "candy_food": 2,
+      "character_human": 337,
+      "gemstone": 80,
+      "item_object": 11,
+      "letter_number_card": 259,
+      "unknown": 275
+    },
+    "summary": {
+      "asset_records": 1473,
+      "assets_with_unknown_subject_type": 275,
+      "games_linked_to_local_source_paths": 67,
+      "games_with_parsed_local_atlas_regions": 0,
+      "games_with_runtime_spine_evidence": 69,
+      "runtime_animations": 13030,
+      "runtime_export_paths": 470
+    },
+    "symbol_roles": {
+      "bonus": 49,
+      "bonus_or_blocker": 8,
+      "high_pay": 236,
+      "jackpot": 136,
+      "low_pay": 258,
+      "medium_pay": 4,
+      "non_symbol_or_unknown": 457,
+      "scatter": 3,
+      "special_feature": 133,
+      "wild": 77,
+      "wysiwyg_value": 112
+    }
+  },
+  "ui_system_evidence_summary": {
+    "animation_bucket_counts": {
+      "avatar_state_ui": 85,
+      "celebration": 522,
+      "interface_ambients": 1251,
+      "interface_popups": 142,
+      "meter": 1631,
+      "overlay_panel_popup_modal": 4,
+      "reel_row_grid_blocker_row_expanding_row": 247,
+      "symbol_family_reference": 8133,
+      "transition": 581,
+      "unknown_ui_or_system": 111,
+      "vfx_only": 268,
+      "winframe_explode": 55
+    },
+    "asset_bucket_counts": {
+      "avatar_state_ui": 1,
+      "celebration": 44,
+      "interface_ambients": 72,
+      "interface_popups": 14,
+      "meter": 153,
+      "overlay_panel_popup_modal": 1,
+      "reel_row_grid_blocker_row_expanding_row": 2,
+      "row_blocker": 8,
+      "symbol_family_reference": 1008,
+      "transition": 136,
+      "unknown_ui_or_system": 1,
+      "vfx_only": 16,
+      "winframe_explode": 17
+    },
+    "bucket_counts": {
+      "avatar_state_ui": 86,
+      "celebration": 566,
+      "interface_ambients": 1323,
+      "interface_popups": 156,
+      "meter": 1784,
+      "overlay_panel_popup_modal": 5,
+      "reel_row_grid_blocker_row_expanding_row": 249,
+      "row_blocker": 8,
+      "symbol_family_reference": 9141,
+      "transition": 717,
+      "unknown_ui_or_system": 112,
+      "vfx_only": 284,
+      "winframe_explode": 72
+    },
+    "compendium_linked_asset_animation_counts": {
+      "avatar_state_ui": 4,
+      "celebration": 658,
+      "interface_ambients": 512,
+      "interface_popups": 47,
+      "meter": 2401,
+      "overlay_panel_popup_modal": 1,
+      "reel_row_grid_blocker_row_expanding_row": 24,
+      "row_blocker": 395,
+      "symbol_family_reference": 8133,
+      "transition": 530,
+      "unknown_ui_or_system": 1,
+      "vfx_only": 39,
+      "winframe_explode": 285
+    },
+    "confidence_bands": {
+      "high": 12030,
+      "low": 112,
+      "medium": 2361
+    },
+    "generated": "2026-05-04T15:17:21",
+    "headline_counts": {
+      "animation_records": 13030,
+      "asset_records": 1473,
+      "games": 69,
+      "row_blocker___bl_animations": 0,
+      "row_blocker___bl_assets": 8,
+      "row_blocker___bl_compendium-linked_animations": 395,
+      "symbol-family_references_excluded_from_ui_taxonomy": 9141,
+      "total_classified_records": 14503,
+      "unknown_ui_system_records": 112
+    },
+    "limitations": [
+      "This is deterministic name/path/tag/role-map classification, not image inspection.",
+      "UI/system records with generic VFX names remain review-gated as unknown_ui_or_system or vfx_only.",
+      "Counts are based on existing generated evidence only; this script does not touch Perforce or G:\\artSource."
+    ],
+    "top_unresolved_examples": [
+      "animation 4011 4011_founding_fortunes_production  Fireworks: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4011 4011_founding_fortunes_production  Flag: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4011 4011_founding_fortunes_production  Wheel_Lights: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4011 4011_founding_fortunes_production  animation: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State0Idle: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State0to1: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State1Idle: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State1to2: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State2Idle: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State3Idle: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State4Idle: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched",
+      "animation 4191 4191_bankrush_bonanza_clone_01_production  State5Idle: unknown_ui_or_system confidence 0.35; no deterministic UI/system evidence matched"
+    ]
+  },
+  "warnings": []
+}

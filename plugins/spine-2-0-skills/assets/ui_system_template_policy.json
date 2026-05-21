@@ -1,0 +1,298 @@
+{
+  "schema": "spine_slot_animation_ui_system_template_policy_v1",
+  "phase": 8,
+  "supported_templates": {
+    "meter": {
+      "family": "meter",
+      "status": "proof_ready",
+      "animation_names": [
+        "MeterIdle",
+        "State1Collect",
+        "State2Collect",
+        "State3Collect",
+        "State4Collect",
+        "State5Collect"
+      ],
+      "timeline_types": [
+        "bone.scale",
+        "slot.rgba"
+      ],
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.recipes_by_family.meter",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.meter"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "generated/family_recipe_specs/family_recipe_specs.md",
+        "references/families.md"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: meter bucket_count=1784, animation_count=1631, asset_count=153, compendium_linked_count=2401",
+        "research/generated/family_recipe_specs/family_recipe_specs.md: meter is formal_spec_generated, readiness=proof-ready, compiler=implemented_proof",
+        "references/families.md: meter naming contract MeterIdle and State1Collect through State5Collect"
+      ]
+    },
+    "transition": {
+      "family": "transition",
+      "status": "proof_ready",
+      "animation_names": [
+        "intro",
+        "TransitionIdle",
+        "outro",
+        "FB_Transition",
+        "SB_Transition"
+      ],
+      "timeline_types": [
+        "bone.scale",
+        "slot.rgba"
+      ],
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.recipes_by_family.transition",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.transition"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "generated/family_recipe_specs/family_recipe_specs.md",
+        "references/families.md"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: transition bucket_count=717, animation_count=581, asset_count=136, compendium_linked_count=530",
+        "research/generated/family_recipe_specs/family_recipe_specs.md: transition is formal_spec_generated, readiness=proof-ready, compiler=implemented_proof",
+        "references/families.md: transition naming contract intro, TransitionIdle, outro, FB_Transition, SB_Transition"
+      ]
+    },
+    "celebration": {
+      "family": "celebration",
+      "status": "proof_ready",
+      "animation_names": [
+        "grandJackpot",
+        "celebration_loop",
+        "tier_1",
+        "tier_2",
+        "tier_3",
+        "celebration_fx_1",
+        "celebration_fx_2",
+        "celebration_fx_3",
+        "burst"
+      ],
+      "timeline_types": [
+        "bone.translate",
+        "bone.scale",
+        "slot.rgba"
+      ],
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.recipes_by_family.celebration",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.celebration"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "generated/family_recipe_specs/family_recipe_specs.md",
+        "references/families.md"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: celebration bucket_count=566, animation_count=522, asset_count=44, compendium_linked_count=658",
+        "research/generated/family_recipe_specs/family_recipe_specs.md: celebration is formal_spec_generated, readiness=proof-ready, compiler=implemented_proof",
+        "references/families.md: celebration naming contract grandJackpot, celebration_loop, tier_1, tier_2, tier_3, celebration_fx_1, burst; assets/compiler_evidence_index.json query_indexes.recipes_by_family.celebration representative_animations include celebration_fx_2 and celebration_fx_3"
+      ]
+    },
+    "winframe_explode": {
+      "family": "winframe_explode",
+      "status": "proof_ready",
+      "animation_names": [
+        "WinFrame",
+        "WinFrameidle",
+        "WinFrameExplode"
+      ],
+      "timeline_types": [
+        "bone.scale",
+        "slot.rgba"
+      ],
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.recipes_by_family.winframe_explode",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.winframe_explode"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "generated/family_recipe_specs/family_recipe_specs.md",
+        "references/families.md"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: winframe_explode bucket_count=72, animation_count=55, asset_count=17, compendium_linked_count=285",
+        "research/generated/family_recipe_specs/family_recipe_specs.md: winframe_explode is formal_spec_generated, readiness=proof-ready, compiler=implemented_proof",
+        "references/families.md: winframe_explode naming contract WinFrame, WinFrameidle, WinFrameExplode"
+      ]
+    },
+    "symbol_frame_glow": {
+      "family": "symbol_frame_glow",
+      "status": "proof_ready_when_source_layers_exist",
+      "applies_to_families": [
+        "hp_symbol",
+        "mp_symbol",
+        "lp_symbol",
+        "wild_symbol",
+        "scatter_symbol",
+        "bonus_symbol",
+        "bo_special_symbol",
+        "jackpot_symbol",
+        "special_feature_symbol",
+        "value_symbol"
+      ],
+      "source_layer_roles": [
+        "frame",
+        "back_frame",
+        "front_frame",
+        "frame_glow",
+        "glow",
+        "sparkle"
+      ],
+      "animation_names": [
+        "existing symbol family setup/idle/breathe/land/win/smart names"
+      ],
+      "timeline_types": [
+        "bone.scale",
+        "slot.rgba"
+      ],
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.recipes_by_family.<symbol_family> validates proof-ready symbol family compiler support",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.symbol_family_reference validates symbol-family reference coverage",
+        "assets/compiler_evidence_index.json: contextual_layer_evidence_summary validates frame/frame_glow/glow/sparkle role evidence"
+      ],
+      "original_source_paths": [
+        "generated/contextual_layer_interpretation/contextual_layer_interpretation.md",
+        "generated/family_recipe_specs/family_recipe_specs.md",
+        "references/families.md"
+      ],
+      "original_evidence": [
+        "research/generated/contextual_layer_interpretation/contextual_layer_interpretation.md: frame/frame_glow roles and frame_pulse/shimmer/sparkle animation uses are inferred for symbol layers",
+        "research/generated/family_recipe_specs/family_recipe_specs.md: symbol families are formal_spec_generated and proof-ready",
+        "references/families.md: HP optional layers include *_frame_glow, back_frame, front_frame, glass, glow, sparkle"
+      ]
+    }
+  },
+  "review_only_buckets": {
+    "button": {
+      "status": "review_only",
+      "unsupported_reason": "UI button idle/hover/press has generated UI evidence but no deterministic source-layer contract or compiler template.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.interface_popups",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.overlay_panel_popup_modal"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: interface_popups bucket_count=156 and overlay_panel_popup_modal bucket_count=5 remain UI taxonomy evidence only",
+        "assets/compiler_evidence_index.json: no button compiler template is listed in recipes_by_family"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "assets/compiler_evidence_index.json"
+      ]
+    },
+    "row_blocker": {
+      "status": "review_only",
+      "unsupported_reason": "Row blockers have role-map evidence but no deterministic row-lock/break/unlock/reveal compiler contract.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.row_blocker",
+        "assets/compiler_evidence_index.json: query_indexes.recipes_by_family.blocker_or_bonus_symbol"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: row_blocker asset_count=8, compendium_linked_count=395",
+        "research/generated/family_recipe_specs/family_recipe_specs.md: blocker_or_bonus_symbol is needs-review and compiler=unsupported"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "generated/family_recipe_specs/family_recipe_specs.md"
+      ]
+    },
+    "background_parallax": {
+      "status": "review_only",
+      "unsupported_reason": "Background drift/parallax has ambient UI evidence but no deterministic background layer, camera, or parallax-depth compiler contract.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.interface_ambients"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: interface_ambients bucket_count=1323, animation_count=1251, asset_count=72",
+        "references/capability_status.md: ambient background animation is not a default family contract today"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "references/capability_status.md"
+      ]
+    },
+    "foreground_overlay": {
+      "status": "review_only",
+      "unsupported_reason": "Foreground ambient overlays have generated UI evidence but no deterministic foreground layer or compositing contract.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.interface_ambients",
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.overlay_panel_popup_modal"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: interface_ambients bucket_count=1323 and overlay_panel_popup_modal bucket_count=5",
+        "references/capability_status.md: full UI/game-screen animation system remains only partially covered"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "references/capability_status.md"
+      ]
+    },
+    "vfx_only": {
+      "status": "review_only",
+      "unsupported_reason": "VFX-only records lack deterministic source-layer/compiler contracts unless they belong to a supported family such as winframe_explode or celebration.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.vfx_only"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: vfx_only bucket_count=284, animation_count=268, asset_count=16",
+        "assets/compiler_evidence_index.json: UI/system records with generic VFX names remain review-gated as unknown_ui_or_system or vfx_only"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "assets/compiler_evidence_index.json"
+      ]
+    },
+    "unknown_ui_or_system": {
+      "status": "review_only",
+      "unsupported_reason": "Unknown UI/system records have no deterministic evidence match and must be classified by a reviewer before compilation.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.unknown_ui_or_system"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: unknown_ui_or_system bucket_count=112, animation_count=111",
+        "assets/compiler_evidence_index.json: top unresolved examples are low-confidence unknown_ui_or_system records"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "assets/compiler_evidence_index.json"
+      ]
+    },
+    "unknown": {
+      "status": "review_only",
+      "unsupported_reason": "Unknown UI/system records have no deterministic evidence match and must be classified by a reviewer before compilation.",
+      "evidence": [
+        "assets/compiler_evidence_index.json: query_indexes.ui_buckets_by_bucket.unknown_ui_or_system"
+      ],
+      "original_evidence": [
+        "research/generated/ui_animation_coverage/ui_animation_classification.md: unknown_ui_or_system bucket_count=112, animation_count=111",
+        "assets/compiler_evidence_index.json: top unresolved examples are low-confidence unknown_ui_or_system records"
+      ],
+      "original_source_paths": [
+        "generated/ui_animation_coverage/ui_animation_classification.md",
+        "assets/compiler_evidence_index.json"
+      ]
+    }
+  },
+  "source_policy": {
+    "allowed_evidence_roots": [
+      "assets/compiler_evidence_index.json"
+    ],
+    "prohibited_roots": [
+      "G:/artSource",
+      "G:\\artSource",
+      "Perforce"
+    ],
+    "production_claim": "Proof-ready templates compile deterministic Spine 4.3 packages for review; they are not final production UI animation approval.",
+    "original_source_paths_are_metadata": true
+  },
+  "evidence_index": {
+    "path": "assets/compiler_evidence_index.json",
+    "schema": "claude_spine_compiler_evidence_index_v1"
+  }
+}

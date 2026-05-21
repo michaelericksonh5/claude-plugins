@@ -1,0 +1,11 @@
+node_modules/
+npm-debug.log*
+coverage/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+*.pem
+*credentials*
+id_rsa*
+id_ed25519*

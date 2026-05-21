@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "nb2node": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/nb2-mcp-server/dist/index.mjs"
+      ],
+      "env": {
+        "FAL_KEY": "${FAL_KEY:-}",
+        "GEMINI_API_KEY": "${GEMINI_API_KEY:-}",
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY:-}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY:-}",
+        "HTTP_PROXY": "${HTTP_PROXY:-}",
+        "HTTPS_PROXY": "${HTTPS_PROXY:-}",
+        "NO_PROXY": "${NO_PROXY:-}",
+        "NODE_EXTRA_CA_CERTS": "${NODE_EXTRA_CA_CERTS:-}",
+        "SSL_CERT_FILE": "${SSL_CERT_FILE:-}"
+      }
+    }
+  }
+}

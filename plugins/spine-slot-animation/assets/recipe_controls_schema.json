@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Spine Slot Animation Recipe Controls",
+  "description": "Bounded numerical controls the compiler accepts. All numeric fields are optional and default to 1.0. Unknown fields fail compilation by design.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "recipe_type": {
+      "type": "string",
+      "description": "Which recipe family the controls apply to. Defaults to hp_symbol when omitted.",
+      "enum": [
+        "hp_symbol",
+        "mp_symbol",
+        "lp_symbol",
+        "wild_symbol",
+        "scatter_symbol",
+        "bonus_symbol",
+        "bo_special_symbol",
+        "jackpot_symbol",
+        "special_feature_symbol",
+        "value_symbol",
+        "winframe_explode",
+        "meter",
+        "transition",
+        "celebration",
+        "avatar"
+      ]
+    },
+    "export_profile": {
+      "type": "string",
+      "description": "Target Spine timeline contract. v10_linear is accepted only by the legacy proof compiler and is rejected by the portable builder; omit entirely for default 4.3 linear output. Use spine_43_bezier only when intentionally opting into numeric Bezier arrays on supported numeric timelines. spine_42_bezier is accepted as a legacy alias.",
+      "enum": ["v10_linear", "spine_43_bezier", "spine_42_bezier"]
+    },
+    "bezier_preset": {
+      "type": "string",
+      "description": "Optional preset for export_profile=spine_43_bezier. The compiler expands the preset to numeric absolute handle arrays; it never emits named curve strings.",
+      "enum": ["ease_in", "ease_out", "ease_in_out", "overshoot", "settle"]
+    },
+    "bounce_strength": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Scales symbol land y-impact and x squash/overshoot magnitude. Default 1.0."
+    },
+    "land_duration_scale": {
+      "type": "number",
+      "minimum": 0.25,
+      "maximum": 3.0,
+      "description": "Multiplies land settle key times and total duration. Default 1.0."
+    },
+    "idle_duration_scale": {
+      "type": "number",
+      "minimum": 0.25,
+      "maximum": 3.0,
+      "description": "Multiplies idle loop duration and nonzero idle key times. Default 1.0."
+    },
+    "glow_intensity": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Scales glow slot alpha when a glow slot exists. Default 1.0. No-op when glow slot is missing."
+    },
+    "sparkle_intensity": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Scales sparkle slot alpha when a sparkle slot exists. Default 1.0. No-op when sparkle slot is missing."
+    },
+    "premium_intensity": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Scales lit/glass alpha and combines with glow, sparkle, and win pulse strength. Default 1.0."
+    },
+    "motion_strength": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Scales pulse magnitude and combines with bounce_strength for land. Default 1.0."
+    },
+    "feature_active_intensity": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Scales smart/feature-active loop intensity for families that emit a smart loop (BO/SF/JP/SC). Default 1.0. No-op when the recipe has no smart loop."
+    }
+  }
+}

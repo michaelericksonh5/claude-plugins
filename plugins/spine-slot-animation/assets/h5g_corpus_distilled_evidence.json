@@ -1,0 +1,296 @@
+{
+  "schema": "spine_slot_animation_h5g_corpus_distilled_evidence_v1",
+  "generated_at": "distilled-2026-05-19",
+  "purpose": "Portable checked-in H5G corpus and bakeoff evidence for recipe selection, rigging decisions, proposal reports, and claim boundaries without requiring the full H5G research workspace.",
+  "production_claim": "self_contained_distilled_evidence_only_not_production_approval",
+  "source_policy": {
+    "bundled_evidence_roots": [
+      "assets/h5g_corpus_distilled_evidence.json",
+      "references/h5g_corpus_distilled_knowledge.md"
+    ],
+    "original_source_paths_are_metadata_only": true,
+    "full_bakeoff_reruns": "optional_h5g_internal_validation_only",
+    "prohibited_writes": [
+      "G:/artSource",
+      "G:\\artSource",
+      "Perforce"
+    ]
+  },
+  "distilled_from": [
+    "research/generated/family_recipe_specs/family_recipe_specs.md",
+    "research/generated/coverage/animation_family_coverage.md",
+    "research/FULL_DEEP_ANIMATION_BAKEOFF_FINDINGS.md",
+    "research/generated/contextual_layer_interpretation/contextual_layer_interpretation.md",
+    "research/h5g_spine_capability_gap_matrix.md",
+    "assets/compiler_evidence_index.json",
+    "assets/ui_system_template_policy.json",
+    "references/capability_status.md"
+  ],
+  "summary": {
+    "families_covered": 15,
+    "review_gated_families": 2,
+    "proof_ready_count": 15,
+    "role_map_rows": 1053,
+    "role_map_review_gated": 45,
+    "one_click_enabled_rows": 145,
+    "source_body_crops": 12,
+    "deep_bakeoff_run": "full_deep_all_20260505_1513",
+    "deep_bakeoff_candidate_results": 2534,
+    "deep_bakeoff_compared_candidates": 766,
+    "deep_bakeoff_failed_candidates": 0,
+    "local_human_authored_json_references": 266
+  },
+  "families": [
+    {
+      "family": "hp_symbol",
+      "title": "HP Symbol",
+      "status": "proof_ready",
+      "support": "implemented",
+      "representative_animations": ["HP1idle", "HP1land", "HP2idle", "HP2land", "HP3idle", "HP3land", "HP4idle", "HP4land", "HP1win"],
+      "role_motion_expectations": ["premium win pulse", "long idle shimmer", "short land impact", "breathe loop where layered character parts exist"],
+      "evidence": {"game_count": 53, "export_count": 69, "animation_count": 2531, "distinct_animation_count": 469, "role_map_candidates": 236, "one_click_enabled": 98, "source_body_count": 12},
+      "known_gaps": ["proof scaffold is not a final production HP template", "bakeoff gaps include slot_attachment, scale, rotate, translate, slot_color, and deform"]
+    },
+    {
+      "family": "lp_symbol",
+      "title": "LP Symbol / General Symbols",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["LP1idle", "LP1land", "LP2idle", "LP2land", "LP3idle", "LP3land", "LP4idle", "LP4land"],
+      "role_motion_expectations": ["readable lower-intensity pulse", "idle shimmer", "compact land", "text-safe sheen for card/value-like layers"],
+      "evidence": {"game_count": 53, "export_count": 57, "animation_count": 3578, "distinct_animation_count": 786, "role_map_candidates": 258, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["needs broader one-click thumbnail/source-body coverage", "bakeoff gaps include slot_attachment, scale, rotate, translate, and slot_color"]
+    },
+    {
+      "family": "mp_symbol",
+      "title": "MP Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["MP1", "MP1idle", "MP1land"],
+      "role_motion_expectations": ["medium-intensity pulse", "idle shimmer", "readable land impact"],
+      "evidence": {"role_map_candidates": 4, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["no promoted full-corpus recipe category/count row yet", "needs production MP intensity validation against game art"]
+    },
+    {
+      "family": "bo_special_symbol",
+      "title": "BO / Special Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["BO1idle", "BO1land", "BO1smart", "SF1idle", "WD1idle", "WD1land", "BO1win", "SF1land"],
+      "role_motion_expectations": ["feature-style motion", "land impact", "short smart loop", "legacy BO-special/wild/special overlap must be disambiguated"],
+      "evidence": {"game_count": 63, "export_count": 158, "animation_count": 2497, "distinct_animation_count": 571, "role_map_candidates": 0},
+      "known_gaps": ["split legacy BO-special coverage from modern bonus/special-feature roles when production needs differ"]
+    },
+    {
+      "family": "wild_symbol",
+      "title": "Wild Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["WD1", "WD1idle", "WD1land"],
+      "role_motion_expectations": ["wild shimmer", "sparkle emphasis", "substitution-style land"],
+      "evidence": {"role_map_candidates": 77, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["no promoted full-corpus recipe category/count row yet", "needs dedicated corpus recipe promotion and thumbnails"]
+    },
+    {
+      "family": "special_feature_symbol",
+      "title": "Special Feature Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["SF1", "SF1idle", "SF1land", "SF1smart"],
+      "role_motion_expectations": ["feature-active pulse", "short smart loop", "feature landing beat"],
+      "evidence": {"role_map_candidates": 133, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["no promoted full-corpus recipe category/count row yet", "needs dedicated special-feature corpus rows"]
+    },
+    {
+      "family": "bonus_symbol",
+      "title": "Bonus Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["BO1", "BO1idle", "BO1land", "BO1smart"],
+      "role_motion_expectations": ["bonus-trigger active pulse", "feature glow", "decisive land"],
+      "evidence": {"role_map_candidates": 49, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["keep BO bonus trigger behavior separate from BL row-blocker UI/gameplay assets"]
+    },
+    {
+      "family": "jackpot_symbol",
+      "title": "Jackpot Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["JP1", "JP1idle", "JP1land", "JP1smart"],
+      "role_motion_expectations": ["premium jackpot pulse", "restrained shine", "high-value landing beat"],
+      "evidence": {"role_map_candidates": 136, "one_click_enabled": 47, "source_body_count": 0},
+      "known_gaps": ["broaden source-body coverage beyond current thumbnail-backed one-click rows"]
+    },
+    {
+      "family": "value_symbol",
+      "title": "Value Symbol / WYS",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["WYS1", "WYS1idle", "WYS1land"],
+      "role_motion_expectations": ["readable value pop", "restrained glow", "minimal text-safe motion"],
+      "evidence": {"role_map_candidates": 112, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["confirm WYS/WY naming and text/value layer requirements with production assets", "bakeoff gaps include slot_color, slot_attachment, translate, rotate, scale, and slot_twoColor"]
+    },
+    {
+      "family": "scatter_symbol",
+      "title": "Scatter Symbol",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["SC1", "SC1idle", "SC1land", "SC1smart"],
+      "role_motion_expectations": ["scatter-trigger pop", "readable emphasis", "compact land"],
+      "evidence": {"role_map_candidates": 3, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["human reference evidence exists but bakeoff selected no generated candidate in the full run", "needs more corpus/source-body evidence"]
+    },
+    {
+      "family": "winframe_explode",
+      "title": "WinFrame / Explode",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["WinFrame", "WinFrameidle", "WinFrameExplode"],
+      "role_motion_expectations": ["frame pulse", "VFX burst", "win impact semantics"],
+      "evidence": {"role_map_candidates": 0, "one_click_enabled": 0, "source_body_count": 0},
+      "known_gaps": ["not production full-frame compositing", "needs production frame/VFX layering, masking, and compositing rules"]
+    },
+    {
+      "family": "meter",
+      "title": "Meter",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["MeterIdle", "State1Collect", "State2Collect", "State3Collect", "State4Collect", "State5Collect", "landscape_tier1", "landscape_tier2", "landscape_tier3"],
+      "role_motion_expectations": ["state collect timing", "tier movement", "meter VFX bursts", "stateful template remains proof-only"],
+      "evidence": {"game_count": 53, "export_count": 85, "animation_count": 698, "distinct_animation_count": 165},
+      "known_gaps": ["production meter state, fill-mask, tier layout, reset, and loop contracts remain undefined"]
+    },
+    {
+      "family": "transition",
+      "title": "Transition",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["intro", "TransitionIdle", "outro", "FB_Transition", "SB_Transition", "totalwin", "freeGamesComplete", "WYS_intro", "landscape_intro_tier1"],
+      "role_motion_expectations": ["intro/outro timing", "feature transition motion", "screen VFX"],
+      "evidence": {"game_count": 62, "export_count": 169, "animation_count": 955, "distinct_animation_count": 181},
+      "known_gaps": ["production screen layout, masks, camera motion, and feature-state integration remain undefined"]
+    },
+    {
+      "family": "celebration",
+      "title": "Celebration",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["grandJackpot", "celebration_loop", "tier_1", "tier_2", "tier_3", "celebration_fx_1", "celebration_fx_2", "celebration_fx_3", "burst"],
+      "role_motion_expectations": ["jackpot/tier timing", "celebration loops", "large VFX bursts"],
+      "evidence": {"game_count": 45, "export_count": 76, "animation_count": 256, "distinct_animation_count": 91},
+      "known_gaps": ["production celebration layout, masking, tier-value overlays, and stop/loop contracts remain undefined"]
+    },
+    {
+      "family": "avatar",
+      "title": "Avatar",
+      "status": "proof_ready",
+      "support": "implemented_proof",
+      "representative_animations": ["State0Idle", "State0to1", "State1Awarded", "State1Close", "State1Idle", "State1to2", "State2Awarded", "State2Close"],
+      "role_motion_expectations": ["state idle", "state transition", "award/close acting beats", "game runtime owns persistent state and event consumption"],
+      "evidence": {"game_count": 17, "family_count": 10, "export_count": 17, "animation_count": 309, "distinct_animation_count": 46, "deform_observations": 148},
+      "known_gaps": ["not a production character rig or full runtime state machine", "large avatar bakeoff missing deltas include slot_attachment, slot_color, scale, translate, rotate, draw_order, and deform references"]
+    }
+  ],
+  "review_gated_families": [
+    {
+      "family": "blocker_or_bonus_symbol",
+      "status": "needs_review",
+      "reason": "Known BL row-blocker UI/gameplay rows exist, but no deterministic row-lock/break/unlock/reveal compiler contract exists.",
+      "evidence": {"role_map_candidates": 8}
+    },
+    {
+      "family": "non_symbol_or_unknown",
+      "status": "needs_review",
+      "reason": "Unresolved assets must be classified by visual/gameplay purpose or left outside the symbol compiler scope.",
+      "evidence": {"role_map_candidates": 37}
+    }
+  ],
+  "animation_intents": {
+    "loops": ["idle", "breathe", "smart", "MeterIdle", "TransitionIdle", "celebration_loop", "State<N>Idle"],
+    "settle_or_impacts": ["land", "win", "WinFrameExplode", "State<N>Awarded", "State<N>Close"],
+    "transitions": ["intro", "outro", "FB_Transition", "SB_Transition", "State<N>to<M>"],
+    "role_to_motion": {
+      "background": "root/static anchor unless a reviewed parallax template exists",
+      "character_body": "idle breathe, land settle, win lift or pulse; mesh candidate when bending is needed",
+      "head": "body-follow with bob, expression swaps, blink/laugh overlays",
+      "left_hand/right_hand/arm": "secondary wave or bounce follow-through; IK remains opt-in/reviewed",
+      "frame/frame_glow/glow": "frame pulse, shimmer, alpha/color emphasis",
+      "sheen/text/value_ball": "text sheen or value pop with minimal readability-safe motion",
+      "sparkle/additive_effect": "short sparkle or VFX burst; avoid production blend-mode claims",
+      "ui_part": "family-specific meter/transition/celebration/winframe proof template only"
+    }
+  },
+  "rig_slot_layer_evidence": {
+    "contextual_layer_summary": {
+      "symbols_interpreted": 17,
+      "layers_interpreted": 84,
+      "low_confidence_layers": 5,
+      "semantic_role_counts": {"background": 13, "character_body": 5, "head": 3, "eyes": 2, "frame": 2, "frame_glow": 2, "sheen": 27, "sparkle": 6, "text": 4, "value_ball": 7},
+      "rig_role_counts": {"additive_effect": 33, "character_part": 15, "frame_part": 4, "overlay": 4, "root_static": 13, "text_effect": 12, "ui_part": 3},
+      "animation_use_counts": {"idle_breathe": 84, "text_sheen": 32, "shimmer": 30, "bounce_followthrough": 19, "value_pop": 11, "sparkle": 6, "frame_pulse": 4, "wave": 4, "blink": 2}
+    },
+    "layer_guidance": [
+      "Use semantic parent hints for body/head/arm/frame/text instead of flattening everything under one rig bone.",
+      "Surface low-confidence and symbol-level-only sidecar matches for animator review.",
+      "Map effect layers to shimmer/text_sheen/frame_pulse/sparkle actions when the family supports them."
+    ]
+  },
+  "ui_system_buckets": {
+    "supported_proof_templates": ["meter", "transition", "celebration", "winframe_explode", "symbol_frame_glow"],
+    "review_only_buckets": ["button", "row_blocker", "background_parallax", "foreground_overlay", "vfx_only", "unknown_ui_or_system"],
+    "boundary": "Supported UI/system buckets produce proof templates and validation reports only; broad UI/background ambience and row blockers remain review-only."
+  },
+  "mesh_weight_deform_findings": {
+    "current_status": "review_required_helper_only",
+    "findings": [
+      "Mesh topology, weights, prune settings, and extreme-pose behavior require rigger review.",
+      "First-pass auto-bound weighted meshes are useful review artifacts but are not Spine Auto parity or final weight painting.",
+      "Deform timelines are not implemented and should stay sparse/reviewed when future cases require them.",
+      "No production mesh topology generation, linked mesh inheritance, or production deform authoring is approved."
+    ]
+  },
+  "production_export_runtime_boundaries": [
+    "Browser runtime preview proof is representative Spine Player acceptance, not target game runtime approval.",
+    "Native .spine creation is allowed only through Spine's official CLI import path when explicitly requested.",
+    "Production .skel export automation, license activation, Perforce submission, and source-art writes are blocked.",
+    "Manual production export remains gated by approved versions, license posture, browser-runtime evidence with hashes, target runtime acceptance, and art approval."
+  ],
+  "known_gaps": [
+    "Proof-ready means deterministic proof compilation and smoke validation exist; it does not mean production-ready animation.",
+    "Full bakeoff reruns are H5G-internal optional validation, not a dependency for Chris's core family/rigging guidance.",
+    "Exact local motion profile refresh is still needed after some compiler improvements.",
+    "Row blockers, broad background/UI ambience, generic VFX-only buckets, and unknown UI/system assets remain review-only.",
+    "Avatar runtime state, listener consumption, final acting, mesh topology, final weights, deform keys, and production export remain gated."
+  ],
+  "query_indexes": {
+    "families_by_family": {
+      "hp_symbol": 0,
+      "lp_symbol": 1,
+      "mp_symbol": 2,
+      "bo_special_symbol": 3,
+      "wild_symbol": 4,
+      "special_feature_symbol": 5,
+      "bonus_symbol": 6,
+      "jackpot_symbol": 7,
+      "value_symbol": 8,
+      "scatter_symbol": 9,
+      "winframe_explode": 10,
+      "meter": 11,
+      "transition": 12,
+      "celebration": 13,
+      "avatar": 14
+    },
+    "evidence_ids": {
+      "family_contracts": "assets/h5g_corpus_distilled_evidence.json:families",
+      "animation_intents": "assets/h5g_corpus_distilled_evidence.json:animation_intents",
+      "role_motion": "assets/h5g_corpus_distilled_evidence.json:animation_intents.role_to_motion",
+      "rig_slot_layer_roles": "assets/h5g_corpus_distilled_evidence.json:rig_slot_layer_evidence",
+      "ui_system_buckets": "assets/h5g_corpus_distilled_evidence.json:ui_system_buckets",
+      "avatar_state_evidence": "assets/h5g_corpus_distilled_evidence.json:families.avatar",
+      "mesh_weight_deform": "assets/h5g_corpus_distilled_evidence.json:mesh_weight_deform_findings",
+      "production_boundaries": "assets/h5g_corpus_distilled_evidence.json:production_export_runtime_boundaries",
+      "known_gaps": "assets/h5g_corpus_distilled_evidence.json:known_gaps"
+    }
+  }
+}
