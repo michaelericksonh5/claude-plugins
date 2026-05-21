@@ -118,5 +118,6 @@
       "tags": ["video", "ai-video", "veo", "veo3.1", "fal-ai", "gemini", "happy-horse", "seedance", "image-to-video", "text-to-video"]
     }
   ],
-  "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, token-saving guidance, and other game-production utilities."
+  "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, token-saving guidance, and other game-production utilities.",
+  "version": "2.0.0"
 }
