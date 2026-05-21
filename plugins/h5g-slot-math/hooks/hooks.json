@@ -1,0 +1,16 @@
+{
+  "description": "H5G slot math guardrails. Adds compact probability-first context only when the submitted prompt appears to involve slot math.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/slot-math-prompt-guard.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

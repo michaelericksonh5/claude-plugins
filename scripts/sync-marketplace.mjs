@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { inspect } from "node:util";
 
-const SYNC_FIELDS = ["description", "author", "license", "homepage", "repository"];
+const SYNC_FIELDS = ["version", "description", "author", "license", "homepage", "repository"];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -29,19 +29,9 @@ Options:
 }
 
 const originalText = await readFile(marketplacePath, "utf8");
-const originalCanonicalText = originalText.replace(/\r\n/g, "\n");
 const marketplace = JSON.parse(originalText);
 
 const changes = [];
-
-if (marketplace.metadata?.description && !marketplace.description) {
-  marketplace.description = marketplace.metadata.description;
-  changes.push("marketplace: moved metadata.description to description");
-}
-if ("metadata" in marketplace) {
-  delete marketplace.metadata;
-  changes.push("marketplace: removed metadata");
-}
 
 for (const plugin of marketplace.plugins ?? []) {
   const manifest = await readPluginManifest(plugin);
@@ -66,17 +56,11 @@ for (const plugin of marketplace.plugins ?? []) {
     changes.push(`${plugin.name}: removed source.sha`);
     delete plugin.source.sha;
   }
-
-  if ("version" in plugin) {
-    changes.push(`${plugin.name}: removed marketplace version`);
-    delete plugin.version;
-  }
-
 }
 
 const nextText = `${formatJson(marketplace)}\n`;
 
-if (nextText !== originalCanonicalText) {
+if (nextText !== originalText) {
   if (checkOnly) {
     console.error("marketplace.json is out of sync:");
     for (const change of changes) {
