@@ -4,19 +4,15 @@
     "name": "Michael Erickson (High 5 Games)",
     "email": "michael.erickson@high5games.com"
   },
-  "metadata": {
-    "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, token-saving guidance, and other game-production utilities."
-  },
   "plugins": [
     {
       "name": "skill-auditor",
       "description": "Audits a skill file or directory against an 8-dimension quality rubric. Produces a structured READY / NEEDS WORK / DRAFT report with specific, actionable findings on frontmatter, description quality, instruction clarity, reference integrity, completeness, output specification, evals coverage, and security.",
-      "version": "1.0.1",
       "author": {
         "name": "Michael Erickson (High 5 Games)",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/skill-auditor.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/skill-auditor" },
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
       "license": "MIT",
@@ -26,12 +22,11 @@
     {
       "name": "slot-art-creator-node",
       "description": "Generate, QA, and resize mobile slot machine art — symbols, UI, backgrounds, key art — with Nano Banana 2. Numbered slash-command workflow (/slot-step-00 through /slot-step-10), persistent project memory across sessions, key-art-anchored style consistency. Generation tools prefer Google Gemini (NB2), including nb2_smart_resize by default; fal.ai remains the fallback when only FAL_KEY is set and runs smart resize against a purpose-built NB Pro endpoint. Either key alone works. Node.js, no Python required.",
-      "version": "1.7.21",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/slot-art-creator-node" },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",
@@ -41,12 +36,11 @@
     {
       "name": "spine-slot-animation",
       "description": "Generate validated Spine 4.3 proof packages for slot-game symbols, UI/system elements, and avatar state rigs from natural-language notes, separated PNG layers, or PSD-export manifests. Includes deterministic atlas packing, loop/settle validation, browser preview proof, and guarded advanced features.",
-      "version": "0.1.4",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/Claude_Spine_Generator" },
       "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "license": "Proprietary",
@@ -56,12 +50,11 @@
     {
       "name": "spine-2-0-skills",
       "description": "Spine 2.0 Skills: validated Spine 4.3 slot-animation proof packages with a compact router skill plus manual compile, diagnose, validate, handoff, and rig-review workflows.",
-      "version": "2.0.1",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/Claude_Spine_Generator_Progressive" },
       "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive",
       "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive",
       "license": "Proprietary",
@@ -71,12 +64,11 @@
     {
       "name": "rtk-token-saver",
       "description": "H5G wrapper for RTK: teaches and verifies RTK-based shell output reduction while preserving Claude model-routing and context-hygiene guidance.",
-      "version": "0.3.1",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/rtk-token-saver.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/rtk-token-saver" },
       "homepage": "https://github.com/michaelericksonh5/rtk-token-saver",
       "repository": "https://github.com/michaelericksonh5/rtk-token-saver",
       "license": "MIT",
@@ -86,12 +78,11 @@
     {
       "name": "webgamedev-structure",
       "description": "GameForge folder structure and no-delete P4 artist workflow guidance for //webgamedev assets.",
-      "version": "0.2.1",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/webgamedev_structure.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/webgamedev_structure" },
       "homepage": "https://github.com/michaelericksonh5/webgamedev_structure",
       "repository": "https://github.com/michaelericksonh5/webgamedev_structure",
       "license": "MIT",
@@ -101,12 +92,11 @@
     {
       "name": "h5g-slot-math",
       "description": "Auto-invoked probability-first slot math skills for H5G: math/RTP/RMG modeling, dependent-probability audits, simulation verification, and rule installation.",
-      "version": "0.2.3",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/h5g-slot-math.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/h5g-slot-math" },
       "homepage": "https://github.com/michaelericksonh5/h5g-slot-math",
       "repository": "https://github.com/michaelericksonh5/h5g-slot-math",
       "license": "UNLICENSED",
@@ -116,17 +106,17 @@
     {
       "name": "ai-video-generator",
       "description": "AI video generation for Claude — Veo 3.1 (fal.ai + Gemini), Happy Horse (Alibaba), and Seedance 2.0 (ByteDance). Text-to-video, image-to-video, first+last frame, reference images, video extension. Supports fal.ai and Google Gemini API keys.",
-      "version": "1.3.1",
       "author": {
         "name": "Michael Erickson",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/ai-video-mcp-server.git" },
+      "source": { "source": "github", "repo": "michaelericksonh5/ai-video-mcp-server" },
       "homepage": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "repository": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "license": "MIT",
       "category": "creative",
       "tags": ["video", "ai-video", "veo", "veo3.1", "fal-ai", "gemini", "happy-horse", "seedance", "image-to-video", "text-to-video"]
     }
-  ]
+  ],
+  "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, token-saving guidance, and other game-production utilities."
 }
