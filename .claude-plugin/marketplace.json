@@ -1,5 +1,5 @@
 {
-  "name": "h5g-plugins",
+  "name": "h5g-plugins-v2",
   "owner": {
     "name": "Michael Erickson (High 5 Games)",
     "email": "michael.erickson@high5games.com"
@@ -12,12 +12,21 @@
         "name": "Michael Erickson (High 5 Games)",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/skill-auditor.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/skill-auditor.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/skill-auditor",
       "repository": "https://github.com/michaelericksonh5/skill-auditor",
       "license": "MIT",
       "category": "developer-tools",
-      "tags": ["skill-quality", "audit", "validation", "claude-skills", "developer-tools"]
+      "tags": [
+        "skill-quality",
+        "audit",
+        "validation",
+        "claude-skills",
+        "developer-tools"
+      ]
     },
     {
       "name": "slot-art-creator-node",
@@ -26,12 +35,22 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/slot-art-creator-node.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "repository": "https://github.com/michaelericksonh5/slot-art-creator-node",
       "license": "MIT",
       "category": "creative",
-      "tags": ["slot-machine", "image-generation", "nano-banana", "gemini", "fal-ai", "game-art"]
+      "tags": [
+        "slot-machine",
+        "image-generation",
+        "nano-banana",
+        "gemini",
+        "fal-ai",
+        "game-art"
+      ]
     },
     {
       "name": "spine-slot-animation",
@@ -40,12 +59,22 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator",
       "license": "Proprietary",
       "category": "creative",
-      "tags": ["spine", "slot-machine", "animation", "game-art", "validation", "claude-skills"]
+      "tags": [
+        "spine",
+        "slot-machine",
+        "animation",
+        "game-art",
+        "validation",
+        "claude-skills"
+      ]
     },
     {
       "name": "spine-2-0-skills",
@@ -54,12 +83,23 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive",
       "repository": "https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive",
       "license": "Proprietary",
       "category": "creative",
-      "tags": ["spine", "spine-2", "slot-machine", "animation", "game-art", "validation", "claude-skills"]
+      "tags": [
+        "spine",
+        "spine-2",
+        "slot-machine",
+        "animation",
+        "game-art",
+        "validation",
+        "claude-skills"
+      ]
     },
     {
       "name": "rtk-token-saver",
@@ -68,12 +108,24 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/rtk-token-saver.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/rtk-token-saver.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/rtk-token-saver",
       "repository": "https://github.com/michaelericksonh5/rtk-token-saver",
       "license": "MIT",
       "category": "developer-tools",
-      "tags": ["rtk", "token-usage", "cost-control", "shell-output", "compact-tldr", "model-routing", "context-hygiene", "claude-code"]
+      "tags": [
+        "rtk",
+        "token-usage",
+        "cost-control",
+        "shell-output",
+        "compact-tldr",
+        "model-routing",
+        "context-hygiene",
+        "claude-code"
+      ]
     },
     {
       "name": "webgamedev-structure",
@@ -82,12 +134,23 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/webgamedev_structure.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/webgamedev_structure.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/webgamedev_structure",
       "repository": "https://github.com/michaelericksonh5/webgamedev_structure",
       "license": "MIT",
       "category": "developer-tools",
-      "tags": ["gameforge", "perforce", "p4", "webgamedev", "game-art", "artist-workflow", "folder-structure"]
+      "tags": [
+        "gameforge",
+        "perforce",
+        "p4",
+        "webgamedev",
+        "game-art",
+        "artist-workflow",
+        "folder-structure"
+      ]
     },
     {
       "name": "h5g-slot-math",
@@ -96,12 +159,23 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/h5g-slot-math.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/h5g-slot-math.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/h5g-slot-math",
       "repository": "https://github.com/michaelericksonh5/h5g-slot-math",
       "license": "UNLICENSED",
       "category": "developer-tools",
-      "tags": ["slot-math", "probability", "rtp", "rmg", "monte-carlo", "par-sheet", "h5g"]
+      "tags": [
+        "slot-math",
+        "probability",
+        "rtp",
+        "rmg",
+        "monte-carlo",
+        "par-sheet",
+        "h5g"
+      ]
     },
     {
       "name": "ai-video-generator",
@@ -110,12 +184,26 @@
         "name": "Michael Erickson",
         "email": "michael.erickson@high5games.com"
       },
-      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/ai-video-mcp-server.git" },
+      "source": {
+        "source": "url",
+        "url": "https://github.com/michaelericksonh5/ai-video-mcp-server.git"
+      },
       "homepage": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "repository": "https://github.com/michaelericksonh5/ai-video-mcp-server",
       "license": "MIT",
       "category": "creative",
-      "tags": ["video", "ai-video", "veo", "veo3.1", "fal-ai", "gemini", "happy-horse", "seedance", "image-to-video", "text-to-video"]
+      "tags": [
+        "video",
+        "ai-video",
+        "veo",
+        "veo3.1",
+        "fal-ai",
+        "gemini",
+        "happy-horse",
+        "seedance",
+        "image-to-video",
+        "text-to-video"
+      ]
     }
   ],
   "description": "High 5 Games Claude plugin marketplace — slot art generation, skill auditing, token-saving guidance, and other game-production utilities."
