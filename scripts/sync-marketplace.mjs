@@ -29,6 +29,7 @@ Options:
 }
 
 const originalText = await readFile(marketplacePath, "utf8");
+const originalCanonicalText = originalText.replace(/\r\n/g, "\n");
 const marketplace = JSON.parse(originalText);
 
 const changes = [];
@@ -60,7 +61,7 @@ for (const plugin of marketplace.plugins ?? []) {
 
 const nextText = `${formatJson(marketplace)}\n`;
 
-if (nextText !== originalText) {
+if (nextText !== originalCanonicalText) {
   if (checkOnly) {
     console.error("marketplace.json is out of sync:");
     for (const change of changes) {
