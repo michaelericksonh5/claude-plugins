@@ -71,7 +71,7 @@
     {
       "name": "rtk-token-saver",
       "description": "H5G wrapper for RTK: teaches and verifies RTK-based shell output reduction while preserving Claude model-routing and context-hygiene guidance.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "author": {
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
@@ -106,7 +106,7 @@
         "name": "High 5 Games",
         "email": "michael.erickson@high5games.com"
       },
-      "source": "./plugins/h5g-slot-math",
+      "source": { "source": "url", "url": "https://github.com/michaelericksonh5/h5g-slot-math.git" },
       "homepage": "https://github.com/michaelericksonh5/h5g-slot-math",
       "repository": "https://github.com/michaelericksonh5/h5g-slot-math",
       "license": "UNLICENSED",
