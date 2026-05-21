@@ -72,7 +72,6 @@ for (const plugin of marketplace.plugins ?? []) {
     delete plugin.version;
   }
 
-  normalizeGitHubSource(plugin, changes);
 }
 
 const nextText = `${formatJson(marketplace)}\n`;
@@ -168,23 +167,6 @@ function isGitHubBackedSource(source) {
     || (source.source === "github" && typeof source.repo === "string")
     || (source.source === "git-subdir" && typeof source.url === "string" && typeof source.path === "string")
   );
-}
-
-function normalizeGitHubSource(plugin, changes) {
-  if (!plugin.source || typeof plugin.source !== "object" || plugin.source.source !== "url") {
-    return;
-  }
-
-  const repo = parseGitHubRepo(plugin.source.url);
-  if (!repo) {
-    return;
-  }
-
-  plugin.source = {
-    source: "github",
-    repo: `${repo.owner}/${repo.name}`,
-  };
-  changes.push(`${plugin.name}: normalized GitHub URL source`);
 }
 
 function getGitHubRepo(source) {
