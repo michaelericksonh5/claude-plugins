@@ -1,18 +1,22 @@
 name: Sync plugin versions
 
 # Keeps .claude-plugin/marketplace.json's `version` fields in lockstep with
-# each plugin's upstream plugin.json. Runs:
-#   - every 15 minutes  (catch normal plugin pushes)
-#   - on demand         (workflow_dispatch from the Actions tab)
-#   - on marketplace.json edits (catch newly added plugins immediately)
+# each plugin's upstream plugin.json. Runs on:
+#   - repository_dispatch (plugin-released) - fired by each plugin repo's
+#     notify-marketplace.yml workflow on tag push; near-instant sync
+#   - workflow_dispatch                     - manual trigger from Actions tab
+#   - push to main                          - catches marketplace.json edits
+#   - schedule */30                         - safety net for missed dispatches
 #
 # Commits and pushes back to the same branch using the built-in GITHUB_TOKEN.
 # Commits made by this workflow do NOT re-trigger the workflow, so no loop.
 
 on:
-  schedule:
-    - cron: '*/15 * * * *'
+  repository_dispatch:
+    types: [plugin-released]
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
   push:
     branches: [main]
     paths:
