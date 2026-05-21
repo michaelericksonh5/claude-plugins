@@ -25,14 +25,14 @@ From inside Claude Code, add the marketplace once, then install whichever plugin
 
 ```
 /plugin marketplace add https://github.com/michaelericksonh5/claude-plugins
-/plugin install skill-auditor@h5g-plugins
-/plugin install slot-art-creator-node@h5g-plugins
-/plugin install spine-slot-animation@h5g-plugins
-/plugin install spine-2-0-skills@h5g-plugins
-/plugin install rtk-token-saver@h5g-plugins
-/plugin install webgamedev-structure@h5g-plugins
-/plugin install h5g-slot-math@h5g-plugins
-/plugin install ai-video-generator@h5g-plugins
+/plugin install skill-auditor@h5g-plugins-v2
+/plugin install slot-art-creator-node@h5g-plugins-v2
+/plugin install spine-slot-animation@h5g-plugins-v2
+/plugin install spine-2-0-skills@h5g-plugins-v2
+/plugin install rtk-token-saver@h5g-plugins-v2
+/plugin install webgamedev-structure@h5g-plugins-v2
+/plugin install h5g-slot-math@h5g-plugins-v2
+/plugin install ai-video-generator@h5g-plugins-v2
 /slot-setup
 /rtk-token-saver
 ```
@@ -46,20 +46,20 @@ the workflow overview.
 
 Third-party marketplace auto-update is off by default. To receive plugin
 updates automatically after installing this marketplace, open `/plugin`, go to
-**Marketplaces**, select `h5g-plugins`, and enable auto-update.
+**Marketplaces**, select `h5g-plugins-v2`, and enable auto-update.
 
 Or from a shell:
 
 ```
 claude plugin marketplace add https://github.com/michaelericksonh5/claude-plugins
-claude plugin install skill-auditor@h5g-plugins
-claude plugin install slot-art-creator-node@h5g-plugins
-claude plugin install spine-slot-animation@h5g-plugins
-claude plugin install spine-2-0-skills@h5g-plugins
-claude plugin install rtk-token-saver@h5g-plugins
-claude plugin install webgamedev-structure@h5g-plugins
-claude plugin install h5g-slot-math@h5g-plugins
-claude plugin install ai-video-generator@h5g-plugins
+claude plugin install skill-auditor@h5g-plugins-v2
+claude plugin install slot-art-creator-node@h5g-plugins-v2
+claude plugin install spine-slot-animation@h5g-plugins-v2
+claude plugin install spine-2-0-skills@h5g-plugins-v2
+claude plugin install rtk-token-saver@h5g-plugins-v2
+claude plugin install webgamedev-structure@h5g-plugins-v2
+claude plugin install h5g-slot-math@h5g-plugins-v2
+claude plugin install ai-video-generator@h5g-plugins-v2
 ```
 
 ### Claude Cowork (Claude desktop app)
