@@ -10,7 +10,8 @@ collaborative mode inside the Claude desktop app).
 |---|---|
 | [`skill-auditor`](https://github.com/michaelericksonh5/skill-auditor) | Audits a Claude skill against an 8-dimension quality rubric and returns a **READY / NEEDS WORK / DRAFT** verdict with specific, actionable findings. Checks frontmatter validity, description trigger quality, instruction clarity, reference integrity, completeness (no TODO/FIXME/TBD), output specification, evals coverage, and security. |
 | [`slot-art-creator-node`](https://github.com/michaelericksonh5/slot-art-creator-node) | Generate, QA, and resize mobile slot art (symbols, UI, backgrounds, key art) with **two model families**: Nano Banana 2 (Gemini + fal.ai, 4 tools — the bulk of the workflow) and OpenAI's gpt-image-2 (2 tools — optional, for paytables, logos, banners with required copy, photorealistic 4K, and compositional multi-image edits). 13 slash commands (workflow + onboarding), persistent project memory, independent keys per family. |
-| [`spine-slot-animation`](https://github.com/michaelericksonh5/Claude_Spine_Generator) | Generate validated Spine 4.2 proof packages for slot-game symbols, UI/system elements, and avatar state rigs from natural-language notes, separated PNG layers, or PSD-export manifests. Deterministic compiler pipeline with atlas packing, loop/settle validation, browser preview proof, and guarded advanced features. |
+| [`spine-slot-animation`](https://github.com/michaelericksonh5/Claude_Spine_Generator) | Generate validated Spine 4.3 proof packages for slot-game symbols, UI/system elements, and avatar state rigs from natural-language notes, separated PNG layers, or PSD-export manifests. Deterministic compiler pipeline with atlas packing, loop/settle validation, browser preview proof, and guarded advanced features. |
+| [`spine-2-0-skills`](https://github.com/michaelericksonh5/Claude_Spine_Generator_Progressive) | Spine 2.0 skills for validated Spine 4.3 slot-animation proof packages, with a compact router plus manual compile, diagnose, validate, handoff, and rig-review workflows. |
 | [`rtk-token-saver`](https://github.com/michaelericksonh5/rtk-token-saver) | H5G wrapper around RTK for shell-output reduction, Compact TLDR replies, model-routing guidance, context hygiene, and conflict-safe setup checks. RTK remains the upstream engine; setup is explicit opt-in so it does not compete with other hooks during marketplace install. |
 | [`webgamedev-structure`](https://github.com/michaelericksonh5/webgamedev_structure) | GameForge folder structure and artist-safe Perforce workflow guidance for `//webgamedev` assets. Covers GLOBAL/LOCAL placement, source-vs-runtime rules, Spine/video/UI/audio/text paths, and optional preview-first P4 helpers. |
 | [`h5g-slot-math`](https://github.com/michaelericksonh5/h5g-slot-math) | Probability-first H5G slot math guidance for RTP/RMG work, dependent-probability audits, Monte Carlo/Test Harness verification, and Claude global/project rule installation. |
@@ -27,6 +28,7 @@ From inside Claude Code, add the marketplace once, then install whichever plugin
 /plugin install skill-auditor@h5g-plugins
 /plugin install slot-art-creator-node@h5g-plugins
 /plugin install spine-slot-animation@h5g-plugins
+/plugin install spine-2-0-skills@h5g-plugins
 /plugin install rtk-token-saver@h5g-plugins
 /plugin install webgamedev-structure@h5g-plugins
 /plugin install h5g-slot-math@h5g-plugins
@@ -42,6 +44,10 @@ on Mac/Linux — that uses hidden-input prompts so keys never echo to terminal
 logs and never touch chat). Once keys are configured, run `/slot-help` for
 the workflow overview.
 
+Third-party marketplace auto-update is off by default. To receive plugin
+updates automatically after installing this marketplace, open `/plugin`, go to
+**Marketplaces**, select `h5g-plugins`, and enable auto-update.
+
 Or from a shell:
 
 ```
@@ -49,6 +55,7 @@ claude plugin marketplace add michaelericksonh5/claude-plugins
 claude plugin install skill-auditor@h5g-plugins
 claude plugin install slot-art-creator-node@h5g-plugins
 claude plugin install spine-slot-animation@h5g-plugins
+claude plugin install spine-2-0-skills@h5g-plugins
 claude plugin install rtk-token-saver@h5g-plugins
 claude plugin install webgamedev-structure@h5g-plugins
 claude plugin install h5g-slot-math@h5g-plugins
@@ -63,7 +70,7 @@ claude plugin install ai-video-generator@h5g-plugins
 4. Click **Browse plugins**
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
 6. Enter the URL: `https://github.com/michaelericksonh5/claude-plugins`
-7. After it syncs, all seven plugins appear in the marketplace listing — click **Install** on whichever you want
+7. After it syncs, all eight plugins appear in the marketplace listing — click **Install** on whichever you want
 8. Open the plugin's settings and paste your API keys into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [slot-art README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) or [ai-video README](https://github.com/michaelericksonh5/ai-video-mcp-server#set-up-your-api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
 10. In any Cowork chat, run `/slot-help` for the slot-art workflow overview, `/slot-setup` for a guided check that your keys are configured correctly, or `/rtk-token-saver` for RTK/model/context hygiene guidance. Ask for GameForge or `//webgamedev` structure help after installing `webgamedev-structure`. Ask naturally about slot math, RTP, RMG, PAR sheets, or dependent probabilities after installing `h5g-slot-math`. RTK shell-output filtering itself is a Claude Code/local-machine workflow; Cowork gets guidance, not local hook enforcement.
@@ -84,11 +91,12 @@ claude-plugins/
     └── marketplace.json    # catalog: lists each plugin's GitHub repo source
 ```
 
-All seven active plugins are sourced from GitHub repos owned by `michaelericksonh5` and exposed through this marketplace:
+All eight active plugins are sourced from GitHub repos owned by `michaelericksonh5` and exposed through this marketplace:
 
 - `skill-auditor` from `michaelericksonh5/skill-auditor`
 - `slot-art-creator-node` from `michaelericksonh5/slot-art-creator-node`
 - `spine-slot-animation` from `michaelericksonh5/Claude_Spine_Generator`
+- `spine-2-0-skills` from `michaelericksonh5/Claude_Spine_Generator_Progressive`
 - `rtk-token-saver` from `michaelericksonh5/rtk-token-saver`
 - `webgamedev-structure` from `michaelericksonh5/webgamedev_structure`
 - `h5g-slot-math` from `./plugins/h5g-slot-math` bundled in this marketplace repo, with a standalone mirror at `michaelericksonh5/h5g-slot-math`
@@ -115,14 +123,31 @@ The older `token-saver` repo remains available at `michaelericksonh5/token_saver
      "version": "1.0.0"
    }
    ```
-4. Validate locally: `claude plugin validate .claude-plugin/marketplace.json`
-5. Commit and push. Users with the marketplace already added pick up new
+4. Sync marketplace metadata from plugin manifests:
+   `node scripts/sync-marketplace.mjs`
+5. Validate locally: `claude plugin validate .claude-plugin/marketplace.json`
+6. Commit and push. Users with the marketplace already added pick up new
    plugins on the next `/plugin marketplace update`.
 
-## Validation
+## Maintainer workflow
 
-Validate the marketplace manifest with the Claude CLI:
+Before publishing marketplace changes, sync metadata from each plugin's
+`.claude-plugin/plugin.json`, verify the catalog is current, and validate it
+with the Claude CLI:
 
 ```
-claude plugin validate .
+node scripts/sync-marketplace.mjs
+node scripts/sync-marketplace.mjs --check
+claude plugin validate .claude-plugin/marketplace.json
 ```
+
+When preparing marketplace changes before the plugin repos are pushed, point the
+sync check at local sibling checkouts:
+
+```
+node scripts/sync-marketplace.mjs --local-root C:/Users/merickson/Documents/Claude_Plugins --check
+```
+
+Keep URL sources branch-tracking unless there is a specific release-blocking
+reason to pin a commit. A `source.sha` pin prevents installed users from moving
+to newer plugin commits until the marketplace SHA changes.
