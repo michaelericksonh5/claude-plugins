@@ -24,7 +24,7 @@ collaborative mode inside the Claude desktop app).
 From inside Claude Code, add the marketplace once, then install whichever plugins you want:
 
 ```
-/plugin marketplace add https://github.com/michaelericksonh5/claude-plugins
+/plugin marketplace add https://github.com/michaelericksonh5/claude-plugins.git
 /plugin install skill-auditor@h5g-plugins-v2
 /plugin install slot-art-creator-node@h5g-plugins-v2
 /plugin install spine-slot-animation@h5g-plugins-v2
@@ -51,7 +51,7 @@ updates automatically after installing this marketplace, open `/plugin`, go to
 Or from a shell:
 
 ```
-claude plugin marketplace add https://github.com/michaelericksonh5/claude-plugins
+claude plugin marketplace add https://github.com/michaelericksonh5/claude-plugins.git
 claude plugin install skill-auditor@h5g-plugins-v2
 claude plugin install slot-art-creator-node@h5g-plugins-v2
 claude plugin install spine-slot-animation@h5g-plugins-v2
@@ -69,7 +69,7 @@ claude plugin install ai-video-generator@h5g-plugins-v2
 3. Click **Customize** in the left sidebar
 4. Click **Browse plugins**
 5. In the **Personal** section, click **+** > **Create plugin** > **Add marketplace**
-6. Enter the full GitHub URL: `https://github.com/michaelericksonh5/claude-plugins`
+6. Enter the full GitHub URL: `https://github.com/michaelericksonh5/claude-plugins.git`
 7. After it syncs, all eight plugins appear in the marketplace listing — click **Install** on whichever you want
 8. Open the plugin's settings and paste your API keys into the env-var fields (**not into chat** — credentials in chat get persisted in conversation history). See the [slot-art README](https://github.com/michaelericksonh5/slot-art-creator-node#api-keys) or [ai-video README](https://github.com/michaelericksonh5/ai-video-mcp-server#set-up-your-api-keys) for where to get keys.
 9. **Restart Claude Desktop once** so the MCP server picks up your keys
